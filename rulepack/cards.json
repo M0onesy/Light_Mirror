@@ -1,0 +1,3424 @@
+[
+  {
+    "id": "E1-value",
+    "error_type": "E1",
+    "name": "两侧披露区间相交",
+    "formula": "(observed_lower < expected_upper or (observed_lower == expected_upper and observed_lower_closed == ONE and expected_upper_closed == ONE)) and (expected_lower < observed_upper or (expected_lower == observed_upper and expected_lower_closed == ONE and observed_upper_closed == ONE))",
+    "inputs": {
+      "observed_lower": "currency",
+      "observed_upper": "currency",
+      "expected_lower": "currency",
+      "expected_upper": "currency",
+      "observed_lower_closed": "boolean",
+      "observed_upper_closed": "boolean",
+      "expected_lower_closed": "boolean",
+      "expected_upper_closed": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "按项目计划书第5.5节，两侧披露区间相交即相容核实；四舍五入区间为[v-q/2,v+q/2)，q按原披露单位和小数位计算。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "按项目计划书第5.5节，两侧披露区间相交即相容核实；四舍五入区间为[v-q/2,v+q/2)，q按原披露单位和小数位计算。",
+        "quote_sha256": "2fd9bc1003175e93394a3e6c21237fcede4c380b1a656e82feaef9ab0ab47615",
+        "clause_id": "MJ-METHOD-intervals"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E1-value",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "observed_lower": "119.995",
+          "observed_upper": "120.005",
+          "expected_lower": "119.999",
+          "expected_upper": "120.009",
+          "observed_lower_closed": "1",
+          "observed_upper_closed": "0",
+          "expected_lower_closed": "1",
+          "expected_upper_closed": "0"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "observed_lower": "119.995",
+          "observed_upper": "120.005",
+          "expected_lower": "119.999",
+          "expected_upper": "120.009",
+          "observed_lower_closed": "1",
+          "observed_upper_closed": "0",
+          "expected_lower_closed": "1",
+          "expected_upper_closed": "0"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "observed_lower": "119.995",
+          "observed_upper": "120.005",
+          "expected_lower": "120.005",
+          "expected_upper": "120.015",
+          "observed_lower_closed": "1",
+          "observed_upper_closed": "0",
+          "expected_lower_closed": "1",
+          "expected_upper_closed": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "4f5be35167708f1b8bb7f2357cdf4ee41d1818f8c71c2106bc023b6a2eca7e37"
+  },
+  {
+    "id": "E2-period",
+    "error_type": "E2",
+    "name": "期间一致",
+    "formula": "declared==actual",
+    "inputs": {
+      "declared": "identity",
+      "actual": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E2-period",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "declared": "2023",
+          "actual": "2023"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "declared": "2023",
+          "actual": "2023"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "declared": "2023",
+          "actual": "2022"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "1398832fe0b9b893e59261b2e36b03a8403d3a20eb7eeb998d1402efcfdd346d"
+  },
+  {
+    "id": "E3-caliber",
+    "error_type": "E3",
+    "name": "口径一致",
+    "formula": "declared==actual",
+    "inputs": {
+      "declared": "identity",
+      "actual": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E3-caliber",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "declared": "1",
+          "actual": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "declared": "1",
+          "actual": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "declared": "1",
+          "actual": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "0471dfaa828ce8073fc86d45ce49e6792ab23a60b5b4f44264cf3eb8a0bd6acf"
+  },
+  {
+    "id": "E4-unit",
+    "error_type": "E4",
+    "name": "万元换算",
+    "formula": "display*TEN_THOUSAND",
+    "inputs": {
+      "display": "currency"
+    },
+    "constants": {
+      "TEN_THOUSAND": {
+        "value": "10000",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E4-unit",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "display": "1"
+        },
+        "expected": "10000"
+      },
+      "negative": {
+        "operands": {
+          "display": "1"
+        },
+        "expected": "10001",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {},
+        "expected": null
+      }
+    },
+    "version_hash": "d0161c664cc90eb3ef8352be20d5ecde4ab39733ca222da3fded4c31473df9f8"
+  },
+  {
+    "id": "E5-yoy",
+    "error_type": "E5",
+    "name": "同比重算",
+    "formula": "(current-base)/base",
+    "inputs": {
+      "current": "currency",
+      "base": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "base"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E5-yoy",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current": "120",
+          "base": "100"
+        },
+        "expected": "0.2"
+      },
+      "negative": {
+        "operands": {
+          "current": "120",
+          "base": "100"
+        },
+        "expected": "1.2",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "current": "10",
+          "base": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "c122fbd52fe819d0952918f2d59ecf646d68e2a0b38686a3ad277d762c056770"
+  },
+  {
+    "id": "E6-citation",
+    "error_type": "E6",
+    "name": "引用对应",
+    "formula": "declared==actual",
+    "inputs": {
+      "declared": "identity",
+      "actual": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E6-citation",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "declared": "1",
+          "actual": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "declared": "1",
+          "actual": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "declared": "1",
+          "actual": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "15ff332cfa5ffea87757c82dcd0847e0fcd68349fad4fe1835748bff92275b5c"
+  },
+  {
+    "id": "E7-comparison",
+    "error_type": "E7",
+    "name": "披露区间大小比较",
+    "formula": "current>base or (current==base and permit_touch==ONE)",
+    "inputs": {
+      "current": "currency",
+      "base": "currency",
+      "permit_touch": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E7-comparison",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current": "120",
+          "base": "100",
+          "permit_touch": "0"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "current": "120",
+          "base": "100",
+          "permit_touch": "0"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "current": "100",
+          "base": "100",
+          "permit_touch": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "f50d7dbca8f30c1cdd13c157e1423212e147a662eb65f9248c865c000d34ea50"
+  },
+  {
+    "id": "E8-missing",
+    "error_type": "E8",
+    "name": "材料就绪",
+    "formula": "available==ONE",
+    "inputs": {
+      "available": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E8-missing",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "available": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "available": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "available": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "f1406c54cc8d9e4b496379ee134711db421aa4dab0d14bebdaa6e4a9aeb6bdff"
+  },
+  {
+    "id": "E9-version",
+    "error_type": "E9",
+    "name": "版本一致",
+    "formula": "selected==declared",
+    "inputs": {
+      "selected": "identity",
+      "declared": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "E9-version",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "selected": "2",
+          "declared": "2"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "selected": "2",
+          "declared": "2"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "selected": "2",
+          "declared": "1"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "eb0cd96ea11ac694b605b6a1a3a00adc89904ee09f34506b3c08680e4cc04979"
+  },
+  {
+    "id": "FIN-gross-margin",
+    "error_type": "signal",
+    "name": "毛利率",
+    "formula": "(REVENUE-COST)/REVENUE",
+    "inputs": {
+      "REVENUE": "currency",
+      "COST": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-gross-margin",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "REVENUE": "100",
+          "COST": "75"
+        },
+        "expected": "0.25"
+      },
+      "negative": {
+        "operands": {
+          "REVENUE": "100",
+          "COST": "75"
+        },
+        "expected": "1.25",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "REVENUE": "0",
+          "COST": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "e269405768f65e2eb540f0cd4644273d889089003a249c4b78affe04d18021c6"
+  },
+  {
+    "id": "FIN-net-margin",
+    "error_type": "signal",
+    "name": "净利率",
+    "formula": "NP/REVENUE",
+    "inputs": {
+      "NP": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-net-margin",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP": "13",
+          "REVENUE": "100"
+        },
+        "expected": "0.13"
+      },
+      "negative": {
+        "operands": {
+          "NP": "13",
+          "REVENUE": "100"
+        },
+        "expected": "1.13",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP": "13",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "692d7b70883990582c9f6ab752efa6baa0c31c84f869c55e1ea8acd127a7ccf8"
+  },
+  {
+    "id": "FIN-debt-ratio",
+    "error_type": "signal",
+    "name": "资产负债率",
+    "formula": "LIABILITIES/ASSETS",
+    "inputs": {
+      "LIABILITIES": "currency",
+      "ASSETS": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "ASSETS"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-debt-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "LIABILITIES": "40",
+          "ASSETS": "100"
+        },
+        "expected": "0.4"
+      },
+      "negative": {
+        "operands": {
+          "LIABILITIES": "40",
+          "ASSETS": "100"
+        },
+        "expected": "1.4",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "LIABILITIES": "40",
+          "ASSETS": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "29db4cb24c1c1edcffc4617a63cfed3cc7e07efeaa0b85b6ffbaca5db67240a8"
+  },
+  {
+    "id": "FIN-cash-content",
+    "error_type": "signal",
+    "name": "现金含量",
+    "formula": "CFO/NP",
+    "inputs": {
+      "CFO": "currency",
+      "NP": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "NP"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-cash-content",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CFO": "80",
+          "NP": "100"
+        },
+        "expected": "0.8"
+      },
+      "negative": {
+        "operands": {
+          "CFO": "80",
+          "NP": "100"
+        },
+        "expected": "1.8",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CFO": "80",
+          "NP": "-10"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "a7dd1adce70115fab0aa42e14c6e328d30a2f87de1c8a95beda478989da890a1"
+  },
+  {
+    "id": "FIN-non-recurring",
+    "error_type": "signal",
+    "name": "四输入扣非重算",
+    "formula": "NP_PARENT-(NRI_TOTAL-NRI_TAX_EFFECT-NRI_MINORITY)",
+    "inputs": {
+      "NP_PARENT": "currency",
+      "NRI_TOTAL": "currency",
+      "NRI_TAX_EFFECT": "currency",
+      "NRI_MINORITY": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "八、公司计算同非经常性损益相关的财务指标时，如涉及少\n数股东损益和所得税影响的，应当予以扣除。",
+    "basis_refs": [
+      {
+        "source_id": "NON_RECURRING_2023",
+        "quote": "八、公司计算同非经常性损益相关的财务指标时，如涉及少\n数股东损益和所得税影响的，应当予以扣除。",
+        "quote_sha256": "14a68742bf89bf05c744f3ca838fdc5ff2a312ce3f3818cab44fe0f1eeb6c5ac",
+        "clause_id": "NRI-8"
+      }
+    ],
+    "tier": "T2",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-non-recurring",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_PARENT": "130",
+          "NRI_TOTAL": "20",
+          "NRI_TAX_EFFECT": "3",
+          "NRI_MINORITY": "2"
+        },
+        "expected": "115"
+      },
+      "negative": {
+        "operands": {
+          "NP_PARENT": "130",
+          "NRI_TOTAL": "20",
+          "NRI_TAX_EFFECT": "3",
+          "NRI_MINORITY": "2"
+        },
+        "expected": "116",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP_PARENT": "130",
+          "NRI_TOTAL": "20"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "32c3df19ad46cc6a1053f261f8e436d7b90a0604927bc9e2bc782ada9777333b"
+  },
+  {
+    "id": "FIN-non-recurring-share",
+    "error_type": "signal",
+    "name": "扣非差额比例",
+    "formula": "(NP_PARENT-NP_PARENT_ADJ)/NP_PARENT",
+    "inputs": {
+      "NP_PARENT": "currency",
+      "NP_PARENT_ADJ": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "NP_PARENT"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-non-recurring-share",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_PARENT": "100",
+          "NP_PARENT_ADJ": "60"
+        },
+        "expected": "0.4"
+      },
+      "negative": {
+        "operands": {
+          "NP_PARENT": "100",
+          "NP_PARENT_ADJ": "60"
+        },
+        "expected": "1.4",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP_PARENT": "0",
+          "NP_PARENT_ADJ": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "678f8a484668b5255c00d15a57f0441bddf07bd19c3125402584b93b3bec2746"
+  },
+  {
+    "id": "FIN-ROE",
+    "error_type": "signal",
+    "name": "加权ROE披露值",
+    "formula": "ROE",
+    "inputs": {
+      "ROE": "ratio"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-ROE",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "ROE": "0.12"
+        },
+        "expected": "0.12"
+      },
+      "negative": {
+        "operands": {
+          "ROE": "0.12"
+        },
+        "expected": "1.12",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {},
+        "expected": null
+      }
+    },
+    "version_hash": "6a2f37f77d534eae1e274a0c322bf940727779e3d16a8b24e7612e38f34ee16e"
+  },
+  {
+    "id": "FIN-EPS",
+    "error_type": "signal",
+    "name": "基本每股收益",
+    "formula": "NP_PARENT/WEIGHTED_SHARES",
+    "inputs": {
+      "NP_PARENT": "currency",
+      "WEIGHTED_SHARES": "shares"
+    },
+    "constants": {},
+    "dimension": "currency_per_share",
+    "positive_inputs": [
+      "WEIGHTED_SHARES"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-EPS",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_PARENT": "100",
+          "WEIGHTED_SHARES": "50"
+        },
+        "expected": "2"
+      },
+      "negative": {
+        "operands": {
+          "NP_PARENT": "100",
+          "WEIGHTED_SHARES": "50"
+        },
+        "expected": "3",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP_PARENT": "100",
+          "WEIGHTED_SHARES": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "d3303ee0560ded7740cb8ef253f55d98b6771c1b3e87cc99f6d5d5ac6e564263"
+  },
+  {
+    "id": "FIN-qoq",
+    "error_type": "signal",
+    "name": "相邻单季环比",
+    "formula": "(current-base)/base",
+    "inputs": {
+      "current": "currency",
+      "base": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "base"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-qoq",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current": "15",
+          "base": "10"
+        },
+        "expected": "0.5"
+      },
+      "negative": {
+        "operands": {
+          "current": "15",
+          "base": "10"
+        },
+        "expected": "1.5",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "current": "15",
+          "base": "-10"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "4274cd06ac92a930c550343426b11b7b726cff52d5a1960021017ea2482a4ef8"
+  },
+  {
+    "id": "FIN-single-quarter",
+    "error_type": "signal",
+    "name": "同版本累计推单季",
+    "formula": "cumulative-prior_cumulative",
+    "inputs": {
+      "cumulative": "currency",
+      "prior_cumulative": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-single-quarter",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "cumulative": "120",
+          "prior_cumulative": "90"
+        },
+        "expected": "30"
+      },
+      "negative": {
+        "operands": {
+          "cumulative": "120",
+          "prior_cumulative": "90"
+        },
+        "expected": "31",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {},
+        "expected": null
+      }
+    },
+    "version_hash": "e0f9a28123bfba0ea2098e973ed369343a360473f1f8cadad8a78a09b55b74ed"
+  },
+  {
+    "id": "FIN-pp-difference",
+    "error_type": "signal",
+    "name": "百分点差",
+    "formula": "current-base",
+    "inputs": {
+      "current": "ratio",
+      "base": "ratio"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-pp-difference",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current": "0.25",
+          "base": "0.20"
+        },
+        "expected": "0.05"
+      },
+      "negative": {
+        "operands": {
+          "current": "0.25",
+          "base": "0.20"
+        },
+        "expected": "1.05",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {},
+        "expected": null
+      }
+    },
+    "version_hash": "bd7d07294cfed315eecf7c11b5d5b8bdf97bafea95dd015cdbe87e5dadef2261"
+  },
+  {
+    "id": "FIN-growth-direction",
+    "error_type": "signal",
+    "name": "变动方向",
+    "formula": "current>base",
+    "inputs": {
+      "current": "currency",
+      "base": "currency"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-growth-direction",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current": "-80",
+          "base": "-114"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "current": "-80",
+          "base": "-114"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "current": "1",
+          "base": "1"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "ef664e3c5cd1e9bd2a8fedfa55b59cc6ade17bd32a9584b32f731b97c9b3d048"
+  },
+  {
+    "id": "FIN-divergence",
+    "error_type": "signal",
+    "name": "利润现金流方向背离",
+    "formula": "(NP_CURRENT-NP_BASE)/(abs(NP_BASE)+abs(NP_CURRENT))*(CFO_CURRENT-CFO_BASE)/(abs(CFO_BASE)+abs(CFO_CURRENT))<ZERO",
+    "inputs": {
+      "NP_CURRENT": "currency",
+      "NP_BASE": "currency",
+      "CFO_CURRENT": "currency",
+      "CFO_BASE": "currency"
+    },
+    "constants": {
+      "ZERO": {
+        "value": "0",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-divergence",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_CURRENT": "20",
+          "NP_BASE": "10",
+          "CFO_CURRENT": "5",
+          "CFO_BASE": "10"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "NP_CURRENT": "20",
+          "NP_BASE": "10",
+          "CFO_CURRENT": "5",
+          "CFO_BASE": "10"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {},
+        "expected": null
+      }
+    },
+    "version_hash": "ce74bcf74cd9e8e6a6e671f97a91fb214fb9e6f1fda32a542b283dc38643db0e"
+  },
+  {
+    "id": "FIN-low-cash-content",
+    "error_type": "signal",
+    "name": "低现金含量登记参数",
+    "formula": "CFO/NP<threshold",
+    "inputs": {
+      "CFO": "currency",
+      "NP": "currency",
+      "threshold": "ratio"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [
+      "NP"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-low-cash-content",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CFO": "30",
+          "NP": "100",
+          "threshold": "0.5"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "CFO": "30",
+          "NP": "100",
+          "threshold": "0.5"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CFO": "1",
+          "NP": "0",
+          "threshold": "0.5"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "837cb6b8040a3bba181e06ae09bce66dbe3fedd53dff36068eeb9e2dc05e0648"
+  },
+  {
+    "id": "FIN-high-nri-share",
+    "error_type": "signal",
+    "name": "高扣非差额登记参数",
+    "formula": "abs((NP_PARENT-NP_PARENT_ADJ)/NP_PARENT)>threshold",
+    "inputs": {
+      "NP_PARENT": "currency",
+      "NP_PARENT_ADJ": "currency",
+      "threshold": "ratio"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [
+      "NP_PARENT"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-high-nri-share",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_PARENT": "100",
+          "NP_PARENT_ADJ": "60",
+          "threshold": "0.30"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "NP_PARENT": "100",
+          "NP_PARENT_ADJ": "60",
+          "threshold": "0.30"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP_PARENT": "0",
+          "NP_PARENT_ADJ": "0",
+          "threshold": "0.30"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "c2b6d7cd2f288dcd0c0b180c07f06bc2080ea6447611bc08752bfad1c819888c"
+  },
+  {
+    "id": "TIME-latest-as-of",
+    "error_type": "signal",
+    "name": "公告日截断",
+    "formula": "publish_day<=cutoff_day",
+    "inputs": {
+      "publish_day": "identity",
+      "cutoff_day": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "TIME-latest-as-of",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "publish_day": "10",
+          "cutoff_day": "11"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "publish_day": "10",
+          "cutoff_day": "11"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "publish_day": "12",
+          "cutoff_day": "11"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "aba2795bd464ef7d2e2309da31e199987a1f33957edfd75a61f07c8bff13b04e"
+  },
+  {
+    "id": "TIME-same-report",
+    "error_type": "signal",
+    "name": "同报告比较数",
+    "formula": "current_doc==base_doc",
+    "inputs": {
+      "current_doc": "identity",
+      "base_doc": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "TIME-same-report",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current_doc": "1",
+          "base_doc": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "current_doc": "1",
+          "base_doc": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "current_doc": "1",
+          "base_doc": "2"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "c48079a8a2053436a51dcf57b70b3b75e05978dc3fc20a8df777f22bf00a9923"
+  },
+  {
+    "id": "TIME-pinned",
+    "error_type": "signal",
+    "name": "声明出处指定报告",
+    "formula": "declared_doc==fact_doc",
+    "inputs": {
+      "declared_doc": "identity",
+      "fact_doc": "identity"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "TIME-pinned",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "declared_doc": "1",
+          "fact_doc": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "declared_doc": "1",
+          "fact_doc": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "declared_doc": "1",
+          "fact_doc": "2"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "8dc8b71636f9f058c2b4499f985d81cd10dc1a1f1d30923049d2174ac563e7fd"
+  },
+  {
+    "id": "CHANGE-policy",
+    "error_type": "signal",
+    "name": "政策变更触发审查",
+    "formula": "explicit_disclosure==ONE",
+    "inputs": {
+      "explicit_disclosure": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "企业根据法律、行政法规或者国家统一的会计制度等要求变更会计政策的，应当按照国家相关会计规定执行。会计政策变更能够提供更可靠、更相关的会计信息的，应当采用追溯调整法处理，将会计政策变更累积影响数调整列报前期最早期初留存收益，其他相关项目的期初余额和列报前期披露的其他比较数据也应当一并调整，但确定该项会计政策变更累积影响数不切实可行的除外。追溯调整法，是指对某项交易或事项变更会计政策，视同该项交易或事项初次发生时即采用变更后的会计政策，并以此对财务报表相关项目进行调整的方法。会计政策变更累积影响数，是指按照变更后的会计政策对以前各期追溯计算的列报前期最早期初留存收益应有金额与现有金额之间的差额。",
+    "basis_refs": [
+      {
+        "source_id": "CAS28",
+        "quote": "企业根据法律、行政法规或者国家统一的会计制度等要求变更会计政策的，应当按照国家相关会计规定执行。会计政策变更能够提供更可靠、更相关的会计信息的，应当采用追溯调整法处理，将会计政策变更累积影响数调整列报前期最早期初留存收益，其他相关项目的期初余额和列报前期披露的其他比较数据也应当一并调整，但确定该项会计政策变更累积影响数不切实可行的除外。追溯调整法，是指对某项交易或事项变更会计政策，视同该项交易或事项初次发生时即采用变更后的会计政策，并以此对财务报表相关项目进行调整的方法。会计政策变更累积影响数，是指按照变更后的会计政策对以前各期追溯计算的列报前期最早期初留存收益应有金额与现有金额之间的差额。",
+        "quote_sha256": "156bea6895ad71c39025b4ca857e43dabb8fb149c9afb00a2166112d03679450",
+        "clause_id": "CAS28-六"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "CHANGE-policy",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "explicit_disclosure": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "explicit_disclosure": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "explicit_disclosure": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "106bb0713d5f02126e8dd412f1686cd51319547e6551f27eacae955453e6fb02"
+  },
+  {
+    "id": "CHANGE-estimate",
+    "error_type": "signal",
+    "name": "估计变更未来适用",
+    "formula": "explicit_disclosure==ONE",
+    "inputs": {
+      "explicit_disclosure": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "企业对会计估计变更应当采用未来适用法处理。会计估计变更仅影响变更当期的，其影响数应当在变更当期予以确认；既影响变更当期又影响未来期间的，其影响数应当在变更当期和未来期间予以确认。",
+    "basis_refs": [
+      {
+        "source_id": "CAS28",
+        "quote": "企业对会计估计变更应当采用未来适用法处理。会计估计变更仅影响变更当期的，其影响数应当在变更当期予以确认；既影响变更当期又影响未来期间的，其影响数应当在变更当期和未来期间予以确认。",
+        "quote_sha256": "fe5bea76b8ef58de73661b42d320ae4430d93098847c697bc0bc99a58d0fe2b6",
+        "clause_id": "CAS28-九"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "CHANGE-estimate",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "explicit_disclosure": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "explicit_disclosure": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "explicit_disclosure": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "e9f017fcdd05896063cee8da8105551c3da5aba154ec347d5449637f360b31b8"
+  },
+  {
+    "id": "CHANGE-error",
+    "error_type": "signal",
+    "name": "差错更正触发双版本",
+    "formula": "explicit_disclosure==ONE",
+    "inputs": {
+      "explicit_disclosure": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio",
+        "authority": "MJ-METHOD"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "企业应当采用追溯重述法更正重要的前期差错，但确定前期差错累积影响数不切实可行的除外。追溯重述法，是指在发现前期差错时，视同该项前期差错从未发生过，从而对财务报表相关项目进行更正的方法。",
+    "basis_refs": [
+      {
+        "source_id": "CAS28",
+        "quote": "企业应当采用追溯重述法更正重要的前期差错，但确定前期差错累积影响数不切实可行的除外。追溯重述法，是指在发现前期差错时，视同该项前期差错从未发生过，从而对财务报表相关项目进行更正的方法。",
+        "quote_sha256": "e0a8551aebddf5c61de38f0b6dcd02bef7d2682d00c694aa971b4b0ed921176f",
+        "clause_id": "CAS28-十二"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.5.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "CHANGE-error",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "explicit_disclosure": "1"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "explicit_disclosure": "1"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "explicit_disclosure": "0"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "f482bbbc0f2614fa9c03d384c934029baa339a9959a1c32cb9977f0b45ed4805"
+  },
+  {
+    "id": "FIN-parent-net-margin",
+    "error_type": "signal",
+    "name": "归母净利率",
+    "formula": "NP_PARENT/REVENUE",
+    "inputs": {
+      "NP_PARENT": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-parent-net-margin",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_PARENT": "-10",
+          "REVENUE": "100"
+        },
+        "expected": "-0.1"
+      },
+      "negative": {
+        "operands": {
+          "NP_PARENT": "-10",
+          "REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP_PARENT": "-10",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "3eb800d0288c09795085b40e7f4f2b69ac87ce3b8a1a8e8177a9c4ef46442ad3"
+  },
+  {
+    "id": "FIN-current-ratio",
+    "error_type": "signal",
+    "name": "流动比率",
+    "formula": "CURRENT_ASSETS/CURRENT_LIABILITIES",
+    "inputs": {
+      "CURRENT_ASSETS": "currency",
+      "CURRENT_LIABILITIES": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "CURRENT_LIABILITIES"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-current-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CURRENT_ASSETS": "200",
+          "CURRENT_LIABILITIES": "100"
+        },
+        "expected": "2"
+      },
+      "negative": {
+        "operands": {
+          "CURRENT_ASSETS": "200",
+          "CURRENT_LIABILITIES": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CURRENT_ASSETS": "200",
+          "CURRENT_LIABILITIES": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "6e9b697d1de4423e9e113a96395ff5022a47b4af39ef2917ce1dd2dee1a71412"
+  },
+  {
+    "id": "FIN-quick-ratio",
+    "error_type": "signal",
+    "name": "速动比率：流动资产减存货",
+    "formula": "(CURRENT_ASSETS-INVENTORY)/CURRENT_LIABILITIES",
+    "inputs": {
+      "CURRENT_ASSETS": "currency",
+      "INVENTORY": "currency",
+      "CURRENT_LIABILITIES": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "CURRENT_LIABILITIES"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-quick-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CURRENT_ASSETS": "200",
+          "INVENTORY": "50",
+          "CURRENT_LIABILITIES": "100"
+        },
+        "expected": "1.5"
+      },
+      "negative": {
+        "operands": {
+          "CURRENT_ASSETS": "200",
+          "INVENTORY": "50",
+          "CURRENT_LIABILITIES": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CURRENT_ASSETS": "200",
+          "INVENTORY": "50",
+          "CURRENT_LIABILITIES": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "5340411dafa367f4065044d6aa0da37c9c4b2e17f55c5c3418345be17f2f60a1"
+  },
+  {
+    "id": "FIN-selling-expense-ratio",
+    "error_type": "signal",
+    "name": "销售费用率",
+    "formula": "EXP_SELLING/REVENUE",
+    "inputs": {
+      "EXP_SELLING": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-selling-expense-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "EXP_SELLING": "5",
+          "REVENUE": "100"
+        },
+        "expected": "0.05"
+      },
+      "negative": {
+        "operands": {
+          "EXP_SELLING": "5",
+          "REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "EXP_SELLING": "5",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "e2fff106c12175b3937631d0939bab7ea0243a6adf4a6786329120976b4415b1"
+  },
+  {
+    "id": "FIN-admin-expense-ratio",
+    "error_type": "signal",
+    "name": "管理费用率",
+    "formula": "EXP_ADMIN/REVENUE",
+    "inputs": {
+      "EXP_ADMIN": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-admin-expense-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "EXP_ADMIN": "5",
+          "REVENUE": "100"
+        },
+        "expected": "0.05"
+      },
+      "negative": {
+        "operands": {
+          "EXP_ADMIN": "5",
+          "REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "EXP_ADMIN": "5",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "fcfaa4eeaead53717ceab9578ed72469128674770ef2e4e6e1f6caa241bac938"
+  },
+  {
+    "id": "FIN-rd-expense-ratio",
+    "error_type": "signal",
+    "name": "研发费用率",
+    "formula": "EXP_RD/REVENUE",
+    "inputs": {
+      "EXP_RD": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-rd-expense-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "EXP_RD": "5",
+          "REVENUE": "100"
+        },
+        "expected": "0.05"
+      },
+      "negative": {
+        "operands": {
+          "EXP_RD": "5",
+          "REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "EXP_RD": "5",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "4654e584d604b330cfd11d1e4e4dc9894470b76b04a82f6896cdfaeac734d39c"
+  },
+  {
+    "id": "FIN-finance-expense-ratio",
+    "error_type": "signal",
+    "name": "财务费用率",
+    "formula": "EXP_FINANCE/REVENUE",
+    "inputs": {
+      "EXP_FINANCE": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-finance-expense-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "EXP_FINANCE": "5",
+          "REVENUE": "100"
+        },
+        "expected": "0.05"
+      },
+      "negative": {
+        "operands": {
+          "EXP_FINANCE": "5",
+          "REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "EXP_FINANCE": "5",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "b0ff4144b933e2793687b489975fbd6808fd4a0714e4b18ce5c8e15decb5af4c"
+  },
+  {
+    "id": "FIN-receivables-notes-sum",
+    "error_type": "signal",
+    "name": "应收票据及应收账款合计",
+    "formula": "AR+NOTES_RECEIVABLE",
+    "inputs": {
+      "AR": "currency",
+      "NOTES_RECEIVABLE": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "票据账款合计仅适用于原文明示应收票据及应收账款或应付票据及应付账款的组成。分别加总同一披露报告内、同公司、期间、币种和报表口径的票据与账款账面金额；缺少任一项不能默认零，低置信、来源冲突或披露日期未知不能通过加总绕过。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "票据账款合计仅适用于原文明示应收票据及应收账款或应付票据及应付账款的组成。分别加总同一披露报告内、同公司、期间、币种和报表口径的票据与账款账面金额；缺少任一项不能默认零，低置信、来源冲突或披露日期未知不能通过加总绕过。",
+        "quote_sha256": "312ef602fbba2225858b01707001dad553fb5dffffbf9ab1a236750be6bf8244",
+        "clause_id": "FIN-receivables-notes-sum-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "原文明确科目组成；同公司、期间、币种、报表口径及同报告版本；每项有原始证据；缺失不默认零",
+    "conflict_key": "FIN-receivables-notes-sum",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "AR": "40",
+          "NOTES_RECEIVABLE": "2"
+        },
+        "expected": "42"
+      },
+      "negative": {
+        "operands": {
+          "AR": "40",
+          "NOTES_RECEIVABLE": "2"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "AR": "0",
+          "NOTES_RECEIVABLE": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "9635ff6fcf2eeddcdfc53c1935ef464bd225ab4099a280317163d3df097fc2cd"
+  },
+  {
+    "id": "FIN-payables-notes-sum",
+    "error_type": "signal",
+    "name": "应付票据及应付账款合计",
+    "formula": "AP+NOTES_PAYABLE",
+    "inputs": {
+      "AP": "currency",
+      "NOTES_PAYABLE": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "票据账款合计仅适用于原文明示应收票据及应收账款或应付票据及应付账款的组成。分别加总同一披露报告内、同公司、期间、币种和报表口径的票据与账款账面金额；缺少任一项不能默认零，低置信、来源冲突或披露日期未知不能通过加总绕过。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "票据账款合计仅适用于原文明示应收票据及应收账款或应付票据及应付账款的组成。分别加总同一披露报告内、同公司、期间、币种和报表口径的票据与账款账面金额；缺少任一项不能默认零，低置信、来源冲突或披露日期未知不能通过加总绕过。",
+        "quote_sha256": "312ef602fbba2225858b01707001dad553fb5dffffbf9ab1a236750be6bf8244",
+        "clause_id": "FIN-payables-notes-sum-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "原文明确科目组成；同公司、期间、币种、报表口径及同报告版本；每项有原始证据；缺失不默认零",
+    "conflict_key": "FIN-payables-notes-sum",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "AP": "60",
+          "NOTES_PAYABLE": "20"
+        },
+        "expected": "80"
+      },
+      "negative": {
+        "operands": {
+          "AP": "60",
+          "NOTES_PAYABLE": "20"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "AP": "0",
+          "NOTES_PAYABLE": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "b468c1bce18e06b29174f50c26f99ee9afbd7853bf37c2e2b6b91b939fa257da"
+  },
+  {
+    "id": "FIN-consolidated-equity-sum",
+    "error_type": "signal",
+    "name": "合并所有者权益合计",
+    "formula": "EQUITY_PARENT+EQUITY_MINORITY",
+    "inputs": {
+      "EQUITY_PARENT": "currency",
+      "EQUITY_MINORITY": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "合并权益合计只在合并报表范围内采用归属于母公司所有者权益与少数股东权益之和。各项必须来自同报告、相同期间、币种和原始列版本；母公司报表不得使用此合成公式。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "合并权益合计只在合并报表范围内采用归属于母公司所有者权益与少数股东权益之和。各项必须来自同报告、相同期间、币种和原始列版本；母公司报表不得使用此合成公式。",
+        "quote_sha256": "9df20c604e0f698a270b3e8351bc35d03cf08877f04a57e0740a410e62c65eba",
+        "clause_id": "FIN-consolidated-equity-sum-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "原文明确科目组成；同公司、期间、币种、报表口径及同报告版本；每项有原始证据；缺失不默认零；只适用于合并报表，母公司口径不可使用归母与少数股东合成",
+    "conflict_key": "FIN-consolidated-equity-sum",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "EQUITY_PARENT": "90",
+          "EQUITY_MINORITY": "10"
+        },
+        "expected": "100"
+      },
+      "negative": {
+        "operands": {
+          "EQUITY_PARENT": "90",
+          "EQUITY_MINORITY": "10"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "EQUITY_PARENT": "0",
+          "EQUITY_MINORITY": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "205d294307c54af8cb88dde8edead2cb0e64e256d48264e7fe4f5a84474ce8b2"
+  },
+  {
+    "id": "FIN-liabilities-equity-sum",
+    "error_type": "signal",
+    "name": "负债和所有者权益合计",
+    "formula": "LIABILITIES+EQUITY",
+    "inputs": {
+      "LIABILITIES": "currency",
+      "EQUITY": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "负债权益合计按原文明示的负债与所有者权益组成加总同报告各项金额。合并权益在没有单独合计披露且各项完整时可由登记的合并权益公式计算；所有子公式、操作数及区间必须保留，不得仅凭资产总额相等反推组成。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "负债权益合计按原文明示的负债与所有者权益组成加总同报告各项金额。合并权益在没有单独合计披露且各项完整时可由登记的合并权益公式计算；所有子公式、操作数及区间必须保留，不得仅凭资产总额相等反推组成。",
+        "quote_sha256": "78705d30609debae5ee2c03da4f30c62c8af26fd46a54eaab0135da0540843ef",
+        "clause_id": "FIN-liabilities-equity-sum-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "原文明确科目组成；同公司、期间、币种、报表口径及同报告版本；每项有原始证据；缺失不默认零",
+    "conflict_key": "FIN-liabilities-equity-sum",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "LIABILITIES": "60",
+          "EQUITY": "40"
+        },
+        "expected": "100"
+      },
+      "negative": {
+        "operands": {
+          "LIABILITIES": "60",
+          "EQUITY": "40"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "LIABILITIES": "0",
+          "EQUITY": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "1fbfff88242b2e7c9fbf6204c6e9b571031ede899e8fddbdf13e768e1ed59cba"
+  },
+  {
+    "id": "FIN-period-expense-ratio",
+    "error_type": "signal",
+    "name": "明确四项期间费用率",
+    "formula": "(EXP_SELLING+EXP_ADMIN+EXP_RD+EXP_FINANCE)/REVENUE",
+    "inputs": {
+      "EXP_SELLING": "currency",
+      "EXP_ADMIN": "currency",
+      "EXP_RD": "currency",
+      "EXP_FINANCE": "currency",
+      "REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-period-expense-ratio",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "EXP_SELLING": "5",
+          "EXP_ADMIN": "5",
+          "EXP_RD": "5",
+          "EXP_FINANCE": "5",
+          "REVENUE": "100"
+        },
+        "expected": "0.2"
+      },
+      "negative": {
+        "operands": {
+          "EXP_SELLING": "5",
+          "EXP_ADMIN": "5",
+          "EXP_RD": "5",
+          "EXP_FINANCE": "5",
+          "REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "EXP_SELLING": "5",
+          "EXP_ADMIN": "5",
+          "EXP_RD": "5",
+          "EXP_FINANCE": "5",
+          "REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "42fae759e63e09e392f6fbdab6de0f2cd02d390eb7fb4769ac722b2438277d8d"
+  },
+  {
+    "id": "FIN-asset-turnover",
+    "error_type": "signal",
+    "name": "总资产周转率：平均资产",
+    "formula": "REVENUE/((ASSETS_START+ASSETS_END)*HALF)",
+    "inputs": {
+      "REVENUE": "currency",
+      "ASSETS_START": "currency",
+      "ASSETS_END": "currency"
+    },
+    "constants": {
+      "HALF": {
+        "value": "0.5",
+        "dimension": "ratio"
+      }
+    },
+    "dimension": "ratio",
+    "positive_inputs": [
+      "ASSETS_START",
+      "ASSETS_END"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-asset-turnover",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "REVENUE": "200",
+          "ASSETS_START": "100",
+          "ASSETS_END": "100"
+        },
+        "expected": "2"
+      },
+      "negative": {
+        "operands": {
+          "REVENUE": "200",
+          "ASSETS_START": "100",
+          "ASSETS_END": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "REVENUE": "200",
+          "ASSETS_START": "0",
+          "ASSETS_END": "100"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "fdaf72eabf1458849971dcf46864162b1feb9560ea03ada385cabc2227dec388"
+  },
+  {
+    "id": "FIN-inventory-turnover",
+    "error_type": "signal",
+    "name": "存货周转率：平均存货",
+    "formula": "COST/((INVENTORY_START+INVENTORY_END)*HALF)",
+    "inputs": {
+      "COST": "currency",
+      "INVENTORY_START": "currency",
+      "INVENTORY_END": "currency"
+    },
+    "constants": {
+      "HALF": {
+        "value": "0.5",
+        "dimension": "ratio"
+      }
+    },
+    "dimension": "ratio",
+    "positive_inputs": [
+      "INVENTORY_START",
+      "INVENTORY_END"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-inventory-turnover",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "COST": "200",
+          "INVENTORY_START": "100",
+          "INVENTORY_END": "100"
+        },
+        "expected": "2"
+      },
+      "negative": {
+        "operands": {
+          "COST": "200",
+          "INVENTORY_START": "100",
+          "INVENTORY_END": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "COST": "200",
+          "INVENTORY_START": "0",
+          "INVENTORY_END": "100"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "855e0877ed425c3bf697af61eff386f031142d8da762cd80d5f2f690d4cf7e9a"
+  },
+  {
+    "id": "FIN-ar-turnover",
+    "error_type": "signal",
+    "name": "应收账款周转率：平均应收账款",
+    "formula": "REVENUE/((AR_START+AR_END)*HALF)",
+    "inputs": {
+      "REVENUE": "currency",
+      "AR_START": "currency",
+      "AR_END": "currency"
+    },
+    "constants": {
+      "HALF": {
+        "value": "0.5",
+        "dimension": "ratio"
+      }
+    },
+    "dimension": "ratio",
+    "positive_inputs": [
+      "AR_START",
+      "AR_END"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-ar-turnover",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "REVENUE": "200",
+          "AR_START": "100",
+          "AR_END": "100"
+        },
+        "expected": "2"
+      },
+      "negative": {
+        "operands": {
+          "REVENUE": "200",
+          "AR_START": "100",
+          "AR_END": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "REVENUE": "200",
+          "AR_START": "0",
+          "AR_END": "100"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "27194daf69199230a90d33696756f154f15a4187f044f32baf423a809827b548"
+  },
+  {
+    "id": "FIN-revenue-share",
+    "error_type": "signal",
+    "name": "收入占公司营业收入比例",
+    "formula": "PART_REVENUE/TOTAL_REVENUE",
+    "inputs": {
+      "PART_REVENUE": "currency",
+      "TOTAL_REVENUE": "currency"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "TOTAL_REVENUE"
+    ],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-revenue-share",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "PART_REVENUE": "25",
+          "TOTAL_REVENUE": "100"
+        },
+        "expected": "0.25"
+      },
+      "negative": {
+        "operands": {
+          "PART_REVENUE": "25",
+          "TOTAL_REVENUE": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "PART_REVENUE": "25",
+          "TOTAL_REVENUE": "0"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "1310917c921903a2dd9f12899510e63e7150740b04eb87dec705ccf9734456c9"
+  },
+  {
+    "id": "FIN-broker-other-current-liabilities",
+    "error_type": "signal",
+    "name": "券商简表流动负债残项",
+    "formula": "CURRENT_LIABILITIES-SHORT_TERM_BORROWING-AP_NOTES",
+    "inputs": {
+      "CURRENT_LIABILITIES": "currency",
+      "SHORT_TERM_BORROWING": "currency",
+      "AP_NOTES": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-broker-other-current-liabilities",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CURRENT_LIABILITIES": "100",
+          "SHORT_TERM_BORROWING": "10",
+          "AP_NOTES": "20"
+        },
+        "expected": "70"
+      },
+      "negative": {
+        "operands": {
+          "CURRENT_LIABILITIES": "100",
+          "SHORT_TERM_BORROWING": "10",
+          "AP_NOTES": "20"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CURRENT_LIABILITIES": "0",
+          "SHORT_TERM_BORROWING": "0",
+          "AP_NOTES": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "612dfbd2f1a580bcb42f2d502cfdda8e98cbd5ad0b660d638a2e56ce1ec62774"
+  },
+  {
+    "id": "FIN-broker-other-noncurrent-liabilities",
+    "error_type": "signal",
+    "name": "券商简表非流动负债残项",
+    "formula": "NONCURRENT_LIABILITIES-LONG_TERM_BORROWING",
+    "inputs": {
+      "NONCURRENT_LIABILITIES": "currency",
+      "LONG_TERM_BORROWING": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-broker-other-noncurrent-liabilities",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NONCURRENT_LIABILITIES": "100",
+          "LONG_TERM_BORROWING": "20"
+        },
+        "expected": "80"
+      },
+      "negative": {
+        "operands": {
+          "NONCURRENT_LIABILITIES": "100",
+          "LONG_TERM_BORROWING": "20"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NONCURRENT_LIABILITIES": "0",
+          "LONG_TERM_BORROWING": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "3c21509d3281dc560dc67c146d1f42f12353fc8952a51f841bc90085ab4b44da"
+  },
+  {
+    "id": "FIN-broker-other-current-assets",
+    "error_type": "signal",
+    "name": "券商简表流动资产残项：原文现金定义",
+    "formula": "CURRENT_ASSETS-CASH_SOURCE-AR_NOTES-OTHER_RECEIVABLES-PREPAYMENTS-INVENTORY",
+    "inputs": {
+      "CURRENT_ASSETS": "currency",
+      "CASH_SOURCE": "currency",
+      "AR_NOTES": "currency",
+      "OTHER_RECEIVABLES": "currency",
+      "PREPAYMENTS": "currency",
+      "INVENTORY": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "券商流动资产残项仅在原简表明确列示现金、应收票据及应收账款、其他应收款、预付账款、存货与其他流动资产的互斥组成时，按流动资产合计依次减去前五项计算；所有项目须绑定同报告、公司、期间、币种和列版本的原文定义及证据，缺项不默认零。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "clause_id": "FIN-broker-other-current-assets-components.v2",
+        "quote": "券商流动资产残项仅在原简表明确列示现金、应收票据及应收账款、其他应收款、预付账款、存货与其他流动资产的互斥组成时，按流动资产合计依次减去前五项计算；所有项目须绑定同报告、公司、期间、币种和列版本的原文定义及证据，缺项不默认零。",
+        "quote_sha256": "84b050f0427a2066b0699aff902d05d1bdb03ae6a648200f03012935a299f6bb"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.1",
+    "applicable_caliber": "原简表明示六项互斥流动资产组成；同公司、期间、币种、报告和列版本；原文现金定义与每个操作数均有证据；缺项不默认零",
+    "conflict_key": "FIN-broker-other-current-assets",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "register_threshold_rule.py",
+    "approved_by": null,
+    "limitations": "不得用法定同名科目或相等金额推断简表组成；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CURRENT_ASSETS": "100",
+          "CASH_SOURCE": "20",
+          "AR_NOTES": "10",
+          "OTHER_RECEIVABLES": "7",
+          "PREPAYMENTS": "8",
+          "INVENTORY": "5"
+        },
+        "expected": "50"
+      },
+      "negative": {
+        "operands": {
+          "CURRENT_ASSETS": "100",
+          "CASH_SOURCE": "20",
+          "AR_NOTES": "10",
+          "OTHER_RECEIVABLES": "7",
+          "PREPAYMENTS": "8",
+          "INVENTORY": "5"
+        },
+        "expected": "65",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CURRENT_ASSETS": "100",
+          "CASH_SOURCE": "20",
+          "AR_NOTES": "10",
+          "OTHER_RECEIVABLES": "7",
+          "PREPAYMENTS": null,
+          "INVENTORY": "5"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "16a9ccba4b8004bfbcb7cb977a54685c886add6c60229179510729e279f5fdff"
+  },
+  {
+    "id": "FIN-broker-other-noncurrent-assets",
+    "error_type": "signal",
+    "name": "券商简表非流动资产残项：原文投资定义",
+    "formula": "NONCURRENT_ASSETS-PPE-INTANGIBLES-INVESTMENTS_SOURCE",
+    "inputs": {
+      "NONCURRENT_ASSETS": "currency",
+      "PPE": "currency",
+      "INTANGIBLES": "currency",
+      "INVESTMENTS_SOURCE": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-broker-other-noncurrent-assets",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NONCURRENT_ASSETS": "100",
+          "PPE": "20",
+          "INTANGIBLES": "10",
+          "INVESTMENTS_SOURCE": "5"
+        },
+        "expected": "65"
+      },
+      "negative": {
+        "operands": {
+          "NONCURRENT_ASSETS": "100",
+          "PPE": "20",
+          "INTANGIBLES": "10",
+          "INVESTMENTS_SOURCE": "5"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NONCURRENT_ASSETS": "0",
+          "PPE": "0",
+          "INTANGIBLES": "0",
+          "INVESTMENTS_SOURCE": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "8706172b2762516222cb2748514c2adde46f54707e7a06bcd23fd4a5ab512f0f"
+  },
+  {
+    "id": "FIN-non-recurring-net",
+    "error_type": "signal",
+    "name": "归母税后净额扣非重算",
+    "formula": "NP_PARENT-NONRECURRING_NET",
+    "inputs": {
+      "NP_PARENT": "currency",
+      "NONRECURRING_NET": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-non-recurring-net",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "NP_PARENT": "100",
+          "NONRECURRING_NET": "10"
+        },
+        "expected": "90"
+      },
+      "negative": {
+        "operands": {
+          "NP_PARENT": "100",
+          "NONRECURRING_NET": "10"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "NP_PARENT": "0",
+          "NONRECURRING_NET": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "b612ab56767eb92ba1c9a2be88d0d7d4903bdf63ab6a5fccb50078d63a3c67bd"
+  },
+  {
+    "id": "FIN-cash-bridge",
+    "error_type": "signal",
+    "name": "现金净增桥接：含明确汇率影响",
+    "formula": "CFO+CFI+CFF+FX_CASH_EFFECT",
+    "inputs": {
+      "CFO": "currency",
+      "CFI": "currency",
+      "CFF": "currency",
+      "FX_CASH_EFFECT": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-cash-bridge",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "extend_coverage_rules.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "CFO": "10",
+          "CFI": "-5",
+          "CFF": "3",
+          "FX_CASH_EFFECT": "0"
+        },
+        "expected": "8"
+      },
+      "negative": {
+        "operands": {
+          "CFO": "10",
+          "CFI": "-5",
+          "CFF": "3",
+          "FX_CASH_EFFECT": "0"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "CFO": "0",
+          "CFI": "0",
+          "CFF": "0",
+          "FX_CASH_EFFECT": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "67031bdb5c05296e2c872e55a9e71210647dd599f38f3f0f6744749687d2efe1"
+  },
+  {
+    "id": "FIN-cagr",
+    "error_type": "signal",
+    "name": "CAGR",
+    "formula": "cagr(current,base,years)",
+    "inputs": {
+      "current": "currency",
+      "base": "currency",
+      "years": "ratio"
+    },
+    "constants": {},
+    "dimension": "ratio",
+    "positive_inputs": [
+      "current",
+      "base",
+      "years"
+    ],
+    "basis": "CAGR仅用于相同指标、口径、币种和同一报告版本的正首尾值，期数为来源明示起止期间的整数差，算法为整数幂比较证明的Decimal根上下界，结果为首尾比值的整数期根减一。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "CAGR仅用于相同指标、口径、币种和同一报告版本的正首尾值，期数为来源明示起止期间的整数差，算法为整数幂比较证明的Decimal根上下界，结果为首尾比值的整数期根减一。",
+        "quote_sha256": "19d16836b6d68b54572666c266426942f074aa9b91ce2053c9c5562b1900eac2",
+        "clause_id": "FIN-cagr-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-cagr",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "current": "121",
+          "base": "100",
+          "years": "2"
+        },
+        "expected": "0.1"
+      },
+      "negative": {
+        "operands": {
+          "current": "121",
+          "base": "100",
+          "years": "2"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "current": "0",
+          "base": "100",
+          "years": "2"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "c8e9a73472c05536ca7cad972cfbeafb428e2de67dd644aee5a941ff786e5eaa"
+  },
+  {
+    "id": "FIN-range",
+    "error_type": "signal",
+    "name": "范围断言",
+    "formula": "lower<=actual_lower and actual_upper<=upper",
+    "inputs": {
+      "lower": "currency",
+      "upper": "currency",
+      "actual_lower": "currency",
+      "actual_upper": "currency"
+    },
+    "constants": {},
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "范围断言只有在来源明确给出上下界和单位时适用；事实披露区间全部包含在范围内才能核实，完全分离才能判违背，部分相交保持弃权。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "范围断言只有在来源明确给出上下界和单位时适用；事实披露区间全部包含在范围内才能核实，完全分离才能判违背，部分相交保持弃权。",
+        "quote_sha256": "d1fe85217ff7895cbd24c77cbb2528d0defd1647137dba7f43534b3c8e73462b",
+        "clause_id": "FIN-range-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-range",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "deterministic_build_script",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "lower": "1",
+          "upper": "3",
+          "actual_lower": "1.5",
+          "actual_upper": "2.5"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "lower": "1",
+          "upper": "3",
+          "actual_lower": "1.5",
+          "actual_upper": "2.5"
+        },
+        "expected": false,
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "lower": "1",
+          "upper": "3",
+          "actual_lower": "0",
+          "actual_upper": "2"
+        },
+        "expected": false
+      }
+    },
+    "version_hash": "0b6e582582fbb3e0655d72d952b3bdb5cd7836a914cf366883f441e09f334208"
+  },
+  {
+    "id": "FIN-nonoperating-income-bridge",
+    "error_type": "signal",
+    "name": "?????????",
+    "formula": "PROFIT_TOTAL-OPERATING_PROFIT+NONOPERATING_EXPENSE",
+    "inputs": {
+      "PROFIT_TOTAL": "currency",
+      "OPERATING_PROFIT": "currency",
+      "NONOPERATING_EXPENSE": "currency"
+    },
+    "constants": {},
+    "dimension": "currency",
+    "positive_inputs": [],
+    "basis": "Nonoperating income bridge: total profit - operating profit + nonoperating expense; every operand must be disclosed in the same report/version and missing operands are not zero.",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "Nonoperating income bridge: total profit - operating profit + nonoperating expense; every operand must be disclosed in the same report/version and missing operands are not zero.",
+        "quote_sha256": "8ee634efa869e2ddbf9638d691ed93af862f11e2fbdb21a810725eebecd152b9",
+        "clause_id": "FIN-nonoperating-income-bridge-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-nonoperating-income-bridge",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "restore_metric_cards.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "PROFIT_TOTAL": "100",
+          "OPERATING_PROFIT": "80",
+          "NONOPERATING_EXPENSE": "5"
+        },
+        "expected": "25"
+      },
+      "negative": {
+        "operands": {
+          "PROFIT_TOTAL": "100",
+          "OPERATING_PROFIT": "80",
+          "NONOPERATING_EXPENSE": "5"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "PROFIT_TOTAL": "0",
+          "OPERATING_PROFIT": "0",
+          "NONOPERATING_EXPENSE": "0"
+        },
+        "expected": "0"
+      }
+    },
+    "version_hash": "b4bf845eb0be725b5a434e47d39dd789a431574b7aeaaa33568973ed4e8aa19f"
+  },
+  {
+    "id": "FIN-ap-turnover",
+    "error_type": "signal",
+    "name": "???????????????",
+    "formula": "COST/((AP_END+AP_START)*HALF)",
+    "inputs": {
+      "COST": "currency",
+      "AP_END": "currency",
+      "AP_START": "currency"
+    },
+    "constants": {
+      "HALF": {
+        "value": "0.5",
+        "dimension": "ratio"
+      }
+    },
+    "dimension": "ratio",
+    "positive_inputs": [
+      "AP_END",
+      "AP_START"
+    ],
+    "basis": "Accounts payable turnover: cost of revenue / average accounts payable; the numerator and both beginning/end balances must be explicit and positive.",
+    "basis_refs": [
+      {
+        "source_id": "MJ-COVERAGE-METHOD",
+        "quote": "Accounts payable turnover: cost of revenue / average accounts payable; the numerator and both beginning/end balances must be explicit and positive.",
+        "quote_sha256": "c0bebc2e3dad28475e7d649219eda301d91f2b64de0012abd22ead43f71edb35",
+        "clause_id": "FIN-ap-turnover-method"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.0",
+    "applicable_caliber": "同公司、期间、合并/母公司与扣非口径；实际来源版本受研报日截断",
+    "conflict_key": "FIN-ap-turnover",
+    "implementation": "deterministic_kernel",
+    "review_status": "engineering_validated",
+    "drafted_by": "restore_metric_cards.py",
+    "approved_by": null,
+    "limitations": "规则执行测试不等于真实金融材料验收；专业签发待完成",
+    "examples": {
+      "positive": {
+        "operands": {
+          "COST": "200",
+          "AP_END": "100",
+          "AP_START": "100"
+        },
+        "expected": "2"
+      },
+      "negative": {
+        "operands": {
+          "COST": "200",
+          "AP_END": "100",
+          "AP_START": "100"
+        },
+        "expected": "999",
+        "expect_match": false
+      },
+      "boundary": {
+        "operands": {
+          "COST": "200",
+          "AP_END": "0",
+          "AP_START": "100"
+        },
+        "expected": null
+      }
+    },
+    "version_hash": "398939ae543bf9aa8ac78fd534b0d862d82a5c632ead848cdbe605b31e5e11ef"
+  },
+  {
+    "id": "SOURCE-threshold-entailment",
+    "error_type": "E7",
+    "name": "来源引述阈值谓词蕴含",
+    "formula": "(lower_entails == ONE and upper_entails == ONE) or source_below_claim == ONE or claim_below_source == ONE",
+    "inputs": {
+      "lower_entails": "boolean",
+      "upper_entails": "boolean",
+      "source_below_claim": "boolean",
+      "claim_below_source": "boolean"
+    },
+    "constants": {
+      "ONE": {
+        "value": "1",
+        "dimension": "ratio"
+      }
+    },
+    "dimension": "boolean",
+    "positive_inputs": [],
+    "basis": "来源谓词蕴含规则：在发行人、有效期间、分子分母定义、引用、披露版本和截止日均已由可信程序核验后，来源允许集合完全包含于陈述允许集合时核实；两个集合完全分离时违背；仅部分相交时未确定。",
+    "basis_refs": [
+      {
+        "source_id": "MJ-THRESHOLD-METHOD",
+        "clause_id": "SOURCE-threshold-entailment-method.v1",
+        "quote": "来源谓词蕴含规则：在发行人、有效期间、分子分母定义、引用、披露版本和截止日均已由可信程序核验后，来源允许集合完全包含于陈述允许集合时核实；两个集合完全分离时违背；仅部分相交时未确定。",
+        "quote_sha256": "ed61486e8ab583e88d30499f98701137d113081c6bd0580ab6d14894ed35e8a3"
+      }
+    ],
+    "tier": "T3",
+    "version": "0.6.1",
+    "applicable_caliber": "可信来源引述；发行人、期间、分子分母、单位、版本和截止日先行验证；不作为点事实",
+    "conflict_key": "SOURCE-threshold-entailment",
+    "implementation": "deterministic_kernel",
+    "operation": "source_predicate_entailment.v1",
+    "review_status": "engineering_validated",
+    "drafted_by": "register_threshold_rule.py",
+    "approved_by": null,
+    "limitations": "只证明来源谓词蕴含/矛盾，不证明精确比例；专业签发待完成；不替换h=2%模糊词政策",
+    "examples": {
+      "positive": {
+        "operands": {
+          "lower_entails": "1",
+          "upper_entails": "1",
+          "source_below_claim": "0",
+          "claim_below_source": "0"
+        },
+        "expected": true
+      },
+      "negative": {
+        "operands": {
+          "lower_entails": "0",
+          "upper_entails": "1",
+          "source_below_claim": "0",
+          "claim_below_source": "0"
+        },
+        "expected": false
+      },
+      "boundary": {
+        "operands": {
+          "lower_entails": "0",
+          "upper_entails": "1",
+          "source_below_claim": "0",
+          "claim_below_source": "1"
+        },
+        "expected": true
+      }
+    },
+    "version_hash": "70df756c31d81565e7db2087d7e0bb84ffb11bf67a09c4e9ee6d0db5139cab45"
+  }
+]

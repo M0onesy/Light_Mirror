@@ -1,0 +1,9 @@
+# These files are frozen resources checked by their exact SHA-256 bytes.
+# Git must never apply platform line-ending conversion to them.
+runtime/** -text
+rulepack/** -text
+frontend/vendor/** -text
+vendor/harness/** -text
+frontend/src/HarnessFrame.tsx -text
+# Generated bundles contain intentional whitespace in library string literals.
+web/harness/** -text -whitespace

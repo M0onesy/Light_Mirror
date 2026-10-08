@@ -1,0 +1,4 @@
+{"id":"demo-1","gold":"verified","prediction":"verified","score":0.10,"error_type":"clean","evidence_hit":true,"repair_pass":true}
+{"id":"demo-2","gold":"violated","prediction":"violated","score":0.95,"error_type":"E5","evidence_hit":true,"repair_pass":true}
+{"id":"demo-3","gold":"verified","prediction":"violated","score":0.80,"error_type":"hedge","is_trap":true,"evidence_hit":false,"repair_pass":false}
+{"id":"demo-4","gold":"violated","prediction":"abstained","score":0.20,"error_type":"E8","evidence_hit":false}

@@ -1,0 +1,1082 @@
+[
+  {
+    "id": "CAL-001",
+    "label": "营业收入",
+    "account": "REVENUE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-002",
+    "label": "营业总收入",
+    "account": "REVENUE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-003",
+    "label": "营收",
+    "account": "REVENUE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-004",
+    "label": "主营业务收入",
+    "account": "REVENUE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-005",
+    "label": "合并营业收入",
+    "account": "REVENUE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-006",
+    "label": "营业成本",
+    "account": "COST",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-007",
+    "label": "合并营业成本",
+    "account": "COST",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-008",
+    "label": "营业总成本",
+    "account": "TOTAL_COST",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-009",
+    "label": "主营业务成本",
+    "account": "MAIN_COST",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-010",
+    "label": "净利润",
+    "account": "NP",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-011",
+    "label": "合并净利润",
+    "account": "NP",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-012",
+    "label": "净利润（净亏损以“-”号填列）",
+    "account": "NP",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-013",
+    "label": "税后净利润",
+    "account": "NP",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-014",
+    "label": "归母净利润",
+    "account": "NP_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "CAS33",
+        "quote": "母公司向子公司出售资产所发生的未实现内部交易损益，应当全额抵销“归属于母公司所有者的净利润”。子公司向母公司出售资产所发生的未实现内部交易损益，应当按照母公司对该子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。子公司之间出售资产所发生的未实现内部交易损益，应当按照母公司对出售方子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。",
+        "quote_sha256": "b4fe09271b0cf00a1534d996fb3f62115c085ff312709e17815996147dde9050",
+        "clause_id": "CAS33-三十六"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-015",
+    "label": "归属于母公司所有者的净利润",
+    "account": "NP_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "CAS33",
+        "quote": "母公司向子公司出售资产所发生的未实现内部交易损益，应当全额抵销“归属于母公司所有者的净利润”。子公司向母公司出售资产所发生的未实现内部交易损益，应当按照母公司对该子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。子公司之间出售资产所发生的未实现内部交易损益，应当按照母公司对出售方子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。",
+        "quote_sha256": "b4fe09271b0cf00a1534d996fb3f62115c085ff312709e17815996147dde9050",
+        "clause_id": "CAS33-三十六"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-016",
+    "label": "归属于母公司股东的净利润",
+    "account": "NP_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "CAS33",
+        "quote": "母公司向子公司出售资产所发生的未实现内部交易损益，应当全额抵销“归属于母公司所有者的净利润”。子公司向母公司出售资产所发生的未实现内部交易损益，应当按照母公司对该子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。子公司之间出售资产所发生的未实现内部交易损益，应当按照母公司对出售方子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。",
+        "quote_sha256": "b4fe09271b0cf00a1534d996fb3f62115c085ff312709e17815996147dde9050",
+        "clause_id": "CAS33-三十六"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-017",
+    "label": "归属于上市公司股东的净利润",
+    "account": "NP_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "CAS33",
+        "quote": "母公司向子公司出售资产所发生的未实现内部交易损益，应当全额抵销“归属于母公司所有者的净利润”。子公司向母公司出售资产所发生的未实现内部交易损益，应当按照母公司对该子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。子公司之间出售资产所发生的未实现内部交易损益，应当按照母公司对出售方子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。",
+        "quote_sha256": "b4fe09271b0cf00a1534d996fb3f62115c085ff312709e17815996147dde9050",
+        "clause_id": "CAS33-三十六"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-018",
+    "label": "归属于挂牌公司股东的净利润",
+    "account": "NP_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "CAS33",
+        "quote": "母公司向子公司出售资产所发生的未实现内部交易损益，应当全额抵销“归属于母公司所有者的净利润”。子公司向母公司出售资产所发生的未实现内部交易损益，应当按照母公司对该子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。子公司之间出售资产所发生的未实现内部交易损益，应当按照母公司对出售方子公司的分配比例在“归属于母公司所有者的净利润”和“少数股东损益”之间分配抵销。",
+        "quote_sha256": "b4fe09271b0cf00a1534d996fb3f62115c085ff312709e17815996147dde9050",
+        "clause_id": "CAS33-三十六"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-019",
+    "label": "扣非归母净利润",
+    "account": "NP_PARENT_ADJ",
+    "scope": "合并",
+    "nr": "扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-020",
+    "label": "扣非净利润",
+    "account": "NP_PARENT_ADJ",
+    "scope": "合并",
+    "nr": "扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-021",
+    "label": "归属于上市公司股东的扣除非经常性损益的净利润",
+    "account": "NP_PARENT_ADJ",
+    "scope": "合并",
+    "nr": "扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-022",
+    "label": "归属于上市公司股东的扣除非经常性损益后的净利润",
+    "account": "NP_PARENT_ADJ",
+    "scope": "合并",
+    "nr": "扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-023",
+    "label": "归属于挂牌公司股东的扣除非经常性损益后的净利润",
+    "account": "NP_PARENT_ADJ",
+    "scope": "合并",
+    "nr": "扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-024",
+    "label": "归属于母公司所有者的扣除非经常性损益后的净利润",
+    "account": "NP_PARENT_ADJ",
+    "scope": "合并",
+    "nr": "扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-025",
+    "label": "经营活动产生的现金流量净额",
+    "account": "CFO",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-026",
+    "label": "经营现金流",
+    "account": "CFO",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-027",
+    "label": "经营性现金流量净额",
+    "account": "CFO",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-028",
+    "label": "经营活动现金流量净额",
+    "account": "CFO",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-029",
+    "label": "经营活动净现金流",
+    "account": "CFO",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-030",
+    "label": "资产总计",
+    "account": "ASSETS",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-031",
+    "label": "总资产",
+    "account": "ASSETS",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-032",
+    "label": "资产合计",
+    "account": "ASSETS",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-033",
+    "label": "负债合计",
+    "account": "LIABILITIES",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-034",
+    "label": "负债总计",
+    "account": "LIABILITIES",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-035",
+    "label": "总负债",
+    "account": "LIABILITIES",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-036",
+    "label": "归属于母公司所有者权益合计",
+    "account": "EQUITY_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-037",
+    "label": "归属于上市公司股东的净资产",
+    "account": "EQUITY_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-038",
+    "label": "归属于挂牌公司股东的净资产",
+    "account": "EQUITY_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-039",
+    "label": "归母净资产",
+    "account": "EQUITY_PARENT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-040",
+    "label": "所有者权益合计",
+    "account": "EQUITY",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-041",
+    "label": "股东权益合计",
+    "account": "EQUITY",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-042",
+    "label": "净资产",
+    "account": "EQUITY",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-043",
+    "label": "基本每股收益",
+    "account": "EPS",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-044",
+    "label": "基本每股收益（元/股）",
+    "account": "EPS",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-045",
+    "label": "稀释每股收益",
+    "account": "EPS_DILUTED",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-046",
+    "label": "稀释每股收益（元/股）",
+    "account": "EPS_DILUTED",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-047",
+    "label": "加权平均净资产收益率",
+    "account": "ROE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-048",
+    "label": "加权净资产收益率",
+    "account": "ROE",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-049",
+    "label": "毛利率",
+    "account": "GROSS_MARGIN",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-050",
+    "label": "综合毛利率",
+    "account": "GROSS_MARGIN",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-051",
+    "label": "净利率",
+    "account": "NET_MARGIN",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-052",
+    "label": "销售净利率",
+    "account": "NET_MARGIN",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-053",
+    "label": "资产负债率",
+    "account": "DEBT_RATIO",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-054",
+    "label": "非经常性损益合计",
+    "account": "NRI_TOTAL",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-055",
+    "label": "非经常性损益总额",
+    "account": "NRI_TOTAL",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-056",
+    "label": "所得税影响额",
+    "account": "NRI_TAX_EFFECT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": true,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-057",
+    "label": "非经常性损益所得税影响额",
+    "account": "NRI_TAX_EFFECT",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-058",
+    "label": "少数股东权益影响额（税后）",
+    "account": "NRI_MINORITY",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-059",
+    "label": "少数股东损益影响额",
+    "account": "NRI_MINORITY",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  },
+  {
+    "id": "CAL-060",
+    "label": "发行在外普通股的加权平均数",
+    "account": "WEIGHTED_SHARES",
+    "scope": "合并",
+    "nr": "未扣非",
+    "requires_context": false,
+    "basis_refs": [
+      {
+        "source_id": "MJ-METHOD",
+        "quote": "受限公式只允许已登记输入、常数、四则运算、绝对值、比较及比较的逻辑与或，分母区间非正或触零时弃权。",
+        "quote_sha256": "6736761026ba821d60ffdee2c87c53891cc0fe160d61fb1ae0d111e8b8658f1b",
+        "clause_id": "MJ-METHOD-1"
+      }
+    ],
+    "approved_by": null,
+    "review_status": "pending_human_signoff"
+  }
+]

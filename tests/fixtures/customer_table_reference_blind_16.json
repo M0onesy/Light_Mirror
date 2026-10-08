@@ -1,0 +1,498 @@
+{
+  "schema_version": "blind-source-table-reference.v1",
+  "origin": "exposed_development_source_not_independent_gold",
+  "source_doc_sha256": "7a70da91863feb0ce795748619f02b21a2b68ab6ec134c5520239b658e686a9d",
+  "source_cutoff": "2024-04-22",
+  "source_kind": "research_report",
+  "table_number": 4,
+  "financial_values_included": false,
+  "caption": {
+    "page": 13,
+    "dict_block": 28,
+    "bbox": [
+      36.84000015258789,
+      618.291015625,
+      347.95001220703125,
+      629.9808959960938
+    ],
+    "text": "表4：2023H1 公司前五大客户占比为[financial value withheld]，超算云客户集中度较低",
+    "original_text_sha256": "4efee9307bbdb0d65ac3d88dad82c7d860b8feb0a3f8d0cc1aa7e07aa58a3141",
+    "financial_values_withheld": true
+  },
+  "headers": {
+    "page": 13,
+    "dict_block": 29,
+    "bbox": [
+      54.720001220703125,
+      634.5609741210938,
+      520.030029296875,
+      644.52392578125
+    ],
+    "text": "年度\n序号\n客户名称\n营业收入（万元）\n占营业收入比重\n主要销售内容"
+  },
+  "segments": [
+    {
+      "page": 13,
+      "period": "2023H1",
+      "period_source": {
+        "page": 13,
+        "dict_block": 30,
+        "bbox": [
+          49.20000076293945,
+          706.5609741210938,
+          80.51399993896484,
+          716.52392578125
+        ],
+        "text": "2023H1"
+      },
+      "rows": [
+        {
+          "ordinal": 1,
+          "customer": "青岛国实科技集团有限公司",
+          "source_spans": [
+            {
+              "page": 13,
+              "dict_block": 31,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                160.10000610351562,
+                651.0489501953125,
+                241.10000610351562,
+                660.0489501953125
+              ],
+              "text": "青岛国实科技集团有"
+            },
+            {
+              "page": 13,
+              "dict_block": 32,
+              "line": 0,
+              "span": 0,
+              "bbox": [
+                187.1300048828125,
+                666.6489868164062,
+                214.1300048828125,
+                675.6489868164062
+              ],
+              "text": "限公司"
+            }
+          ]
+        },
+        {
+          "ordinal": 2,
+          "customer": "客户H",
+          "source_spans": [
+            {
+              "page": 13,
+              "dict_block": 34,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                187.25,
+                682.7289428710938,
+                205.25,
+                691.7289428710938
+              ],
+              "text": "客户"
+            },
+            {
+              "page": 13,
+              "dict_block": 34,
+              "line": 1,
+              "span": 1,
+              "bbox": [
+                205.3699951171875,
+                682.4409790039062,
+                216.25999450683594,
+                692.4039306640625
+              ],
+              "text": " H "
+            }
+          ]
+        },
+        {
+          "ordinal": 3,
+          "customer": "中国航天空气动力技术研究院",
+          "source_spans": [
+            {
+              "page": 13,
+              "dict_block": 35,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                160.10000610351562,
+                698.8089599609375,
+                241.10000610351562,
+                707.8089599609375
+              ],
+              "text": "中国航天空气动力技"
+            },
+            {
+              "page": 13,
+              "dict_block": 36,
+              "line": 0,
+              "span": 0,
+              "bbox": [
+                182.66000366210938,
+                714.4089965820312,
+                218.66000366210938,
+                723.4089965820312
+              ],
+              "text": "术研究院"
+            }
+          ]
+        },
+        {
+          "ordinal": 4,
+          "customer": "清华大学",
+          "source_spans": [
+            {
+              "page": 13,
+              "dict_block": 38,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                182.66000366210938,
+                730.4889526367188,
+                218.66000366210938,
+                739.4889526367188
+              ],
+              "text": "清华大学"
+            }
+          ]
+        },
+        {
+          "ordinal": 5,
+          "customer": "客户E",
+          "source_spans": [
+            {
+              "page": 13,
+              "dict_block": 39,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                187.72999572753906,
+                746.56494140625,
+                205.72999572753906,
+                755.56494140625
+              ],
+              "text": "客户"
+            },
+            {
+              "page": 13,
+              "dict_block": 39,
+              "line": 1,
+              "span": 1,
+              "bbox": [
+                205.85000610351562,
+                746.2769775390625,
+                215.77999877929688,
+                756.2399291992188
+              ],
+              "text": " E "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "period": "2022Y",
+      "period_source": {
+        "page": 14,
+        "dict_block": 3,
+        "bbox": [
+          49.08000183105469,
+          116.44096374511719,
+          80.63400268554688,
+          126.40396118164062
+        ],
+        "text": "2022 年"
+      },
+      "rows": [
+        {
+          "ordinal": 1,
+          "customer": "清华大学",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 4,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                182.66000366210938,
+                76.52900695800781,
+                218.66000366210938,
+                85.52900695800781
+              ],
+              "text": "清华大学"
+            }
+          ]
+        },
+        {
+          "ordinal": 2,
+          "customer": "客户E",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 5,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                187.72999572753906,
+                92.60896301269531,
+                205.72999572753906,
+                101.60896301269531
+              ],
+              "text": "客户"
+            },
+            {
+              "page": 14,
+              "dict_block": 5,
+              "line": 1,
+              "span": 1,
+              "bbox": [
+                208.1300048828125,
+                92.32096862792969,
+                215.77999877929688,
+                102.28396606445312
+              ],
+              "text": "E "
+            }
+          ]
+        },
+        {
+          "ordinal": 3,
+          "customer": "客户H",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 6,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                187.25,
+                108.68898010253906,
+                205.25,
+                117.68898010253906
+              ],
+              "text": "客户"
+            },
+            {
+              "page": 14,
+              "dict_block": 6,
+              "line": 1,
+              "span": 1,
+              "bbox": [
+                207.64999389648438,
+                108.40098571777344,
+                216.25999450683594,
+                118.36398315429688
+              ],
+              "text": "H "
+            }
+          ]
+        },
+        {
+          "ordinal": 4,
+          "customer": "三台县梓丰现代农业",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 7,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                160.10000610351562,
+                124.76899719238281,
+                241.10000610351562,
+                133.7689971923828
+              ],
+              "text": "三台县梓丰现代农业"
+            }
+          ]
+        },
+        {
+          "ordinal": 5,
+          "customer": "中科院力学研究所",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 8,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                164.66000366210938,
+                140.96900939941406,
+                236.66000366210938,
+                149.96900939941406
+              ],
+              "text": "中科院力学研究所"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "period": "2021Y",
+      "period_source": {
+        "page": 14,
+        "dict_block": 10,
+        "bbox": [
+          49.08000183105469,
+          213.04100036621094,
+          80.63400268554688,
+          223.00399780273438
+        ],
+        "text": "2021 年"
+      },
+      "rows": [
+        {
+          "ordinal": 1,
+          "customer": "凌空天行",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 11,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                182.66000366210938,
+                173.1289825439453,
+                218.66000366210938,
+                182.1289825439453
+              ],
+              "text": "凌空天行"
+            }
+          ]
+        },
+        {
+          "ordinal": 2,
+          "customer": "清华大学",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 12,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                182.66000366210938,
+                189.20899963378906,
+                218.66000366210938,
+                198.20899963378906
+              ],
+              "text": "清华大学"
+            }
+          ]
+        },
+        {
+          "ordinal": 3,
+          "customer": "国防科技大学",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 13,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                173.66000366210938,
+                205.28895568847656,
+                227.66000366210938,
+                214.28895568847656
+              ],
+              "text": "国防科技大学"
+            }
+          ]
+        },
+        {
+          "ordinal": 4,
+          "customer": "中科院力学研究所",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 14,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                164.66000366210938,
+                221.3689727783203,
+                236.66000366210938,
+                230.3689727783203
+              ],
+              "text": "中科院力学研究所"
+            }
+          ]
+        },
+        {
+          "ordinal": 5,
+          "customer": "北京理工大学",
+          "source_spans": [
+            {
+              "page": 14,
+              "dict_block": 15,
+              "line": 1,
+              "span": 0,
+              "bbox": [
+                173.66000366210938,
+                237.56898498535156,
+                227.66000366210938,
+                246.56898498535156
+              ],
+              "text": "北京理工大学"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "citation": {
+    "page": 14,
+    "dict_block": 17,
+    "bbox": [
+      36.84000015258789,
+      269.4709777832031,
+      201.13999938964844,
+      279.4339904785156
+    ],
+    "text": "资料来源：公司招股书、开源证券研究所"
+  },
+  "source_reference": {
+    "family": "prospectus",
+    "family_evidence": "explicit_table_footer_citation",
+    "exact_source_doc_sha256": null,
+    "exact_source_publish_date": null,
+    "anonymous_customer_identity": "requires_locked_same_source_table_or_complete_cohort_not_label_alone"
+  },
+  "continuation_evidence": {
+    "adjacent_pages": [
+      13,
+      14
+    ],
+    "same_customer_column_x_range": [
+      145,
+      243
+    ],
+    "period_order": [
+      "2023H1",
+      "2022Y",
+      "2021Y"
+    ],
+    "row_ordinals_each_period": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "citation_page": 14,
+    "citation_terminates_table": true,
+    "continuation_header_repeated": false
+  },
+  "limitations": [
+    "Does not authorize consolidated or parent-company scope.",
+    "Prospectus family citation alone does not pin a specific version or document.",
+    "Anonymous customer labels must not be joined across disclosures by label alone.",
+    "No financial values, model candidates, verification statuses or facts are stored."
+  ]
+}

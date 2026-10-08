@@ -1,0 +1,401 @@
+{
+  "fixture_schema": "issuer-context-web07-development.v1",
+  "provenance": {
+    "source_run_id": "web-1ac7e3314357",
+    "source_status": "recorded_failure",
+    "source_run_relative_path": "runs/source-native-web-stable-07/profile/workspace/runs/web-1ac7e3314357",
+    "source_file_sha256": {
+      "claims.json": "28aff0c01461b75626030404bf0151af3a32db053ea8e328581b258920a24b40",
+      "bindings.json": "d86f1ff7adbf513f302f68b24811b20d9082b985846074923639ce49df5118b7",
+      "results.json": "9a1a630e0454638e46d1087b28c227c07fb0decc934a1add5be2b774b0e8cc28"
+    },
+    "anonymization": "Only frozen issuer and A/B issuer fields replaced with the portable issuer alias; original row text, numeric spans, source hashes and scope proof retained.",
+    "label_status": "development_regression_not_independent_human_gold",
+    "api_status": "copied_existing_run_observation_no_new_api_call"
+  },
+  "task_company": "甲公司",
+  "cases": [
+    {
+      "claim": {
+        "claim_id": "table-1564-1568",
+        "text": "归母净利润(百万元) \n-114  \n-80  \n-37  \n7 \n45",
+        "start": 1564,
+        "end": 1568,
+        "claim_type": "numeric",
+        "company": "甲公司",
+        "account": "NP_PARENT",
+        "period": "2022Y",
+        "candidate_value": "-114000000",
+        "unit": "百万元",
+        "caliber_hint": [
+          "未知",
+          "未扣非"
+        ],
+        "declared_source": null,
+        "relation": "value",
+        "base_period": null,
+        "display_decimals": 0,
+        "numeric_text": "-114",
+        "binding_status": "disagreed",
+        "parse_status": "parsed",
+        "modality": "fact",
+        "query_strategy": "latest_as_of",
+        "approximate": false,
+        "table_context": {
+          "title": "指标",
+          "headers": [
+            {
+              "start": 1441,
+              "end": 1446,
+              "text": "2022A"
+            },
+            {
+              "start": 1448,
+              "end": 1453,
+              "text": "2023A"
+            },
+            {
+              "start": 1455,
+              "end": 1460,
+              "text": "2024E"
+            },
+            {
+              "start": 1462,
+              "end": 1467,
+              "text": "2025E"
+            },
+            {
+              "start": 1469,
+              "end": 1474,
+              "text": "2026E"
+            }
+          ],
+          "row_label": "归母净利润(百万元)",
+          "source_spans": [
+            {
+              "start": 1552,
+              "end": 1562
+            },
+            {
+              "start": 1564,
+              "end": 1568
+            },
+            {
+              "start": 1571,
+              "end": 1574
+            },
+            {
+              "start": 1577,
+              "end": 1580
+            },
+            {
+              "start": 1583,
+              "end": 1584
+            },
+            {
+              "start": 1586,
+              "end": 1588
+            }
+          ],
+          "column_index": 1,
+          "period_source": "source_header",
+          "modality_source": "source_header",
+          "account_hint": "NP_PARENT",
+          "period_hint": "2022Y",
+          "scope_hint": "未知",
+          "unit_hint": "百万元",
+          "relation_hint": "value",
+          "layout_source": "source_text_sequence",
+          "source_scope_required": true,
+          "source_dimensions": {
+            "schema_version": "source-dimensions.v1",
+            "company": "甲公司",
+            "account": "NP_PARENT",
+            "period": "2022Y",
+            "scope": "合并",
+            "relation": "value",
+            "base_period": "",
+            "source_text_sha256": "7e8611f72c3632ec4e5d7d60026007bc45ae64293b9bc221c476039a6c90775f",
+            "source_start": 1564,
+            "source_end": 1568,
+            "source_numeric_start": 12,
+            "provenance": "deterministic_table_headers",
+            "scope_provenance": "source_account_definition",
+            "company_provenance": "host_locked_issuer_context",
+            "source_company_subjects": [],
+            "company_source_explicit": false,
+            "scope_definition_id": "NP_PARENT-consolidated.v1",
+            "scope_definition_label": "归母净利润",
+            "scope_definition_basis": {
+              "source_id": "CAS33",
+              "clause_id": "CAS33-三十六",
+              "caliber_id": "CAL-014",
+              "professional_signoff_status": "pending"
+            },
+            "scope_definition_source": "source_financial_label",
+            "explicit": {
+              "company": false,
+              "account": true,
+              "period": true,
+              "scope": true,
+              "relation": true,
+              "base_period": false
+            }
+          }
+        },
+        "source_numeric_start": 12
+      },
+      "binding_A": {
+        "company": "",
+        "account": "NP_PARENT",
+        "period": "2022Y",
+        "scope": "合并",
+        "relation": "value",
+        "base_period": ""
+      },
+      "binding_B": {
+        "company": "甲公司",
+        "account": "NP_PARENT",
+        "period": "2022Y",
+        "scope": "合并",
+        "relation": "value",
+        "base_period": ""
+      },
+      "original_agreement": {
+        "claim_id": "table-1564-1568",
+        "agreed": false,
+        "differences": [
+          "company"
+        ],
+        "scope_source_proven": true
+      },
+      "original_result": {
+        "claim_id": "table-1564-1568",
+        "status": "abstained",
+        "error_type": "E8",
+        "observed": null,
+        "expected": null,
+        "display_value": null,
+        "formula": null,
+        "tolerance": null,
+        "evidence": [],
+        "basis": [
+          "E8：给定材料优先、口径匹配"
+        ],
+        "reason": "语义绑定与原文明示或用户补充声明的报表口径冲突",
+        "correction": null,
+        "diagnostics": [
+          "X3"
+        ],
+        "operands": [],
+        "abstention_code": "X3",
+        "advisories": [],
+        "rule_ids": [
+          "E8-missing"
+        ],
+        "claim_interval": null,
+        "expected_interval": null,
+        "verification_basis": null,
+        "precision_note": null,
+        "source_precision": [],
+        "diagnostic_hypotheses": [],
+        "claim_text": "归母净利润(百万元) \n-114  \n-80  \n-37  \n7 \n45",
+        "source_span": {
+          "start": 1564,
+          "end": 1568
+        }
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "table-1571-1574",
+        "text": "归母净利润(百万元) \n-114  \n-80  \n-37  \n7 \n45",
+        "start": 1571,
+        "end": 1574,
+        "claim_type": "numeric",
+        "company": "甲公司",
+        "account": "NP_PARENT",
+        "period": "2023Y",
+        "candidate_value": "-80000000",
+        "unit": "百万元",
+        "caliber_hint": [
+          "未知",
+          "未扣非"
+        ],
+        "declared_source": null,
+        "relation": "value",
+        "base_period": null,
+        "display_decimals": 0,
+        "numeric_text": "-80",
+        "binding_status": "disagreed",
+        "parse_status": "parsed",
+        "modality": "fact",
+        "query_strategy": "latest_as_of",
+        "approximate": false,
+        "table_context": {
+          "title": "指标",
+          "headers": [
+            {
+              "start": 1441,
+              "end": 1446,
+              "text": "2022A"
+            },
+            {
+              "start": 1448,
+              "end": 1453,
+              "text": "2023A"
+            },
+            {
+              "start": 1455,
+              "end": 1460,
+              "text": "2024E"
+            },
+            {
+              "start": 1462,
+              "end": 1467,
+              "text": "2025E"
+            },
+            {
+              "start": 1469,
+              "end": 1474,
+              "text": "2026E"
+            }
+          ],
+          "row_label": "归母净利润(百万元)",
+          "source_spans": [
+            {
+              "start": 1552,
+              "end": 1562
+            },
+            {
+              "start": 1564,
+              "end": 1568
+            },
+            {
+              "start": 1571,
+              "end": 1574
+            },
+            {
+              "start": 1577,
+              "end": 1580
+            },
+            {
+              "start": 1583,
+              "end": 1584
+            },
+            {
+              "start": 1586,
+              "end": 1588
+            }
+          ],
+          "column_index": 2,
+          "period_source": "source_header",
+          "modality_source": "source_header",
+          "account_hint": "NP_PARENT",
+          "period_hint": "2023Y",
+          "scope_hint": "未知",
+          "unit_hint": "百万元",
+          "relation_hint": "value",
+          "layout_source": "source_text_sequence",
+          "source_scope_required": true,
+          "source_dimensions": {
+            "schema_version": "source-dimensions.v1",
+            "company": "甲公司",
+            "account": "NP_PARENT",
+            "period": "2023Y",
+            "scope": "合并",
+            "relation": "value",
+            "base_period": "",
+            "source_text_sha256": "7e8611f72c3632ec4e5d7d60026007bc45ae64293b9bc221c476039a6c90775f",
+            "source_start": 1571,
+            "source_end": 1574,
+            "source_numeric_start": 19,
+            "provenance": "deterministic_table_headers",
+            "scope_provenance": "source_account_definition",
+            "company_provenance": "host_locked_issuer_context",
+            "source_company_subjects": [],
+            "company_source_explicit": false,
+            "scope_definition_id": "NP_PARENT-consolidated.v1",
+            "scope_definition_label": "归母净利润",
+            "scope_definition_basis": {
+              "source_id": "CAS33",
+              "clause_id": "CAS33-三十六",
+              "caliber_id": "CAL-014",
+              "professional_signoff_status": "pending"
+            },
+            "scope_definition_source": "source_financial_label",
+            "explicit": {
+              "company": false,
+              "account": true,
+              "period": true,
+              "scope": true,
+              "relation": true,
+              "base_period": false
+            }
+          }
+        },
+        "source_numeric_start": 19
+      },
+      "binding_A": {
+        "company": "",
+        "account": "NP_PARENT",
+        "period": "2023Y",
+        "scope": "合并",
+        "relation": "value",
+        "base_period": ""
+      },
+      "binding_B": {
+        "company": "甲公司",
+        "account": "NP_PARENT",
+        "period": "2023Y",
+        "scope": "合并",
+        "relation": "value",
+        "base_period": ""
+      },
+      "original_agreement": {
+        "claim_id": "table-1571-1574",
+        "agreed": false,
+        "differences": [
+          "company"
+        ],
+        "scope_source_proven": true
+      },
+      "original_result": {
+        "claim_id": "table-1571-1574",
+        "status": "abstained",
+        "error_type": "E8",
+        "observed": null,
+        "expected": null,
+        "display_value": null,
+        "formula": null,
+        "tolerance": null,
+        "evidence": [],
+        "basis": [
+          "E8：给定材料优先、口径匹配"
+        ],
+        "reason": "语义绑定与原文明示或用户补充声明的报表口径冲突",
+        "correction": null,
+        "diagnostics": [
+          "X3"
+        ],
+        "operands": [],
+        "abstention_code": "X3",
+        "advisories": [],
+        "rule_ids": [
+          "E8-missing"
+        ],
+        "claim_interval": null,
+        "expected_interval": null,
+        "verification_basis": null,
+        "precision_note": null,
+        "source_precision": [],
+        "diagnostic_hypotheses": [],
+        "claim_text": "归母净利润(百万元) \n-114  \n-80  \n-37  \n7 \n45",
+        "source_span": {
+          "start": 1571,
+          "end": 1574
+        }
+      }
+    }
+  ]
+}

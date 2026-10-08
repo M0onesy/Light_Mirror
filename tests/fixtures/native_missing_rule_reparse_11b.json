@@ -1,0 +1,39 @@
+{
+  "provenance": {
+    "source_run": "source-native-reparse-stable-11b/native-parent",
+    "source_status": "partial",
+    "tool_trace_sha256": "434043b65e05b119a19d7961a60672c895afd41a8ff7f47ef2bdafe1236be8ee",
+    "kind": "anonymized_contract_regression_not_financial_gold",
+    "retained_original_artifacts": true
+  },
+  "claim_text": "甲公司2023年合并营业收入100元。",
+  "company": "甲公司",
+  "cutoff": "2024-04-22",
+  "recorded_lookup": {
+    "fact": null,
+    "query_outcome_status": "missing",
+    "required_rule_ids": []
+  },
+  "recorded_native_sequence": [
+    "mj_get_facts",
+    "mj_list_reports",
+    "mj_search_blocks",
+    "mj_search_blocks",
+    "mj_read_context",
+    "mj_read_context",
+    "mj_search_blocks",
+    "mj_search_blocks",
+    "mj_search_blocks",
+    "mj_read_context",
+    "mj_verify_bindings",
+    "mj_verify_bindings"
+  ],
+  "recorded_verify_rejection": {"error": "ToolDenied"},
+  "symptoms": {
+    "rules_read": 0,
+    "reparse_calls": 0,
+    "native_verify_denials": 2,
+    "pending_claims": 1,
+    "final_judgments": 0
+  }
+}

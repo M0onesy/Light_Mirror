@@ -1,0 +1,896 @@
+{
+  "python": [
+    {
+      "component": "Python",
+      "path": "docs/licenses/python/python/LICENSE_PYTHON.txt",
+      "sha256": "343237e4be4e1787bb54019abcd61d48465ac7fc2e12f4183846fa68b8447371"
+    },
+    {
+      "component": "altgraph",
+      "path": "docs/licenses/python/altgraph/6c194d6db0c6-LICENSE",
+      "sha256": "0b9ba1394c0a342806271a7cfafdb69966c4c3446234b9ae4809157fde9ff758"
+    },
+    {
+      "component": "annotated-types",
+      "path": "docs/licenses/python/annotated-types/fe1049884b1a-LICENSE",
+      "sha256": "a871c5961df6af173c81fabdc9731efe1eb8a9f7ea81f1ec99a6fc6c8d704f29"
+    },
+    {
+      "component": "anyio",
+      "path": "docs/licenses/python/anyio/5361ac9dc58f-LICENSE",
+      "sha256": "f084e5f6b530edc39393ef7817810fca449cf7ea5d7e090faa0430411badf7c3"
+    },
+    {
+      "component": "attrs",
+      "path": "docs/licenses/python/attrs/882115c95dfc-LICENSE",
+      "sha256": "f3f5c30313daec595b7dfe6f3f6fce2c9ad1f0f04a780ad463e6a382ffc50a81"
+    },
+    {
+      "component": "cffi",
+      "path": "docs/licenses/python/cffi/04b80f5b077b-LICENSE",
+      "sha256": "7ac11950e72df5b45c51716a7b22e7bb34b324d67f065e2938152dd472c4815f"
+    },
+    {
+      "component": "click",
+      "path": "docs/licenses/python/click/9a8ad106a394-LICENSE.rst",
+      "sha256": "757302fe7c41e7026fa46d3315ea8604ed5295fc95c2256d9b38adac43f6fbe5"
+    },
+    {
+      "component": "colorama",
+      "path": "docs/licenses/python/colorama/cac35c02686e-LICENSE.txt",
+      "sha256": "3525b361643e12a9c6c0b7f6ee2d447c171ecb21af1245a24c9f7d3cb4382e8b"
+    },
+    {
+      "component": "cryptography",
+      "path": "docs/licenses/python/cryptography/3e0c7c091a94-LICENSE",
+      "sha256": "089d2e6abab324bda36cc4b032b9c39954b39b488ec92973f314ffe922dce4bc"
+    },
+    {
+      "component": "cryptography",
+      "path": "docs/licenses/python/cryptography/aac73b3148f6-LICENSE.APACHE",
+      "sha256": "e8de1a7393457e9c88768b78e6ba790622fbefb040ce48194c2cb0f1b6d4e9ff"
+    },
+    {
+      "component": "cryptography",
+      "path": "docs/licenses/python/cryptography/602c4c7482de-LICENSE.BSD",
+      "sha256": "661d18932dd84bb263a8ee418ab7774ed94eec33c83fd1db5b533f78eb774ca4"
+    },
+    {
+      "component": "h11",
+      "path": "docs/licenses/python/h11/37db5bb85926-LICENSE.txt",
+      "sha256": "3fe2f916436a5f964325ee8451fe7aaa6331b60e2d0c8bbbd485f3b98a849b8a"
+    },
+    {
+      "component": "httpcore2",
+      "path": "docs/licenses/python/httpcore2/c4df125c807b-LICENSE.md",
+      "sha256": "6412ee690258e27623577824f4963d17b850ab77d28e7f3059f2068f93472500"
+    },
+    {
+      "component": "httpx2",
+      "path": "docs/licenses/python/httpx2/7e7d6dbaf7fe-LICENSE.md",
+      "sha256": "9f0c3bd2c68e83952659368961507839e2c952df48ebab9b2f0143dac385ddc5"
+    },
+    {
+      "component": "idna",
+      "path": "docs/licenses/python/idna/1a9a4f0e3d47-LICENSE.md",
+      "sha256": "b395c7499873dbd9c4117046d91bfd2c47ca5d7d35b9dd9c1ba1911eefce0e59"
+    },
+    {
+      "component": "jsonschema",
+      "path": "docs/licenses/python/jsonschema/4f92a015a13c-COPYING",
+      "sha256": "66010c33da1256c30c4359f6edd8c30fbccbf41a4bf66cb0c576e5c726978142"
+    },
+    {
+      "component": "jsonschema-specifications",
+      "path": "docs/licenses/python/jsonschema-specifications/42dcd63495f8-COPYING",
+      "sha256": "8792625a6abba630a3e56e38633d67e84c9b7e5dfcd60f6a5c7447ddcf68faa4"
+    },
+    {
+      "component": "mcp",
+      "path": "docs/licenses/python/mcp/5e13dbbc1d12-LICENSE",
+      "sha256": "22f8d69b51b1231102c966d1291d5056491f1882c5828b859e499e092fb9a594"
+    },
+    {
+      "component": "mcp-types",
+      "path": "docs/licenses/python/mcp-types/5e13dbbc1d12-LICENSE",
+      "sha256": "22f8d69b51b1231102c966d1291d5056491f1882c5828b859e499e092fb9a594"
+    },
+    {
+      "component": "opentelemetry-api",
+      "path": "docs/licenses/python/opentelemetry-api/c71d239df917-LICENSE",
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+    },
+    {
+      "component": "packaging",
+      "path": "docs/licenses/python/packaging/cad1ef5bd340-LICENSE",
+      "sha256": "8ef81e4c883c5ccb2a08026cc74ba3193279dd5149b36839d976c0a896637d87"
+    },
+    {
+      "component": "packaging",
+      "path": "docs/licenses/python/packaging/0d542e0c8804-LICENSE.APACHE",
+      "sha256": "eb3d7b5485466acbd81f2b496f595ab637d2792e268206b27d99e793bdb67549"
+    },
+    {
+      "component": "packaging",
+      "path": "docs/licenses/python/packaging/b70e7e9b742f-LICENSE.BSD",
+      "sha256": "67daf15b478dbd91bcd83bff907efff68471d42d2138226b89f039d658d53435"
+    },
+    {
+      "component": "pefile",
+      "path": "docs/licenses/python/pefile/b44409c067c6-LICENSE",
+      "sha256": "fa09deef47ce9e1134dafeb6c6f94cb89e4cb5310b629a3bc1755e5a75894a7a"
+    },
+    {
+      "component": "pycparser",
+      "path": "docs/licenses/python/pycparser/3e7df25b8dfb-LICENSE",
+      "sha256": "839aee1bbfd49154ed48b2d9611c00637e3efb9986e9616f320e74db68341569"
+    },
+    {
+      "component": "pydantic",
+      "path": "docs/licenses/python/pydantic/a9e186f3ca16-LICENSE",
+      "sha256": "fc67bae6467548be3bf034f79012cb3cdb2cc548c18969e305717cf8074bf8e7"
+    },
+    {
+      "component": "pydantic_core",
+      "path": "docs/licenses/python/pydantic-core/fbe7f615f18d-LICENSE",
+      "sha256": "fbe7f615f18d135c07000e5a86325db27f42c7729699ef166ac1f7a3f4586bf4"
+    },
+    {
+      "component": "pyinstaller",
+      "path": "docs/licenses/python/pyinstaller/0598064c7d27-COPYING.txt",
+      "sha256": "2f71515511f67e3102ae9ba0d3ec0d3a513295262dec1fa0ab0bb2e23e9f2a77"
+    },
+    {
+      "component": "pyinstaller-hooks-contrib",
+      "path": "docs/licenses/python/pyinstaller-hooks-contrib/91d0baaff007-LICENSE",
+      "sha256": "f7f282da3989d0b3423bca8d90f38e83c91c273d4896a72b01f7a89b2f1ce08d"
+    },
+    {
+      "component": "PyJWT",
+      "path": "docs/licenses/python/pyjwt/797a7a20231d-LICENSE",
+      "sha256": "b487afdfc0d6ae9308d20ebec62cd02f1e0f7f2c43a32b3116579b254150504e"
+    },
+    {
+      "component": "pymupdf",
+      "path": "docs/licenses/python/pymupdf/40e606976005-COPYING",
+      "sha256": "40e60697600535eabfb5ae05f72829d88cfe8d02dd4792f5a754f6f51dabe55b"
+    },
+    {
+      "component": "python-multipart",
+      "path": "docs/licenses/python/python-multipart/cfc7749b96f6-LICENSE.txt",
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/5ea2f23c7f00-license.txt",
+      "sha256": "5ea2f23c7f00c3006bacf267183e816d8d4b6dc95ea57a4ddb0ff81de6d8719e"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/a74d826efb24-License.txt",
+      "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/57ec79bbeab4-Scintilla-License.txt",
+      "sha256": "57ec79bbeab4fd1cf7460a7ad450d2ab01471810459aeae9e75e4c66b472095f"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/a0fa1e7b8a42-LICENSE.txt",
+      "sha256": "a0fa1e7b8a4230055685e796548ac084a6c0eea395294574093bba72efd9191b"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/5ea2f23c7f00-license.txt",
+      "sha256": "5ea2f23c7f00c3006bacf267183e816d8d4b6dc95ea57a4ddb0ff81de6d8719e"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/fad39c18fc38-License.txt",
+      "sha256": "fad39c18fc3825fa278db1c86fd52cf88d7c525b3c2fbf7817fa383cbae4d423"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/1c4cf44d2fb8-LICENSE",
+      "sha256": "1c4cf44d2fb8bf2d10214d6da80cc9e05502824cc4460f35be4c7bcb4cde53da"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/a74d826efb24-License.txt",
+      "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/57ec79bbeab4-License.txt",
+      "sha256": "57ec79bbeab4fd1cf7460a7ad450d2ab01471810459aeae9e75e4c66b472095f"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/a0fa1e7b8a42-LICENSE.txt",
+      "sha256": "a0fa1e7b8a4230055685e796548ac084a6c0eea395294574093bba72efd9191b"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/a74d826efb24-License.txt",
+      "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/a74d826efb24-License.txt",
+      "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/fad39c18fc38-License.txt",
+      "sha256": "fad39c18fc3825fa278db1c86fd52cf88d7c525b3c2fbf7817fa383cbae4d423"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/fad39c18fc38-License.txt",
+      "sha256": "fad39c18fc3825fa278db1c86fd52cf88d7c525b3c2fbf7817fa383cbae4d423"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/1c4cf44d2fb8-MAPIStubLibrary-License.txt",
+      "sha256": "1c4cf44d2fb8bf2d10214d6da80cc9e05502824cc4460f35be4c7bcb4cde53da"
+    },
+    {
+      "component": "pywin32",
+      "path": "docs/licenses/python/pywin32/dedf997c8f55-NOTICE.md",
+      "sha256": "dedf997c8f5568a0e0aff57d009f501226ea30c401323d67912b6a8f8735a825"
+    },
+    {
+      "component": "referencing",
+      "path": "docs/licenses/python/referencing/42dcd63495f8-COPYING",
+      "sha256": "8792625a6abba630a3e56e38633d67e84c9b7e5dfcd60f6a5c7447ddcf68faa4"
+    },
+    {
+      "component": "rpds-py",
+      "path": "docs/licenses/python/rpds-py/8bcb72c82ea8-LICENSE",
+      "sha256": "8bcb72c82ea8ae74802293c41d93ad7d51434001b0ae45a603a5af0f507aee0a"
+    },
+    {
+      "component": "sse-starlette",
+      "path": "docs/licenses/python/sse-starlette/80af6bfccbeb-LICENSE",
+      "sha256": "1dbfb8fc009d869405ef445af4a58ead35eced01b3ceaebae0e3bf97bd2fc565"
+    },
+    {
+      "component": "starlette",
+      "path": "docs/licenses/python/starlette/dcb95677a022-LICENSE.md",
+      "sha256": "38184b047d9c147baaa1b78de5ccbddb838965582493f1d83f7846242c7d4682"
+    },
+    {
+      "component": "truststore",
+      "path": "docs/licenses/python/truststore/33be7b7e8fa4-LICENSE",
+      "sha256": "9697933f3b361a0dd056668a655c403907c89178ebaa125c3ab969e506c4b5e4"
+    },
+    {
+      "component": "typing_extensions",
+      "path": "docs/licenses/python/typing-extensions/3b2f81fe21d1-LICENSE",
+      "sha256": "343237e4be4e1787bb54019abcd61d48465ac7fc2e12f4183846fa68b8447371"
+    },
+    {
+      "component": "typing-inspection",
+      "path": "docs/licenses/python/typing-inspection/804b59b25f2c-LICENSE",
+      "sha256": "1f6698ea4bab271f656a1fa7c220c2c4f71e5951aef81cb274606efcbe615c7e"
+    },
+    {
+      "component": "uvicorn",
+      "path": "docs/licenses/python/uvicorn/efe1acf3e62f-LICENSE.md",
+      "sha256": "c07b04547f369d2332649c8812be4cade5cb9232a79967a43e26b276730585e7"
+    }
+  ],
+  "runtime": [
+    {
+      "path": "licenses/DEEPSEEK_HARNESS_LICENSE",
+      "bytes": 1065,
+      "sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be"
+    },
+    {
+      "path": "licenses/NODE_LICENSE",
+      "bytes": 157606,
+      "sha256": "148eacf7863ef4329224a29398623077200a27194aa075569faf4a0a85566ca5"
+    },
+    {
+      "path": "node_modules/@anthropic-ai/sdk/LICENSE",
+      "bytes": 1056,
+      "sha256": "8bf96984ff8bcfae7e48cae76a529e8a25317ba9e02abf7fd3cc64fdf95657a6"
+    },
+    {
+      "path": "node_modules/@anthropic-ai/sdk/src/internal/qs/LICENSE.md",
+      "bytes": 1588,
+      "sha256": "d8c77eaffed7f1f874b97f66ee47a557ae24fd59bae8ae14f9b1b84f26a94d2f"
+    },
+    {
+      "path": "node_modules/@aws/lambda-invoke-store/LICENSE",
+      "bytes": 10142,
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "path": "node_modules/@aws-crypto/sha256-browser/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/@aws-crypto/sha256-js/LICENSE",
+      "bytes": 11323,
+      "sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a"
+    },
+    {
+      "path": "node_modules/@aws-crypto/supports-web-crypto/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/@aws-crypto/util/LICENSE",
+      "bytes": 11356,
+      "sha256": "db1ed8cccea0d0fb5d92b7c59d9aa78a5bbcd047972519c6a21a4416937f2ebf"
+    },
+    {
+      "path": "node_modules/@aws-sdk/client-bedrock-runtime/LICENSE",
+      "bytes": 11390,
+      "sha256": "18c295fdd68d4f68418b0209829f241481e93549d9e7b9fcd4b4c029322c8a45"
+    },
+    {
+      "path": "node_modules/@aws-sdk/core/LICENSE",
+      "bytes": 11352,
+      "sha256": "edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-env/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-http/node_modules/@smithy/node-http-handler/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-ini/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-node/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-process/LICENSE",
+      "bytes": 11352,
+      "sha256": "2ef1e48ea743d9c82313e6887858f7c1feaddd636f5a3f43926aab0143e67ebd"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-sso/LICENSE",
+      "bytes": 11352,
+      "sha256": "2ef1e48ea743d9c82313e6887858f7c1feaddd636f5a3f43926aab0143e67ebd"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-sso/node_modules/@aws-sdk/token-providers/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/credential-provider-web-identity/LICENSE",
+      "bytes": 11352,
+      "sha256": "2ef1e48ea743d9c82313e6887858f7c1feaddd636f5a3f43926aab0143e67ebd"
+    },
+    {
+      "path": "node_modules/@aws-sdk/eventstream-handler-node/LICENSE",
+      "bytes": 11385,
+      "sha256": "07364a5f7d0177a59a05a0002187431f8f899320983c0dc049d72df015e8064c"
+    },
+    {
+      "path": "node_modules/@aws-sdk/middleware-eventstream/LICENSE",
+      "bytes": 11390,
+      "sha256": "e345c2ee7df4446e739de7b91535f0c10ddcd909b9753889e943ee637b05db8c"
+    },
+    {
+      "path": "node_modules/@aws-sdk/middleware-websocket/LICENSE",
+      "bytes": 11385,
+      "sha256": "07364a5f7d0177a59a05a0002187431f8f899320983c0dc049d72df015e8064c"
+    },
+    {
+      "path": "node_modules/@aws-sdk/nested-clients/node_modules/@smithy/node-http-handler/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/signature-v4-multi-region/LICENSE",
+      "bytes": 11385,
+      "sha256": "07364a5f7d0177a59a05a0002187431f8f899320983c0dc049d72df015e8064c"
+    },
+    {
+      "path": "node_modules/@aws-sdk/token-providers/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/types/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/util-locate-window/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@aws-sdk/xml-builder/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@babel/runtime/LICENSE",
+      "bytes": 1106,
+      "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/cordis/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/cordis-plugin-group/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/cordis-plugin-include/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/cordis-plugin-loader/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/cordis-plugin-timer/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/cosmokit/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-chunked-list/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-commands/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-llm/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-llm-retry/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-sandbox-policy/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-sdk-app/node_modules/commander/LICENSE",
+      "bytes": 1098,
+      "sha256": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-session-projection/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/dsh-session-title/node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    },
+    {
+      "path": "node_modules/@deepseek-ai/schemastery/LICENSE",
+      "bytes": 1071,
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7"
+    },
+    {
+      "path": "node_modules/@google/genai/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/@protobufjs/aspromise/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/base64/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/codegen/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/eventemitter/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/fetch/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/float/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/path/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/pool/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@protobufjs/utf8/LICENSE",
+      "bytes": 1505,
+      "sha256": "a67b34a24a5daddcce46aea68c5004e4442bbfb63690329fa607bf4de4269794"
+    },
+    {
+      "path": "node_modules/@smithy/core/LICENSE",
+      "bytes": 11385,
+      "sha256": "07364a5f7d0177a59a05a0002187431f8f899320983c0dc049d72df015e8064c"
+    },
+    {
+      "path": "node_modules/@smithy/credential-provider-imds/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@smithy/fetch-http-handler/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@smithy/is-array-buffer/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@smithy/node-http-handler/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@smithy/signature-v4/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@smithy/types/LICENSE",
+      "bytes": 11385,
+      "sha256": "07364a5f7d0177a59a05a0002187431f8f899320983c0dc049d72df015e8064c"
+    },
+    {
+      "path": "node_modules/@smithy/util-buffer-from/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@smithy/util-utf8/LICENSE",
+      "bytes": 11357,
+      "sha256": "d82ceb8cbd004a2d4834085c557d55459f528e30268d95159ee1e4030a693a6e"
+    },
+    {
+      "path": "node_modules/@stablelib/base64/LICENSE",
+      "bytes": 1110,
+      "sha256": "1605b77bebe018db1fc27bd22fbcdeed1335c617937a124299a8b042b42b0fb6"
+    },
+    {
+      "path": "node_modules/@standard-schema/spec/LICENSE",
+      "bytes": 1071,
+      "sha256": "653b779005a3a4d64a7288c940f7b9a0e8f0b1e0375f6aa6af9473caf131e564"
+    },
+    {
+      "path": "node_modules/@types/node/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+    },
+    {
+      "path": "node_modules/@types/retry/LICENSE",
+      "bytes": 1183,
+      "sha256": "dea9265341829002e2c23a7372393eb2ed6e26085fb623f38a4ba0af833f30a6"
+    },
+    {
+      "path": "node_modules/agent-base/LICENSE",
+      "bytes": 1101,
+      "sha256": "8d8c55319c7729d57be811c747452636688d54f19701ee0752b6b15ad3771d9a"
+    },
+    {
+      "path": "node_modules/argparse/LICENSE",
+      "bytes": 12775,
+      "sha256": "de4d1f2d2ad5ad0cfd1657a106476b31cb5db5ef9d1ff842b237c0c81f0c8a23"
+    },
+    {
+      "path": "node_modules/base64-js/LICENSE",
+      "bytes": 1081,
+      "sha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1"
+    },
+    {
+      "path": "node_modules/bignumber.js/LICENCE.md",
+      "bytes": 1147,
+      "sha256": "def75ba75d6426f1c3f02addf8e175fbe6e0d8a82e541cbdffc16d2bd8fd7d6a"
+    },
+    {
+      "path": "node_modules/bowser/LICENSE",
+      "bytes": 1797,
+      "sha256": "dfde54fedc270c2a305d9a9f993d93f706d34624455a2fd2d2a05ca34d8ae8c3"
+    },
+    {
+      "path": "node_modules/buffer-equal-constant-time/LICENSE.txt",
+      "bytes": 1518,
+      "sha256": "751d0e80fb5c828f8c3de198cc760e1e05377e47c8263ab6ee2f10cdc19ba658"
+    },
+    {
+      "path": "node_modules/commander/LICENSE",
+      "bytes": 1098,
+      "sha256": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b"
+    },
+    {
+      "path": "node_modules/debug/LICENSE",
+      "bytes": 1139,
+      "sha256": "3a61c6c96caf5c1d9b623fb9b04c822b783dfcb78aa7e49c76a3f643e6ed7f95"
+    },
+    {
+      "path": "node_modules/ecdsa-sig-formatter/LICENSE",
+      "bytes": 11312,
+      "sha256": "50a6b24f8defc31a078aa9799a91d776f83948071574854f12473362aee74d0d"
+    },
+    {
+      "path": "node_modules/eventsource-parser/LICENSE",
+      "bytes": 1098,
+      "sha256": "835eb611a23301b27115ca1be9f754c876e643ceb7fe63049c6b50609a1cafeb"
+    },
+    {
+      "path": "node_modules/extend/LICENSE",
+      "bytes": 1081,
+      "sha256": "97af7428f93afbab9bf79cd09254da1357161794f4255eb1b4599f04dd2d2e7c"
+    },
+    {
+      "path": "node_modules/fast-sha256/LICENSE",
+      "bytes": 1210,
+      "sha256": "88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd"
+    },
+    {
+      "path": "node_modules/fetch-blob/LICENSE",
+      "bytes": 1068,
+      "sha256": "a5edccac92c3aa845694dcfaa72a0c098c1ae40d5ca6a37e4e59d778cf8e29bd"
+    },
+    {
+      "path": "node_modules/formdata-polyfill/LICENSE",
+      "bytes": 1083,
+      "sha256": "435a6437e47e5e479942255680e7fbe5f333d55234ada1c35f6115ca641d5bb4"
+    },
+    {
+      "path": "node_modules/gaxios/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/gcp-metadata/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/google-auth-library/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/google-logging-utils/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/http-proxy-agent/LICENSE",
+      "bytes": 1102,
+      "sha256": "71368fd0f5b4129191e9afcd1e1ef2dc89a9090d3e4d80bbab92dafd032b3bef"
+    },
+    {
+      "path": "node_modules/https-proxy-agent/LICENSE",
+      "bytes": 1101,
+      "sha256": "8d8c55319c7729d57be811c747452636688d54f19701ee0752b6b15ad3771d9a"
+    },
+    {
+      "path": "node_modules/js-yaml/LICENSE",
+      "bytes": 1084,
+      "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550"
+    },
+    {
+      "path": "node_modules/json-bigint/LICENSE",
+      "bytes": 1081,
+      "sha256": "def82c085d05e795fe6a9cb5b70c48e022212355afc0e91d4de047cade28df06"
+    },
+    {
+      "path": "node_modules/json-schema-to-ts/LICENSE",
+      "bytes": 1071,
+      "sha256": "18a2bfd070b08bd1cc538c90f59989a9523e070e72fe9a9068593c3e82f44fa7"
+    },
+    {
+      "path": "node_modules/jwa/LICENSE",
+      "bytes": 1068,
+      "sha256": "3320319f8a5f42bc4254e65471eca7a5ea4dc8c883c4c24b4868e36b14890bcf"
+    },
+    {
+      "path": "node_modules/jws/LICENSE",
+      "bytes": 1068,
+      "sha256": "3320319f8a5f42bc4254e65471eca7a5ea4dc8c883c4c24b4868e36b14890bcf"
+    },
+    {
+      "path": "node_modules/koffi/LICENSE.txt",
+      "bytes": 1117,
+      "sha256": "22bcbbbacd739b026a8dc484f62a31484ce4c4e31f3408b60b29b4e41d62b290"
+    },
+    {
+      "path": "node_modules/koffi/vendor/node-addon-api/LICENSE.md",
+      "bytes": 1150,
+      "sha256": "89024017b88a9f2b763f79b941a4f2db3b4428edfcacdc0b23866b2da633ad0c"
+    },
+    {
+      "path": "node_modules/koffi/vendor/node-api-headers/LICENSE",
+      "bytes": 1064,
+      "sha256": "a553508f516031c91f3af1148d44970cb81bbae6c4f091be6835d39cc252238c"
+    },
+    {
+      "path": "node_modules/long/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "node_modules/ms/license.md",
+      "bytes": 1079,
+      "sha256": "1662fae9b5314d11cf51284e2dcd1f006a354f7343f08712a730fcff9a359801"
+    },
+    {
+      "path": "node_modules/node-addon-native-custom-loader/LICENSE",
+      "bytes": 1096,
+      "sha256": "75bd0a6d6b9f9f0a6c792ca89832360b19749ebe16af0222e34387f262baa95e"
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin/LICENSE",
+      "bytes": 1096,
+      "sha256": "75bd0a6d6b9f9f0a6c792ca89832360b19749ebe16af0222e34387f262baa95e"
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-win32-x64-msvc/LICENSE",
+      "bytes": 1096,
+      "sha256": "75bd0a6d6b9f9f0a6c792ca89832360b19749ebe16af0222e34387f262baa95e"
+    },
+    {
+      "path": "node_modules/node-domexception/LICENSE",
+      "bytes": 1071,
+      "sha256": "8ec1386f7f078b0c7cd25341cd80f332df902371cda9f40c10ec2b4007b420b7"
+    },
+    {
+      "path": "node_modules/node-fetch/LICENSE.md",
+      "bytes": 1090,
+      "sha256": "3e2c11dcf3f17ab585baab8faba54772d7872f1c6e026022acd4b4006665efb0"
+    },
+    {
+      "path": "node_modules/openai/LICENSE",
+      "bytes": 11336,
+      "sha256": "636eb7d79da9bb6d515a4b3fd417aa26679eb3cf16396ddab4bc55fa74e616e4"
+    },
+    {
+      "path": "node_modules/openai/src/_vendor/zod-to-json-schema/LICENSE",
+      "bytes": 746,
+      "sha256": "7beaa85b57d7211f6684af6c1d97e6d9ef7ec1851f779152043a47a8700306a9"
+    },
+    {
+      "path": "node_modules/openai/src/internal/qs/LICENSE.md",
+      "bytes": 1588,
+      "sha256": "d8c77eaffed7f1f874b97f66ee47a557ae24fd59bae8ae14f9b1b84f26a94d2f"
+    },
+    {
+      "path": "node_modules/p-retry/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+    },
+    {
+      "path": "node_modules/partial-json/LICENSE",
+      "bytes": 1075,
+      "sha256": "cd519ad3d7e012427f978dfb2e3b92ee403d189d7b859ba6bf68fd7e12ca456f"
+    },
+    {
+      "path": "node_modules/protobufjs/google/LICENSE",
+      "bytes": 1476,
+      "sha256": "4ab87e6e3c0c0b78e47c77d49ec10c048f8a519fb8062e6e3217e3e6e9b0c6e9"
+    },
+    {
+      "path": "node_modules/protobufjs/LICENSE",
+      "bytes": 1937,
+      "sha256": "49d6a1c9a623784c61c6cb70f773f3457faceb1914a13c8560a9823b7631950c"
+    },
+    {
+      "path": "node_modules/resolve.exports/license",
+      "bytes": 1114,
+      "sha256": "306fa513e39b23a6e8747520de761809d206b99800ef41907b530226574c59ae"
+    },
+    {
+      "path": "node_modules/retry/License",
+      "bytes": 1139,
+      "sha256": "01ad164273e8e095abc9dbd1c21e194594a671af7d528cb43ee7b4c903ba7da3"
+    },
+    {
+      "path": "node_modules/safe-buffer/LICENSE",
+      "bytes": 1081,
+      "sha256": "c7cc929b57080f4b9d0c6cf57669f0463fc5b39906344dfc8d3bc43426b30eac"
+    },
+    {
+      "path": "node_modules/ts-algebra/LICENSE",
+      "bytes": 1071,
+      "sha256": "18a2bfd070b08bd1cc538c90f59989a9523e070e72fe9a9068593c3e82f44fa7"
+    },
+    {
+      "path": "node_modules/tslib/CopyrightNotice.txt",
+      "bytes": 822,
+      "sha256": "da16ddb65f8ca390998fb99223d0112498b56b45784d00afd77ff8ce1ac4de8b"
+    },
+    {
+      "path": "node_modules/tslib/LICENSE.txt",
+      "bytes": 655,
+      "sha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751"
+    },
+    {
+      "path": "node_modules/typebox/license",
+      "bytes": 1094,
+      "sha256": "e8a7cc256941a26ba8234f04390165243a4d42f74fd6491934140605bf7eae2d"
+    },
+    {
+      "path": "node_modules/undici/lib/web/fetch/LICENSE",
+      "bytes": 1071,
+      "sha256": "a21d6c8d3fc631198b97e57584697f7f9c37805c71c6cf9a12e4442b40394b88"
+    },
+    {
+      "path": "node_modules/undici/LICENSE",
+      "bytes": 1090,
+      "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+    },
+    {
+      "path": "node_modules/undici-types/LICENSE",
+      "bytes": 1090,
+      "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+    },
+    {
+      "path": "node_modules/web-streams-polyfill/LICENSE",
+      "bytes": 1120,
+      "sha256": "81008a3fb78f69f3c4a72a9e005c8582342ab62864371b3ab8e1b6af9041e080"
+    },
+    {
+      "path": "node_modules/ws/LICENSE",
+      "bytes": 1183,
+      "sha256": "2b29dcfe0d6471f7e8c92c5fb38c9f93edee10330937055440192f1832b1ecef"
+    },
+    {
+      "path": "node_modules/zod/LICENSE",
+      "bytes": 1072,
+      "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+    }
+  ]
+}

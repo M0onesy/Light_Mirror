@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MingJing CRRV v2 sample",
+  "type": "object",
+  "required": ["id", "set", "draft", "company", "gold_status", "gold_origin"],
+  "properties": {
+    "id": {"type": "string"},
+    "set": {"enum": ["P", "A", "B", "C", "X", "D3"]},
+    "draft": {"type": "string"},
+    "company": {"type": "string"},
+    "gold_status": {"enum": ["verified", "violated", "abstained", "out_of_scope"]},
+    "gold_origin": {"enum": ["deterministic_generated_fixture", "independent_human_original_pdf"]},
+    "human_reviews": {"type": "array"},
+    "gold_error_type": {"type": ["string", "null"]},
+    "gold_abstention_code": {"type": ["string", "null"]},
+    "variant": {"enum": ["raw", "rounded", "original"]},
+    "report_date": {"type": ["string", "null"]},
+    "facts": {"type": "array"},
+    "evidence_kind": {"enum": ["synthetic", "original_pdf"]}
+  }
+}

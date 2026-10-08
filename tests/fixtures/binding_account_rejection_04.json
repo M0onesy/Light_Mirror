@@ -1,0 +1,264 @@
+{
+  "provenance": {
+    "source_run": "source-native-reparse-stable-04/native-child",
+    "source_status": "partial",
+    "selection": "Only public tool-call deltas and matching host trace. No reasoning or assistant text is copied.",
+    "source_sha256": {
+      "tool_trace.json": "8707cbfd25208e79df1cad4d2df13c65b9c8d89adfc707409107b3fa26689ef8",
+      "agent_model_cache.json": "046d42b575da29e7051f7e5ec2b265de2118ea0849925b29d5b8b8339012a263",
+      "claims.json": "fcafb99b108c177a61ed0c8e4967369876c1bb792c7c0b5580c9f0d9ae8f0563"
+    }
+  },
+  "claim": {
+    "claim_id": "claim-00001",
+    "text": "并行科技2023年合并营业收入495671818.88元",
+    "start": 60,
+    "end": 73,
+    "claim_type": "numeric",
+    "company": "并行科技",
+    "account": "REVENUE",
+    "period": "2023Y",
+    "candidate_value": "495671818.88",
+    "unit": "元",
+    "caliber_hint": [
+      "合并",
+      "未扣非"
+    ],
+    "declared_source": null,
+    "relation": "value",
+    "base_period": null,
+    "display_decimals": 2,
+    "numeric_text": "495671818.88元",
+    "binding_status": "disagreed",
+    "parse_status": "parsed",
+    "modality": "fact",
+    "query_strategy": "latest_as_of",
+    "approximate": false,
+    "table_context": {
+      "source_scope_required": true,
+      "source_dimensions": {
+        "schema_version": "source-dimensions.v1",
+        "company": "并行科技",
+        "account": "REVENUE",
+        "period": "2023Y",
+        "scope": "合并",
+        "relation": "value",
+        "base_period": "",
+        "source_text_sha256": "2331b16a67885b4e555916bdfe6f496c4a00e9a52b341a24dbb7e4298d2eb2aa",
+        "source_start": 60,
+        "source_end": 73,
+        "source_numeric_start": 15,
+        "provenance": "source_text_deterministic",
+        "scope_provenance": "source_text_only",
+        "company_provenance": "explicit_source_subject",
+        "source_company_subjects": [
+          "并行科技"
+        ],
+        "company_source_explicit": true,
+        "explicit": {
+          "company": true,
+          "account": true,
+          "period": true,
+          "scope": true,
+          "relation": true,
+          "base_period": false
+        }
+      }
+    },
+    "source_numeric_start": 15
+  },
+  "cached_submission_calls": [
+    {
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "营业收入",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "营业收入",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "REVENUE",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "营业收入",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "binding": {
+              "account": "营业收入",
+              "base_period": "",
+              "company": "并行科技",
+              "period": "2023Y",
+              "relation": "value",
+              "scope": "合并"
+            },
+            "mention_id": "claim-00001"
+          }
+        ]
+      }
+    }
+  ],
+  "trace_submissions": [
+    {
+      "role": "planner",
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "营业收入",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      },
+      "status": "denied"
+    },
+    {
+      "role": "verifier",
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "营业收入",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      },
+      "status": "denied"
+    },
+    {
+      "role": "verifier",
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "REVENUE",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      },
+      "status": "success"
+    },
+    {
+      "role": "planner",
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "mention_id": "claim-00001",
+            "binding": {
+              "company": "并行科技",
+              "account": "营业收入",
+              "period": "2023Y",
+              "scope": "合并",
+              "relation": "value",
+              "base_period": ""
+            }
+          }
+        ]
+      },
+      "status": "denied"
+    },
+    {
+      "role": "planner",
+      "tool": "mj_submit_bindings",
+      "input": {
+        "bindings": [
+          {
+            "binding": {
+              "account": "营业收入",
+              "base_period": "",
+              "company": "并行科技",
+              "period": "2023Y",
+              "relation": "value",
+              "scope": "合并"
+            },
+            "mention_id": "claim-00001"
+          }
+        ]
+      },
+      "status": "denied"
+    }
+  ]
+}

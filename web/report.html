@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>明镜 MingJing · 研报核查报告</title>
+  <style>
+    :root { --ink:#18212f; --muted:#647184; --line:#dce2ea; --bg:#f5f7fa; --panel:#fff; --blue:#1957a6; --red:#b42318; --amber:#9a6700; --green:#087443; --gray:#59636f; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--bg); font:14px/1.55 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; }
+    header { background:#112a46; color:#fff; padding:20px clamp(16px,4vw,48px); }
+    header .bar { max-width:1500px; margin:auto; display:flex; align-items:center; gap:20px; justify-content:space-between; }
+    h1 { margin:0; font-size:22px; letter-spacing:.02em; } h2 { margin:0 0 12px; font-size:17px; } h3 { margin:0 0 6px; font-size:15px; }
+    .subtitle { color:#cbd8e7; margin-top:3px; font-size:12px; }
+    main { max-width:1500px; margin:20px auto; padding:0 clamp(12px,3vw,36px); }
+    .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+    button, input, select { font:inherit; } button, .file-label { border:1px solid #b7c3d2; border-radius:5px; background:#fff; color:var(--ink); cursor:pointer; padding:7px 11px; }
+    button:hover, .file-label:hover { border-color:var(--blue); color:var(--blue); } input[type=search] { min-width:220px; flex:1; padding:8px 10px; border:1px solid #b7c3d2; border-radius:5px; }
+    input[type=file] { display:none; } .hint { color:var(--muted); font-size:12px; }
+    .status { padding:7px 10px; border-radius:4px; font-weight:600; font-size:12px; } .status.verified { background:#e8f6ef;color:var(--green); } .status.violated { background:#fff0ee;color:var(--red); } .status.abstained { background:#fff7df;color:var(--amber); } .status.unknown { background:#eef1f4;color:var(--gray); }
+    .metrics { display:grid; grid-template-columns:repeat(5,minmax(110px,1fr)); gap:10px; margin-bottom:16px; }
+    .metric { background:var(--panel); border:1px solid var(--line); padding:13px 15px; border-radius:6px; } .metric .value { font-size:24px; font-weight:700; } .metric .label { color:var(--muted); font-size:12px; }
+    .layout { display:grid; grid-template-columns:minmax(230px,.85fr) minmax(320px,1.2fr) minmax(300px,1fr); gap:14px; align-items:start; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:6px; overflow:hidden; } .panel-head { padding:13px 15px; border-bottom:1px solid var(--line); background:#fbfcfd; } .panel-body { padding:14px 15px; }
+    .claim-list { max-height:calc(100vh - 245px); overflow:auto; } .claim { padding:12px 14px; border-bottom:1px solid #edf0f4; cursor:pointer; } .claim:hover,.claim.selected { background:#edf4fc; } .claim p { margin:7px 0 0; color:#273446; }
+    .claim-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; } .claim-id { color:var(--muted); font-size:11px; }
+    .empty { padding:28px 14px; color:var(--muted); text-align:center; } .section { margin-bottom:18px; } dl { display:grid; grid-template-columns:105px 1fr; margin:0; gap:7px 12px; } dt { color:var(--muted); } dd { margin:0; overflow-wrap:anywhere; }
+    pre { white-space:pre-wrap; overflow:auto; background:#f5f7fa; border:1px solid var(--line); padding:10px; border-radius:4px; font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .evidence { border-left:3px solid #b9cbe1; padding:8px 10px; margin:8px 0; background:#fafbfd; } .evidence a { color:var(--blue); word-break:break-all; } .evidence small { display:block; color:var(--muted); }
+    .recommendation { border:1px solid #d5e4f6; background:#f3f8fe; padding:10px; border-radius:4px; } .recommendation strong { display:block; margin-bottom:4px; }
+    table { width:100%; border-collapse:collapse; font-size:12px; } th,td { border-bottom:1px solid var(--line); padding:7px 6px; text-align:left; vertical-align:top; } th { color:var(--muted); font-weight:600; }
+    .notice { border:1px dashed #b7c3d2; padding:12px; border-radius:5px; color:var(--muted); background:#fbfcfd; } .error { color:var(--red); }
+    @media (max-width:1050px) { .layout { grid-template-columns:1fr 1fr; } .layout > :last-child { grid-column:1/-1; } }
+    @media (max-width:700px) { .metrics { grid-template-columns:repeat(2,1fr); } .layout { grid-template-columns:1fr; } .layout > :last-child { grid-column:auto; } .claim-list { max-height:none; } header .bar { display:block; } }
+  </style>
+</head>
+<body>
+<header><div class="bar"><div><h1>明镜 MingJing · 研报核查报告</h1><div class="subtitle" id="run-subtitle">未载入运行结果</div></div><div class="subtitle">离线报告查看器</div></div></header>
+<main>
+  <div class="toolbar">
+    <label class="file-label" for="file-input">载入 results.json</label><input id="file-input" type="file" accept=".json,application/json">
+    <button id="load-default" type="button">尝试读取同目录 results.json</button>
+    <input id="search" type="search" placeholder="搜索原文、公司、科目或证据 ID" aria-label="搜索">
+    <select id="status-filter" aria-label="状态过滤"><option value="">全部状态</option><option value="violated">违反</option><option value="verified">已验证</option><option value="abstained">弃权</option></select>
+    <span class="hint" id="load-hint">可将 JSON 文件拖到此页面</span>
+  </div>
+  <div id="error-box" class="notice error" hidden></div>
+  <section class="metrics" aria-label="汇总"><div class="metric"><div id="m-total" class="value">—</div><div class="label">陈述总数</div></div><div class="metric"><div id="m-violated" class="value">—</div><div class="label">违反</div></div><div class="metric"><div id="m-verified" class="value">—</div><div class="label">已验证</div></div><div class="metric"><div id="m-abstained" class="value">—</div><div class="label">弃权</div></div><div class="metric"><div id="m-coverage" class="value">—</div><div class="label">覆盖率</div></div></section>
+  <div class="layout">
+    <section class="panel"><div class="panel-head"><h2>原子陈述</h2></div><div id="claim-list" class="claim-list"><div class="empty">载入结果后显示陈述。</div></div></section>
+    <section class="panel"><div class="panel-head"><h2>判定与计算</h2></div><div id="detail" class="panel-body"><div class="empty">选择左侧陈述查看详情。</div></div></section>
+    <section class="panel"><div class="panel-head"><h2>证据与修改建议</h2></div><div id="evidence" class="panel-body"><div class="empty">选择左侧陈述查看证据。</div></div></section>
+  </div>
+</main>
+<script>
+/* The CLI may replace this object when producing a standalone report. */
+window.MINGJING_RESULTS = window.MINGJING_RESULTS || null;
+const state = { data:null, selected:null };
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const arr = value => Array.isArray(value) ? value : (value == null ? [] : [value]);
+function claimsOf(data) {
+  const claims = arr(data.claims);
+  const results = arr(data.results);
+  const byId = new Map(results.map((r,i) => [r.claim_id ?? r.claimId ?? r.id ?? i, r]));
+  return claims.length ? claims.map((c,i) => ({...c, ...(byId.get(c.id ?? c.claim_id ?? i) || {})})) : results;
+}
+function normalize(data) {
+  const claims = claimsOf(data).map((c,i) => ({...c, _id:c.id ?? c.claim_id ?? c.claimId ?? String(i), _status:String(c.status ?? c.verdict ?? c.result ?? 'unknown').toLowerCase()}));
+  return {...data, _claims:claims};
+}
+function pct(n,d) { return d ? (100*n/d).toFixed(1)+'%' : '-'; }
+function statusLabel(s) { return ({violated:'违反',verified:'已验证',abstained:'弃权',unknown:'未判定'})[s] || s; }
+function evidenceHref(item) {
+  let href=item.path||item.file||item.uri; if(!href) return '';
+  href=String(href).trim();
+  if(/^javascript:|^data:/i.test(href)) return '';
+  if(/^[a-z]:[\\/]/i.test(href)) href='file:///'+href.replace(/\\/g,'/');
+  else if(!/^(https?:|file:|\/|\.\/|\.\.\/)/i.test(href)) href='./'+href;
+  const page=item.page||item.page_number;
+  if(page && /\.pdf(?:$|[?#])/i.test(href) && !/[#&]page=/.test(href)) href += (href.includes('#')?'&':'#')+'page='+encodeURIComponent(page);
+  return href;
+}
+function renderMetrics(data) {
+  const cs=data._claims, n=s=>cs.filter(c=>c._status===s).length;
+  $('m-total').textContent=cs.length; $('m-violated').textContent=n('violated'); $('m-verified').textContent=n('verified'); $('m-abstained').textContent=n('abstained'); $('m-coverage').textContent=pct(n('violated')+n('verified'),cs.length);
+  const run=data.run_manifest || data.manifest || {}; const title=run.run_id || data.run_id || run.created_at || '已载入结果'; $('run-subtitle').textContent = `${title}${run.report_date ? ' · 报告日 '+run.report_date : ''}`;
+}
+function filteredClaims() { const q=$('search').value.trim().toLowerCase(), s=$('status-filter').value; return (state.data?state.data._claims:[]).filter(c => (!s||c._status===s) && (!q || JSON.stringify(c).toLowerCase().includes(q))); }
+function renderList() { const list=$('claim-list'), cs=filteredClaims(); if(!cs.length){list.innerHTML='<div class="empty">没有匹配的陈述。</div>';return;} list.innerHTML=cs.map(c=>`<article class="claim ${state.selected===c._id?'selected':''}" data-id="${esc(c._id)}"><div class="claim-meta"><span class="status ${esc(c._status)}">${esc(statusLabel(c._status))}</span><span class="claim-id">${esc(c._id)}</span>${c.claim_type||c.type?`<span class="claim-id">${esc(c.claim_type||c.type)}</span>`:''}</div><p>${esc(c.text||c.claim||c.original_text||'（无原文）')}</p></article>`).join(''); list.querySelectorAll('.claim').forEach(el=>el.addEventListener('click',()=>{state.selected=el.dataset.id;renderList();renderDetail();})); }
+function evidenceItems(c) { return arr(c.evidence || c.evidence_ids || c.sources); }
+function renderDetail() { const c=(state.data?state.data._claims:[]).find(x=>x._id===state.selected); if(!c){$('detail').innerHTML='<div class="empty">选择左侧陈述查看详情。</div>';$('evidence').innerHTML='<div class="empty">选择左侧陈述查看证据。</div>';return;} const operands=c.operands||c.inputs||c.calculation?.operands; const rule=c.rule||c.rule_id||c.rule_card; $('detail').innerHTML=`<div class="section"><div class="claim-meta"><span class="status ${esc(c._status)}">${esc(statusLabel(c._status))}</span><span class="claim-id">${esc(c._id)}</span></div><h3>原文</h3><p>${esc(c.text||c.claim||c.original_text||'')}</p></div><div class="section"><h3>判定说明</h3><p>${esc(c.reason||c.explanation||c.message||'未提供说明')}</p></div><div class="section"><dl><dt>错误类型</dt><dd>${esc(arr(c.error_types||c.error_type||c.errors).join('、')||'-')}</dd><dt>公司</dt><dd>${esc(c.company||c.entity||'-')}</dd><dt>科目</dt><dd>${esc(c.subject||c.account||'-')}</dd><dt>期间</dt><dd>${esc(c.period||c.effective_period||'-')}</dd><dt>口径</dt><dd>${esc(c.scope||c.caliber||'-')}</dd></dl></div>${c.formula||c.calculation?.formula?`<div class="section"><h3>公式</h3><pre>${esc(c.formula||c.calculation.formula)}</pre></div>`:''}${operands?`<div class="section"><h3>操作数</h3><pre>${esc(JSON.stringify(operands,null,2))}</pre></div>`:''}${rule?`<div class="section"><h3>规则依据</h3><p>${esc(typeof rule==='string'?rule:JSON.stringify(rule))}</p></div>`:''}`; renderEvidence(c); }
+function renderEvidence(c) { const es=evidenceItems(c), rec=c.recommendation||c.repair||c.suggestion; let html=''; if(es.length) html+='<div class="section"><h3>证据</h3>'+es.map(e=>{const x=typeof e==='string'?{id:e}:e; const href=evidenceHref(x); return `<div class="evidence"><strong>${esc(x.id||x.evidence_id||'证据')}</strong><small>${esc([x.document||x.doc_sha12,x.page||x.page_number?'第'+(x.page||x.page_number)+'页':'',x.coordinates||x.bbox].filter(Boolean).join(' · '))}</small><div>${esc(x.snippet||x.text||'')}</div>${href?`<a href="${esc(href)}" target="_blank" rel="noopener">打开来源</a>`:''}</div>`}).join('')+'</div>'; if(rec) html+=`<div class="section"><h3>修改建议</h3><div class="recommendation"><strong>正确值</strong>${esc(rec.correct_value??rec.value??'—')}<strong>来源与证据</strong>${esc(rec.source??rec.evidence_id??'—')}<strong>计算式</strong>${esc(rec.formula??'—')}<strong>规则依据</strong>${esc(rec.rule_basis??rec.basis??'—')}<strong>可替换文本</strong>${esc(rec.replacement??rec.text??'—')}</div></div>`; if(!html) html='<div class="empty">该陈述没有附带证据或修改建议。</div>'; $('evidence').innerHTML=html; }
+function load(data) { if(!data||typeof data!=='object') throw new Error('JSON 根节点必须是对象'); state.data=normalize(data); state.selected=state.data._claims[0]?state.data._claims[0]._id:null; $('error-box').hidden=true; renderMetrics(state.data); renderList(); renderDetail(); }
+function fail(error) { $('error-box').hidden=false; $('error-box').textContent='载入失败：'+error.message; }
+async function loadDefault() { try { const r=await fetch('results.json',{cache:'no-store'}); if(!r.ok) throw new Error('同目录没有可读取的 results.json（直接打开 file:// 时请使用文件选择）'); load(await r.json()); } catch(e) { fail(e); } }
+$('file-input').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{load(JSON.parse(reader.result));}catch(err){fail(err);}};reader.readAsText(f,'utf-8');});
+$('load-default').addEventListener('click',loadDefault); $('search').addEventListener('input',renderList); $('status-filter').addEventListener('change',renderList);
+document.addEventListener('dragover',e=>e.preventDefault()); document.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{load(JSON.parse(reader.result));}catch(err){fail(err);}};reader.readAsText(f,'utf-8');});
+if(window.MINGJING_RESULTS) { try { load(window.MINGJING_RESULTS); } catch(e) { fail(e); } }
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "version": "0.6.1",
+  "files": {
+    "caliber.json": "3cd772ce2bfacc36c95b0c9fa7a311c593da4b8ba72cd0007827dd1acf223b57",
+    "cards.json": "25748048e5a682f6345af6a47b98b294cc1895aba17cef0dc17456aeb3f2430e",
+    "source_clauses.json": "96202eacb6e1f8cb7d98ea015f8def55096500d17de7024542c778651e71ca61",
+    "sources/CAS28.md": "718cc178c2e4290d0e6d80e3eee205e2b8319238cf12592584b62621c10f1b80",
+    "sources/CAS30.md": "74a7b035560e71da44dd1fe3e0d7cd2b14d2cdab462ad7dd5971cc9f80fc0802",
+    "sources/CAS31.md": "5f427efc1a8f1db68a3b730d34bab4c11ac118579d75f6bd866eed6f81655f7f",
+    "sources/CAS33.md": "4a00ee05992fc4ba3d64ed5ce835789920c60db3faf34e9d57de96806dfdf2fd",
+    "sources/MJ-COVERAGE-METHOD.md": "59a0b1ded0622ca379e2c4e26abaab523d30d0c9cd9ecdcd8ffa45765d8d0ba9",
+    "sources/MJ-METHOD.md": "5cf2dd37f86c32b7f5f558e33b5456d0fa8b05221d0e35c15b6aa2aef6879abd",
+    "sources/MJ-THRESHOLD-METHOD.md": "bab711d32df019d69bb8bb673e88fa3799a30d625c0b5c1b49f7dfc0fea3dec2",
+    "sources/NON_RECURRING_2023.md": "1b6832f1223bf1e32b37428b908a0466731563f1262cd0501cb312004568b97b",
+    "sources.json": "b7a777016ab9afa5c43307b24dec1b3c3ac7b68771a04d71651c8ded907ffe06"
+  },
+  "sha256": "c52151d5e7041da3ef82d45f152279806648ff9a098adacf00ee24707a00938f"
+}
