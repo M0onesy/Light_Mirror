@@ -7,3 +7,6 @@ vendor/harness/** -text
 frontend/src/HarnessFrame.tsx -text
 # Generated bundles contain intentional whitespace in library string literals.
 web/harness/** -text -whitespace
+
+# Source-export manifests use exact bytes on every platform.
+* -text

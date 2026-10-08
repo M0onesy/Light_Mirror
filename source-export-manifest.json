@@ -19,8 +19,8 @@
   "files": [
     {
       "path": ".gitattributes",
-      "bytes": 369,
-      "sha256": "90207c688ab0a1724d73bb0f6075076765bfcffc962931f8ae3e680eea94b2d9"
+      "bytes": 439,
+      "sha256": "52857cdb40d9ce9dd6fce66ebb5d1acc010eb33220aa6181c49cdbfee6591139"
     },
     {
       "path": ".gitignore",
@@ -63888,7 +63888,7 @@
       "sha256": "8556b6a87c02d89b9376f9d04d6e3e39ba0a80fa9b6c9f30c0ffe7b251d6ee25"
     }
   ],
-  "total_bytes": 123684345,
+  "total_bytes": 123684415,
   "max_file_bytes": 2611265,
   "stage_exe": {
     "version": "1.0.0.dev2",
@@ -63896,5 +63896,9 @@
     "bytes": 106619351,
     "source_sha256": "50e2d531e15cee0afd03806eea06c0aef3fabd66a7b118c13ec923b1e0160800",
     "runtime_manifest_sha256": "88cffba09b89f8bafc03199a2d0ce899f82f85e31fd99dcc1a7ca06a1c55720e"
+  },
+  "git_checkout_policy": {
+    "global_text_attribute": "unset",
+    "reason": "preserve_every_manifest_file_byte_with_core_autocrlf_true_or_false"
   }
 }
