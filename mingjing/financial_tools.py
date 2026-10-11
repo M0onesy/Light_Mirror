@@ -5,6 +5,7 @@ This module is a transport boundary; the Decimal kernel remains independent.
 """
 from __future__ import annotations
 
+from copy import deepcopy
 import re
 import threading
 import time
@@ -24,7 +25,10 @@ from .metrics import METRIC_SPECS, metric_definitions, TURNOVER_METRICS
 from .dimensions import claim_dimensions
 
 BIND_FIELDS = ("company", "account", "period", "scope", "relation", "base_period")
-BIND_ACCOUNTS = ('', 'UNKNOWN', *sorted(AMOUNT_ACCOUNTS | RATIO_ACCOUNTS | PER_SHARE_ACCOUNTS | SHARE_ACCOUNTS))
+from .metrics import unified_definition_catalog
+from .smart.taxonomy import ACCOUNT_NAMES as SMART_ACCOUNT_NAMES
+BIND_ACCOUNTS = ('', 'UNKNOWN', *sorted(AMOUNT_ACCOUNTS | RATIO_ACCOUNTS | PER_SHARE_ACCOUNTS | SHARE_ACCOUNTS |
+                                      set(SMART_ACCOUNT_NAMES) | {row['account'] for row in unified_definition_catalog('smart')}))
 BIND_SCOPES = ('', '合并', '母公司', '来源表')
 BIND_RELATIONS = ('', 'value', 'yoy', 'qoq', 'pp_difference', 'share', 'ratio', 'cagr', 'gt', 'lt', 'ge', 'le', 'eq')
 PERIOD_PATTERN = r'^20\d{2}(Y|H1|H2|[1-4]Q|Q[1-4]|9M)$'
@@ -55,6 +59,8 @@ ANALYSIS_METRICS = {
 }
 ANALYSIS_METRICS.update({item.account:(item.label,'computed',[item.rule_id])
                          for item in METRIC_SPECS.values() if item.analysis})
+from .smart.native_analysis import metric_catalog as smart_analysis_metric_catalog, project_analysis
+SMART_ANALYSIS_METRICS = {row['metric']: row for row in smart_analysis_metric_catalog()}
 ANALYSIS_KINDS = {
     'non_recurring_share': ('signals', '非经常性损益占比提示', 'FIN-non-recurring-share'),
     'low_cash_content': ('signals', '经营现金流含金量连续期间提示', 'FIN-low-cash-content'),
@@ -123,7 +129,7 @@ _BINDING_ARGUMENT_ERRORS = {
         'submit mention_id and binding with all six string fields: '
         'company, account, period, scope, relation, base_period; no extra fields.', None),
     'invalid_bindings_arguments': ('bindings',
-        'submit bindings as one to eight mention_id/binding objects; each binding '
+        'submit mention_id/binding objects within the registered batch cap; each binding '
         'must contain all six string fields and no extra fields.', None),
 }
 
@@ -253,9 +259,21 @@ DESCRIPTIONS = {
 }
 
 
-def tool_definitions(role: str) -> list[dict]:
-    return [{"name": name, "description": DESCRIPTIONS[name], "inputSchema": TOOL_SCHEMAS[name]}
+def tool_definitions(role: str, batch_size: int = 8, *, smart_profile: bool = False) -> list[dict]:
+    return [{"name": name, "description": DESCRIPTIONS[name].replace('八', str(batch_size)) if batch_size != 8 else DESCRIPTIONS[name],
+             "inputSchema": tool_schema(name, batch_size, smart_profile=smart_profile)}
             for name in sorted(PERMISSIONS[role])]
+
+
+def tool_schema(name: str, batch_size: int = 8, *, smart_profile: bool = False) -> dict:
+    from copy import deepcopy
+    schema = deepcopy(TOOL_SCHEMAS[name])
+    if name in {'mj_submit_bindings', 'mj_get_facts', 'mj_verify_bindings'}:
+        field = 'bindings' if name == 'mj_submit_bindings' else 'binding_ids'
+        schema['properties'][field]['maxItems'] = batch_size
+    if smart_profile and name == 'mj_analyze':
+        schema['properties']['metric']['enum'] = list(SMART_ANALYSIS_METRICS)
+    return schema
 
 
 def _validate(value: Any, schema: dict, tool_name: str | None = None) -> None:
@@ -420,6 +438,7 @@ class FinancialDispatcher:
         self.slots: dict[str, str] = {}
         self.templates: dict[str, str] = {}
         self.analysis_snapshots: dict[str, dict] = {}
+        self.batch_size = 8
         self.analysis_scope = '合并'
         self.reparse_attempts: dict[str, int] = {}
         self.reparse_claim_attempts: dict[str, int] = {}
@@ -619,7 +638,24 @@ class FinancialDispatcher:
     def source_dimensions(claim: AtomicClaim) -> dict:
         from .scope import source_scope_dimensions
         proof = source_dimensions_from_text(claim)
-        return {**proof, **source_scope_dimensions(claim), 'source_provenance': proof['provenance']}
+        dimensions = {**proof, **source_scope_dimensions(claim), 'source_provenance': proof['provenance']}
+        smart = claim.table_context.get('smart_binding')
+        if isinstance(smart, dict) and claim.table_context.get('smart_cid'):
+            dimensions.update(smart, scope_header=smart['scope'], company_provenance='host_locked_issuer_context',
+                              source_provenance='host_smart_deterministic_parser',
+                              scope_assumption=claim.table_context.get('scope_assumption', False),
+                              validation_policy=claim.table_context.get('validation_policy'))
+            original = claim.table_context.get('smart_claim', {})
+            dimensions.update(smart_entity=original.get('entity', ''),
+                              smart_segment=original.get('segment', ''),
+                              smart_notes=original.get('notes', []),
+                              **claim.table_context.get('smart_dimensions', {}))
+            if original.get('entity') in {'company', 'segment'}:
+                # Sentence continuation and segment recognition are frozen
+                # host evidence, even if the native source row is shortened.
+                dimensions.update(source_company_conflict=False, source_company_ambiguous=False,
+                                  source_company_subjects=[], company_provenance='host_locked_issuer_context')
+        return dimensions
 
     def mention_context(self, claim: AtomicClaim, blind=True, *, compact=False) -> dict:
         dimensions = self.source_dimensions(claim)
@@ -782,14 +818,62 @@ class FinancialDispatcher:
                     if identity.get('answer_submitted'):
                         raise ToolDenied('guarded answer already submitted; stop this turn')
                     identity['report_submission_attempts'] = attempts + 1
-                _validate(params, TOOL_SCHEMAS[name], name)
+                _validate(params, tool_schema(name, self.batch_size, smart_profile=hasattr(self, 'smart_analysis')), name)
                 output = self._execute(role, identity, name, params)
             except Exception as exc:
                 rejection = exc.rejection() if isinstance(exc, (FinancialArgumentError, FinancialRequirementError)) else {"error": type(exc).__name__}
                 self._log(session_id, role, call_id, name, params, rejection, "denied")
                 raise
             self._log(session_id, role, call_id, name, params, output, "success")
+            return self.model_verification_output(name, output)
+
+    @staticmethod
+    def model_verification_output(name, output):
+        """Project smart verdicts for the model after recording the full result.
+
+        The host trace, final judgements and report slots retain the original
+        kernel result. The model needs one copy of the chosen operands and
+        precision, plus all assumptions and blocking explanations; candidate
+        catalogues and the nested copy of that same result are audit data.
+        Legacy tool responses keep their existing shape and values.
+        """
+        if name not in {'mj_verify', 'mj_verify_bindings'}:
             return output
+
+        def project(row):
+            if not isinstance(row, dict) or not isinstance(row.get('smart_result'), dict):
+                return row
+            smart = row['smart_result']
+            compact = {key: value for key, value in row.items() if key != 'smart_result'}
+            # Keep every distinct diagnostic, assumption and blocker. Native
+            # IDs/status/codes and display values already carry these aliases.
+            for key, value in smart.items():
+                if key not in compact and key not in {'cid', 'abstain_code', 'expected_display', 'candidates'}:
+                    compact[key] = value
+            operand_fields = {
+                'fact_id', 'claim_id', 'company', 'account', 'period', 'scope', 'nr', 'value',
+                'unit', 'value_unit', 'display_unit', 'decimals', 'quantum', 'interval',
+                'currency', 'definition_id', 'dimension', 'dimension_kind', 'dimension_id',
+                'relation', 'source_relation', 'source_doc', 'publish_date', 'version', 'evidence',
+                'subject_evidence', 'page', 'source_table_id', 'source_table_evidence',
+                'source_scope_evidence', 'source_row_index', 'operand_type', 'assertion_id',
+                'operator', 'bound', 'eligible_as_point_fact',
+            }
+            # Preserve smart units verbatim. Native compact_operand infers
+            # canonical units, which would relabel a disclosed smart YOY row.
+            compact['operands'] = [
+                {key: value for key, value in operand.items() if key in operand_fields and value is not None}
+                for operand in row.get('operands') or []
+            ]
+            compact['source_precision'] = [
+                {key: value for key, value in precision.items() if value is not None}
+                for precision in row.get('source_precision') or []
+            ]
+            return deepcopy(compact)
+
+        if name == 'mj_verify_bindings' and isinstance(output, dict):
+            return {**output, 'items': [project(row) for row in output.get('items', [])]}
+        return project(output)
 
     def _log(self, session_id, role, call_id, name, params, output, status):
         input_hash = digest(params)
@@ -913,7 +997,8 @@ class FinancialDispatcher:
     def _analysis_missing_payload(self, p, category) -> dict:
         from .presentation import escape_markdown
         label = ANALYSIS_KINDS[p['kind']][1] if p.get('kind') else (
-            ANALYSIS_METRICS[p['metric']][0] if p.get('metric') else
+            (SMART_ANALYSIS_METRICS[p['metric']]['label'] if hasattr(self, 'smart_analysis') and p['metric'] in SMART_ANALYSIS_METRICS
+             else ANALYSIS_METRICS[p['metric']][0]) if p.get('metric') else
             {'metrics': '财报指标', 'signals': '复核信号', 'events': '披露事件'}.get(category, '财报分析'))
         proof = {'status': 'analysis_record_not_found', 'category': category, 'kind': p.get('kind'),
                  'metric': p.get('metric'), 'requested_period': p.get('period'),
@@ -1256,6 +1341,30 @@ class FinancialDispatcher:
                     "fields": list(BIND_FIELDS),
                     "account_labels": labels}
         if name == 'mj_get_rule':
+            if p['rule_id'] == 'SMART-registered-kernel' and hasattr(self, 'trusted_verifier'):
+                from .source_cache import extractor_source_modules
+                catalog = unified_definition_catalog('smart')
+                selected = [self.claims[mid] for mid in identity['mentions'] if mid in self.claims]
+                accounts = {c.account for c in selected}
+                if any(c.relation != 'value' for c in selected):
+                    accounts.add('PERIOD_CHANGE')
+                if not selected and hasattr(self, 'smart_analysis'):
+                    from .smart.analysis import AMOUNTS, RATIOS, EXTRA
+                    accounts.update([*AMOUNTS, *RATIOS, *EXTRA, 'PERIOD_CHANGE'])
+                identity.setdefault('rules_read', set()).add('SMART-registered-kernel')
+                return {'rule_id': 'SMART-registered-kernel', 'entrypoint': 'mingjing.smart.verify.verify_model',
+                        'validation_policy': self.validation_policy,
+                        'definitions': [row for row in catalog if row['account'] in accounts],
+                        'catalog_hash': digest(catalog), 'catalog_entries': len(catalog),
+                        'catalog_scope': 'authorized_session_accounts', 'professional_review_status': 'pending',
+                        'extractor_lock': extractor_source_modules(), 'source': 'host_registered_deterministic_kernel',
+                        'policy': '值仅取宿主冻结原文，绑定仅六字段；文本佐证不提升为数值核实'}
+            if p['rule_id'].startswith('SMART:'):
+                from .rules import registered_rule_description
+                rule = registered_rule_description(p['rule_id'])
+                if rule:
+                    identity.setdefault('rules_read', set()).add(p['rule_id'])
+                    return rule
             import json
             cards = json.loads((rulepack_root() / 'cards.json').read_text(encoding='utf-8'))
             for card in cards:
@@ -1343,14 +1452,24 @@ class FinancialDispatcher:
             claim = self.claims[binding_id]
             if name == 'mj_get_fact':
                 identity.setdefault('facts_read', set()).add(binding_id)
+                query_dimensions = claim_dimensions(claim)
+                if claim.table_context.get('smart_cid') and hasattr(self, 'trusted_verifier'):
+                    from .dimensions import validate_fact_dimensions
+                    query_dimensions = {**query_dimensions, **claim.table_context.get('smart_dimensions', {})}
+                    validate_fact_dimensions(query_dimensions['dimension_kind'], query_dimensions['dimension_id'],
+                                             query_dimensions['currency'], query_dimensions['definition_id'])
                 metadata = {'required_rule_ids': self._required_verification_rules(claim),
                             'query_dimensions': {'company': claim.company, 'account': claim.account,
                                 'period': claim.period, 'scope': claim.caliber_hint[0] if claim.caliber_hint else '',
-                                'relation': claim.relation, 'base_period': claim.base_period or '',**claim_dimensions(claim)},
-                            'metric_definitions':[x for x in metric_definitions() if x['account']==claim.account]}
+                                'relation': claim.relation, 'base_period': claim.base_period or '', **query_dimensions},
+                            'metric_definitions':[x for x in unified_definition_catalog('smart' if claim.table_context.get('smart_cid') else 'canonical') if x['account']==claim.account]}
+                if claim.table_context.get('smart_cid'):
+                    metadata.pop('metric_definitions', None)
+                    metadata['definition_reference'] = {'tool': 'mj_get_rule', 'rule_id': 'SMART-registered-kernel', 'account': claim.account}
                 from .judge import _source_scope_issue
-                issue = (_source_semantic_issue(claim) or source_binding_issue(claim, strict=True)
-                         or _source_scope_issue(claim, strict=True))
+                issue = (None if claim.table_context.get('smart_cid') and hasattr(self, 'trusted_verifier') else
+                         (_source_semantic_issue(claim) or source_binding_issue(claim, strict=True)
+                          or _source_scope_issue(claim, strict=True)))
                 if issue:
                     identity.setdefault('facts_missing', set()).discard(binding_id)
                     return {"fact": None, "source_definition_unavailable": issue[1], **metadata}
@@ -1372,14 +1491,22 @@ class FinancialDispatcher:
                     outcome = self.store.query_outcome(claim.company, claim.account, claim.period, scope=scope or '合并',
                                         nr='扣非' if claim.account == 'NP_PARENT_ADJ' else '未扣非', cutoff=self.report_date,
                                         strategy='pinned' if claim.declared_source else claim.query_strategy,
-                                        source_doc=claim.declared_source,**claim_dimensions(claim))
+                                        source_doc=claim.declared_source, **query_dimensions)
                 missing = identity.setdefault('facts_missing', set())
                 # A raw lookup failure may still need a future-task parse
                 # proposal. It never authorizes a current formula or clears X4.
                 missing.add(binding_id) if outcome.fact is None else missing.discard(binding_id)
-                return {"fact": outcome.fact.to_dict() if outcome.fact else None,
-                        "query_outcome": outcome.to_dict(), **metadata}
+                if claim.table_context.get('smart_cid'):
+                    outcome_meta = {key: value for key, value in outcome.to_dict().items()
+                                    if key in {'status', 'reason', 'cutoff', 'strategy', 'blockers', 'source_doc', 'source_selection'}}
+                    return {'fact': self.compact_operand(outcome.fact.to_dict()) if outcome.fact else None,
+                            'query_outcome': outcome_meta, **metadata}
+                return {"fact": outcome.fact.to_dict() if outcome.fact else None, "query_outcome": outcome.to_dict(), **metadata}
             self._require_verification_reads(identity, claim)
+            if hasattr(self, 'trusted_verifier'):
+                result = self.trusted_verifier(claim)
+                if result is not None:
+                    return result
             return Judge(self.store, self.report_date).verify(claim).to_dict()
         if name == 'mj_get_verdicts':
             rows = [r for r in self.results if r['claim_id'] in identity['mentions']]
@@ -1407,6 +1534,7 @@ class FinancialDispatcher:
             return output
         if name == 'mj_analyze':
             from .analysis import analyze_financials
+            metric_catalog = smart_analysis_metric_catalog if hasattr(self, 'smart_analysis') else analysis_metric_catalog
             if not self.task_company:
                 raise ToolDenied('financial analysis requires one trusted task company; select the issuer in a new task')
             requested_category = p.get('category') or (ANALYSIS_KINDS[p['kind']][0] if p.get('kind') else None)
@@ -1420,21 +1548,21 @@ class FinancialDispatcher:
                     periods.update(f.period for f in self.store.facts)
                 return self.bounded_page([], p, lambda _: dict(analysis=[], slots={}, slot_template='', slot_ids=[]),
                     dict(catalog_only=True, company=self.task_company, scope=self.analysis_scope,
-                         report_date=self.report_date, registered_metrics=analysis_metric_catalog(p.get('metric'))
+                         report_date=self.report_date, registered_metrics=metric_catalog(p.get('metric'))
                              if requested_category in {None, 'metrics'} else [],
                          registered_kinds=analysis_kind_catalog(requested_category, p.get('kind')),
                          selection=self.analysis_selection(periods, p), slot_instruction=SLOT_INSTRUCTION,
                          next_action={'tool': 'mj_analyze', 'arguments': {'analysis_id': 'financial_summary'},
                                       'instruction': '从目录选择问题对应的metric并设置本期period；同比槽位自带本期、基期、公式和证据。'}))
             if role == 'coordinator' and not identity.get('frozen_analysis_reader') and (not identity.get('reports_read') or not any(
-                str(rule).startswith(('FIN-', 'NON_RECURRING_')) for rule in identity.get('rules_read', set()))):
+                str(rule).startswith(('FIN-', 'NON_RECURRING_', 'SMART-registered-kernel')) for rule in identity.get('rules_read', set()))):
                 raise ToolDenied('read locked reports and an authorized financial rule before analysis')
             if role == 'reporter' or identity.get('frozen_analysis_reader') or (role == 'question' and self.analysis_snapshots):
                 if not self.analysis_snapshots:
                     raise ToolDenied('reporter can only read already frozen financial analysis')
                 analysis = list(self.analysis_snapshots.values())
             else:
-                analysis = [analyze_financials(self.store, self.task_company,
+                analysis = [project_analysis(self.smart_analysis())] if hasattr(self, 'smart_analysis') else [analyze_financials(self.store, self.task_company,
                     sorted({f.period for f in self.store.facts}), self.report_date, self.analysis_scope,
                     disclosures=getattr(self, 'accounting_disclosures', []))]
                 for item in analysis:
@@ -1463,7 +1591,7 @@ class FinancialDispatcher:
                                      'slot_id': slot_id, 'raw_slot_id': raw_slot_id, 'company': item['company']})
             metadata = dict(company=self.task_company, scope=self.analysis_scope, report_date=self.report_date,
                             selection=selection, slot_instruction=SLOT_INSTRUCTION,
-                            registered_metrics=analysis_metric_catalog(p.get('metric'))
+                            registered_metrics=metric_catalog(p.get('metric'))
                                 if requested_category in {None, 'metrics'} and (p.get('metric') or not rows) else [],
                             registered_kinds=analysis_kind_catalog(requested_category, p.get('kind')) if requested_category or p.get('kind') or not rows else [])
             selection.update(category=requested_category, kind=p.get('kind'))
@@ -1530,6 +1658,8 @@ class FinancialDispatcher:
         raise ToolDenied("unknown tool")
 
     def _required_verification_rules(self, claim: AtomicClaim) -> list[str]:
+        if claim.table_context.get('smart_cid') and hasattr(self, 'trusted_verifier'):
+            return ['SMART-registered-kernel']
         from .source_quarter_quotation import validated_threshold_reference
         if validated_threshold_reference(claim):
             return ['SOURCE-threshold-entailment']
@@ -1612,7 +1742,10 @@ class FinancialDispatcher:
             if not scope_proven:
                 agreed = False
             from .source_quarter_quotation import validated_threshold_reference
-            if agreed and a_cmp['relation'] != 'value' and not a_cmp['base_period'] and not validated_threshold_reference(claim):
+            smart = claim.table_context.get('smart_binding')
+            smart_yoy = bool(agreed and smart and hasattr(self, 'trusted_verifier') and smart.get('relation') == 'yoy'
+                             and all(a_cmp.get(key) == smart.get(key) for key in BIND_FIELDS))
+            if agreed and a_cmp['relation'] != 'value' and not a_cmp['base_period'] and not smart_yoy and not validated_threshold_reference(claim):
                 agreed = False
             self.agreements[mid] = {"claim_id": mid, "agreed": agreed,
                                     "differences": [key for key in BIND_FIELDS
@@ -1628,7 +1761,12 @@ class FinancialDispatcher:
                 proposed = replace(claim, company=a_cmp['company'], account=a_cmp['account'], period=a_cmp['period'],
                                    caliber_hint=(a_cmp['scope'], nr), relation=a_cmp['relation'],
                                    base_period=a_cmp['base_period'] or None, binding_status='agreed')
-                source_issue = source_binding_issue(proposed, strict=True)
+                smart = claim.table_context.get('smart_binding')
+                if smart and hasattr(self, 'trusted_verifier'):
+                    source_issue = (None if all(a_cmp[k] == smart[k] for k in BIND_FIELDS) else
+                                    ('X3', '绑定与宿主冻结新版解析语义冲突'))
+                else:
+                    source_issue = source_binding_issue(proposed, strict=True)
                 agreed = source_issue is None
                 self.agreements[mid].update(agreed=agreed, source_dimensions_proven=agreed,
                                             source_binding_issue=source_issue[1] if source_issue else None)

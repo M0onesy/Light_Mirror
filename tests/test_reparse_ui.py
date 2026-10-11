@@ -22,7 +22,7 @@ def test_harness_page_supplement_preserves_parent_and_creates_only_ready_version
     before = {path.relative_to(parent.out): path.read_bytes() for path in parent.out.rglob('*') if path.is_file()}
     frozen = json.loads((parent.out / 'results.json').read_text(encoding='utf-8'))
     claim = next(row for row in frozen['claims'] if row['account'] == 'NP')
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.locator('.history-row').filter(has_text=parent.id[-8:]).click()
     expect(page.locator('.verdict-row')).to_have_count(2)
     page.locator('.verdict-row').filter(has_text='净利润20元').click()
@@ -99,7 +99,7 @@ def test_task_supplement_list_is_accessible_when_missing_claim_has_no_evidence(u
     assert data['results'][0]['status'] == 'abstained' and data['results'][0]['evidence'] == []
     packet = state.reparse(parent.id, {'report_id': source['block']['report_id'], 'page': 3})
     assert packet['status'] == 'ready'
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.locator('.history-row').filter(has_text=parent.id[-8:]).click()
     expect(page.locator('.verdict-row')).to_have_count(1)
     packets = page.get_by_role('region', name='任务补证包', exact=True)

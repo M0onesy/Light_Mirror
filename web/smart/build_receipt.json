@@ -1,0 +1,28 @@
+{
+  "kind": "mingjing-upload-ui-source.v1",
+  "status": "checked",
+  "files": [
+    {
+      "path": "web/smart/app.css",
+      "bytes": 11968,
+      "sha256": "8d4a4bab054e64046c5cdc8b96226e9663c572a8f73ea9bce27c4a202e52604d"
+    },
+    {
+      "path": "web/smart/app.js",
+      "bytes": 55941,
+      "sha256": "fc0824be1a9e7bbb2fd6bec4e736141812d65581d1a862a1847c9ca8f724605e"
+    },
+    {
+      "path": "web/smart/decimal.js",
+      "bytes": 1640,
+      "sha256": "5e3c6f0d5a2ca9f63be97a1640fae029b4a652ca07d3a4eb9c04919ac19e3201"
+    },
+    {
+      "path": "web/smart/index.html",
+      "bytes": 16986,
+      "sha256": "3f85d048220e9726900bca7ef3f5ab458582fa8bd66da5b75a690332c63da08a"
+    }
+  ],
+  "sha256": "93b5412b3816dd40c7580a486ee94436b00d2cc0be1b4358e4402442e9e71144",
+  "recorded_at": "2026-10-10T08:33:35.896646+00:00"
+}

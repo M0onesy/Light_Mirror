@@ -77,6 +77,7 @@ class AgentBudget:
     max_runtime_s: int = 1800
     max_subagents: int = 2
     max_depth: int = 1
+    binding_group_size: int = 16
 
 
 @dataclass
@@ -223,6 +224,8 @@ def validate_providers(providers: Mapping[str, ProviderConfig], agent: AgentConf
         for name, value in asdict(budget).items():
             if type(value) is not int or value < 1:
                 errors.append(f"{label}.{name} must be a positive integer")
+    if type(agent.budget.binding_group_size) is int and agent.budget.binding_group_size > 16:
+        errors.append('agent.budget.binding_group_size must be between 1 and 16')
     if type(agent.budget.max_subagents) is int and agent.budget.max_subagents > 2 or type(agent.budget.max_depth) is int and agent.budget.max_depth > 1:
         errors.append("agent descendants are limited to two children and one level")
     for role in ROLES:

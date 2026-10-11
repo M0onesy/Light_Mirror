@@ -6,6 +6,11 @@ import pytest
 from scripts.holdout_acceptance import ROOT, evaluate_holdout, seal_holdout
 
 
+def require_installed_holdout_gold(name):
+    if not (ROOT / 'bench' / name).is_file():
+        pytest.skip('Optional original holdout gold is not installed: ' + name)
+
+
 def test_sealed_holdout_and_next_cohort_are_disjoint(tmp_path):
     corpus = tmp_path / "corpus"
     for ticker in range(920000, 920010):
@@ -32,6 +37,7 @@ def test_existing_holdout_metrics_cannot_be_overwritten(tmp_path):
 
 
 def test_first_holdout_gold_has_original_pdf_provenance_and_no_predictions():
+    require_installed_holdout_gold('D.jsonl')
     rows = [json.loads(line) for line in (ROOT / "bench" / "D.jsonl").read_text(encoding="utf-8").splitlines()]
     sealed = json.loads((ROOT / "bench" / "holdout_seal_manifest.json").read_text(encoding="utf-8"))
     reports = {item["ticker"]: item for item in sealed["reports"]}
@@ -47,6 +53,7 @@ def test_first_holdout_gold_has_original_pdf_provenance_and_no_predictions():
 
 
 def test_second_holdout_is_a_new_sealed_company_cohort():
+    require_installed_holdout_gold('D2.jsonl')
     first = json.loads((ROOT / "bench" / "holdout_seal_manifest.json").read_text(encoding="utf-8"))
     second = json.loads((ROOT / "bench" / "holdout2_seal_manifest.json").read_text(encoding="utf-8"))
     rows = [json.loads(line) for line in (ROOT / "bench" / "D2.jsonl").read_text(encoding="utf-8").splitlines()]

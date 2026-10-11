@@ -564,6 +564,13 @@ def _indexed_files(root: Path, company: str, **control) -> list[tuple[Path, str,
             category = row.get("category", "")
             indexed_year = row.get("year", "")
             row_period = indexed_year + ("H1" if "半年" in category else "Q1" if "一季" in category else "9M" if "三季" in category else "Y" if "年报" in category else "") if indexed_year else ''
+            explicit_period = str(row.get('period') or '').strip()
+            if explicit_period:
+                if not re.fullmatch(r'20\d{2}(?:Y|H[12]|Q[1-4]|9M)', explicit_period):
+                    raise ValueError('语料索引期间必须是登记期间')
+                if row_period and row_period != explicit_period:
+                    raise ValueError('语料索引显式期间与类别年份冲突')
+                row_period = explicit_period
             filename_period = _document_period(path, "")
             if filename_period and row_period and filename_period != row_period:
                 raise ValueError(f"语料索引期间与报告文件名不一致：{path.name}")

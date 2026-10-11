@@ -102,7 +102,7 @@ def verify() -> dict:
 def main() -> None:
     global UPSTREAM
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out", type=Path, default=ROOT / "runs/harness-ui-source-review")
+    parser.add_argument("--out", type=Path, default=ROOT / "evidence/harness-ui-source-review")
     parser.add_argument("--upstream", type=Path, default=UPSTREAM)
     args = parser.parse_args()
     UPSTREAM = args.upstream.resolve(strict=True)

@@ -80,7 +80,7 @@ def test_interval_rule_checks_half_open_touch_and_explicit_closed_endpoints():
     assert not intervals_compatible(a, b)
     assert intervals_compatible(replace(a, upper_closed=True), b)
     assert validate_rulepack()['status'] == 'ok'
-    assert validate_rulepack()['version'] == '0.6.0'
+    assert validate_rulepack()['version'] == '0.6.1'
 
 
 def test_rule_execution_keeps_global_decimal_context_and_refuses_forged_boolean():

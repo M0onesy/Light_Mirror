@@ -67,6 +67,24 @@ def original_pdf_evidence(page, document_sha256: str) -> dict[str, dict]:
         if text:
             identifier = make_evidence_id(document_sha256, page.number+1, text, bbox)
             result.setdefault(identifier, {'quote_text': text, 'bbox': list(bbox)})
+    # Smart tables join physically aligned lines into a source row. Rebuild
+    # those rows from the same original PDF; a cache-supplied rectangle or
+    # normalized quote alone never authorizes an evidence identity.
+    from .smart.docio import rows_from_chunks
+    chunks, cursor, raw_text = [], 0, page.get_text()
+    for block in page.get_text('dict').get('blocks', []):
+        if block.get('type') != 0:
+            continue
+        for line in block.get('lines', []):
+            text = ''.join(span['text'] for span in line.get('spans', []))
+            start = raw_text.find(text, cursor) if text else -1
+            if start >= 0:
+                cursor = start + len(text)
+                chunks.append((text, *line['bbox']))
+    for row in rows_from_chunks(page.number + 1, chunks):
+        identifier = make_evidence_id(document_sha256, row.page, row.text, row.bbox)
+        result.setdefault(identifier, {'quote_text': row.text, 'bbox': list(row.bbox),
+                                       'source_kind': 'deterministic_original_pdf_row'})
     return result
 
 

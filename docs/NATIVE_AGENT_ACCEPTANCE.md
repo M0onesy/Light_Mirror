@@ -1,8 +1,11 @@
 # 原生金融 Agent 架构与候选验收
 
+本版统一入口与实施契约见[SMART_PIPELINE.md](SMART_PIPELINE.md)及[PROJECT_TASK_MANUAL.md](PROJECT_TASK_MANUAL.md)。以下保留原生架构与验收标准，历史运行路径/数字不改写为1.0.0.dev3成绩。
+
+
 ## 版本与框架
 
-当前应用为 `1.0.0.dev2` 源码开发版，旧 `1.0.0rc1` EXE 保留为历史记录。Harness 来自本地 `0.1.6-alpha.2` archive 快照；上游 commit 缺失，登记 null，不混装公开 PyPI 其他版本。独立 Windows x64 金融运行时、金融插件、profile 和依赖按 manifest 锁定，开发机已验证脱离系统 Node 和上游依赖目录。Python 客户端实现 stdio 传输及生命周期扩展，不重写原生 Agent Loop。
+当前应用为 `1.0.0.dev3` 源码开发版；下述原生历史观察保留各自原版本，旧 `1.0.0rc1` EXE 保留为历史记录。Harness 来自本地 `0.1.6-alpha.2` archive 快照；上游 commit 缺失，登记 null，不混装公开 PyPI 其他版本。独立 Windows x64 金融运行时、金融插件、profile 和依赖按 manifest 锁定，开发机已验证脱离系统 Node 和上游依赖目录。Python 客户端实现 stdio 传输及生命周期扩展，不重写原生 Agent Loop。
 
 ## 执行
 

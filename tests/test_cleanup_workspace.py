@@ -137,3 +137,35 @@ def test_apply_removes_only_unprotected_rebuildable_files_and_verifies_hashes(tm
 def test_windows_extended_length_path_conversion(tmp_path):
     native = cleanup.native_path(tmp_path)
     assert native.startswith('\\\\?\\') if os.name == 'nt' else native == str(tmp_path.absolute())
+
+
+def test_consolidated_data_evidence_artifacts_and_archives_are_never_candidates(tmp_path, monkeypatch):
+    root = tmp_path / 'workspace'
+    project = root / 'Light_Mirror'
+    for relative in ('data/annual', 'evidence/dev3/failed', 'runtime/carrier',
+                     'vendor/harness', 'artifacts/program'):
+        (project / relative / '__pycache__').mkdir(parents=True)
+    archived = root / '存档/历史版本/old/__pycache__'
+    archived.mkdir(parents=True)
+    source_cache = project / 'mingjing/__pycache__'
+    source_cache.mkdir(parents=True)
+    monkeypatch.setattr(cleanup, 'process_paths', lambda _: set())
+    protected, _ = cleanup.dependencies(root)
+    assert all(cleanup.overlaps(project / name, protected)
+               for name in ('data', 'evidence', 'runtime', 'vendor', 'artifacts'))
+    assert cleanup.overlaps(archived, protected)
+    assert cleanup.candidates(root) == [(source_cache, 'rebuildable_python_or_test_cache')]
+
+
+def test_consolidated_default_workspace_is_the_immediate_parent(tmp_path, monkeypatch):
+    root = tmp_path / 'workspace'
+    project = root / 'Light_Mirror'
+    project.mkdir(parents=True)
+    observed = []
+    monkeypatch.setattr(cleanup, 'ROOT', project)
+    monkeypatch.setattr(cleanup, 'dependencies', lambda workspace: (observed.append(workspace) or set(), []))
+    monkeypatch.setattr(cleanup, 'candidates', lambda _: [])
+    monkeypatch.setattr(sys, 'argv', ['cleanup'])
+    assert cleanup.main() == 0
+    assert observed == [root]
+    assert (project / 'evidence/cleanup-preview/cleanup_receipt.json').is_file()

@@ -1,5 +1,7 @@
 # 明镜 dev2 功能开发验收记录
 
+本页为原工程历史记录，保留原路径、版本、数字与运行锁；不能作为 `mainProj/新版/mingjing` 的 `1.0.0.dev3` 验收成绩。当前工作与关闭标准见 [PROJECT_TASK_MANUAL.md](PROJECT_TASK_MANUAL.md)。
+
 本记录对应 `mainProj/mingjing-next` 的源码开发版本，时间为 2026-10-07。未制作新 EXE、发行 ZIP，未展开发行包。Web 使用锁定 Harness 的 React 界面与控件；只在前端变更后增量生成离线静态页面。
 
 ## 本次完成的实际功能

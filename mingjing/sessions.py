@@ -328,9 +328,10 @@ class FinancialSessions:
             from .providers import resolve_route
             route = resolve_route(cfg)
             provider = dict(cfg['providers'][route['provider']], provider_id=route['provider'])
+            question_tools = tool_definitions('question', smart_profile=agent.request.get('material_profile') == 'smart')
             opening = dict(session_id=sid, role='question', run_id=state['run_id'], resource_lock=state['resource_lock'],
-                           route=route, tool_definitions=tool_definitions('question'),
-                           allowed_tools=[t['name'] for t in tool_definitions('question')], budget=agent.budget)
+                           route=route, tool_definitions=question_tools,
+                           allowed_tools=[t['name'] for t in question_tools], budget=agent.budget)
             # Harness session history lives under a stable conversation home.
             from .harness_client import HarnessRuntime
             agent.runtime = HarnessRuntime(home=self.root/sid/'harness', request_handler=agent._incoming, event_handler=agent._event, config=cfg)

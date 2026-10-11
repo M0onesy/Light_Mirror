@@ -1,0 +1,439 @@
+{
+  "purpose": "exclude_all_inspected_issuers_from_future_unseen_holdouts",
+  "D3_status": "not_selected_not_opened_not_sealed_not_executed",
+  "exposed_tickers": [
+    "920011",
+    "920012",
+    "920025",
+    "920026",
+    "920028",
+    "920030",
+    "920033",
+    "920035",
+    "920036",
+    "920038",
+    "920039",
+    "920046",
+    "920047",
+    "920050",
+    "920057",
+    "920058",
+    "920059",
+    "920060",
+    "920061",
+    "920062",
+    "920493"
+  ],
+  "sources": [
+    {
+      "ticker": "920011",
+      "company": "晨光电机",
+      "year": "2025",
+      "path": "reports/920011_晨光电机/年报/2026-03-05_2025年年度报告.pdf",
+      "sha256": "a614d8d6c9fc82f4be526e6fb836c89cffdebc997fa1fbcf84c8c3f56362e2e5",
+      "bytes": 1903787,
+      "pages": 155,
+      "machine_fact_count": 54
+    },
+    {
+      "ticker": "920011",
+      "company": "晨光电机",
+      "year": "2024",
+      "path": "reports/920011_晨光电机/年报/2025-04-23_2024年年度报告.pdf",
+      "sha256": "fc38228fde4a7629ed40cd7b218fcf751e6cb2387f7a759a1498191e8ab3e966",
+      "bytes": 2781747,
+      "pages": 167,
+      "machine_fact_count": 54
+    },
+    {
+      "ticker": "920012",
+      "company": "创达新材",
+      "year": "2024",
+      "path": "reports/920012_创达新材/年报/2025-03-17_2024年年度报告.pdf",
+      "sha256": "ac3016d80d3b2e3d0ca58df8f1bca68e1724ea742c5b06a2667bddbfd64b5cbf",
+      "bytes": 2555276,
+      "pages": 169,
+      "machine_fact_count": 52
+    },
+    {
+      "ticker": "920012",
+      "company": "创达新材",
+      "year": "2025",
+      "path": "reports/920012_创达新材/年报/2026-03-18_2025年年度报告.pdf",
+      "sha256": "4dac109e14d94090505b9ee10304c00f6e7c7fd48c774a97c0ede7c76d08700e",
+      "bytes": 2601925,
+      "pages": 185,
+      "machine_fact_count": 50
+    },
+    {
+      "ticker": "920025",
+      "company": "凯达重工",
+      "year": "2024",
+      "path": "reports/920025_凯达重工/年报/2025-04-29_2024年年度报告.pdf",
+      "sha256": "2db4c4babf92e6989eddde021ae2f0566a773df64fab8b31ab9e9adb315d3e20",
+      "bytes": 2126276,
+      "pages": 124,
+      "machine_fact_count": 54
+    },
+    {
+      "ticker": "920025",
+      "company": "凯达重工",
+      "year": "2025",
+      "path": "reports/920025_凯达重工/年报/2026-03-20_2025年年度报告.pdf",
+      "sha256": "1d59badebde55404b975d8b90b6bb57cc5c46f381d2920e1871f2eba3cf28d5d",
+      "bytes": 1600512,
+      "pages": 122,
+      "machine_fact_count": 54
+    },
+    {
+      "ticker": "920026",
+      "company": "卓兆点胶",
+      "year": "2025",
+      "path": "reports/920026_卓兆点胶/年报/2025-07-29_年度报告信息披露重大差错责任追究制度.pdf",
+      "sha256": "d8e46901119b81d7bca8415408d849ae989252f0f61697d4e1aa1bc930b60974",
+      "bytes": 167352,
+      "pages": 6,
+      "machine_fact_count": 0
+    },
+    {
+      "ticker": "920026",
+      "company": "卓兆点胶",
+      "year": "2024",
+      "path": "reports/920026_卓兆点胶/年报/2025-04-28_2024年年度报告.pdf",
+      "sha256": "766702eba06f88b7e347e30f9edad069b1186726fce585fa348892653e47a331",
+      "bytes": 2993067,
+      "pages": 264,
+      "machine_fact_count": 82
+    },
+    {
+      "ticker": "920028",
+      "company": "新恒泰",
+      "year": "2024",
+      "path": "reports/920028_新恒泰/年报/2025-03-31_2024年年度报告.pdf",
+      "sha256": "9a22de1ddf4ff11feae51b977fd85cbc8bf6eaf537b1ac873968854b050bcd09",
+      "bytes": 2777128,
+      "pages": 183,
+      "machine_fact_count": 62
+    },
+    {
+      "ticker": "920028",
+      "company": "新恒泰",
+      "year": "2025",
+      "path": "reports/920028_新恒泰/年报/2026-01-30_2025年年度报告.pdf",
+      "sha256": "6d098914146bc103009f8d6a4c20caeec465f78e25807227db6cdaf4bbbd26c9",
+      "bytes": 2854069,
+      "pages": 208,
+      "machine_fact_count": 62
+    },
+    {
+      "ticker": "920030",
+      "company": "德众汽车",
+      "year": "2023",
+      "path": "reports/920030_德众汽车/年报/2024-04-22_2023年年度报告.pdf",
+      "sha256": "c1acb32c904daad531109d92e9f25827b114a3afa62f94cf83a3bbc24e268a63",
+      "bytes": 2506103,
+      "pages": 253,
+      "machine_fact_count": 83
+    },
+    {
+      "ticker": "920030",
+      "company": "德众汽车",
+      "year": "2024",
+      "path": "reports/920030_德众汽车/年报/2025-04-25_2024年年度报告.pdf",
+      "sha256": "758cc735189b6e0a67509befac42775fd36484138e39fe61823c53a56da12b19",
+      "bytes": 2467945,
+      "pages": 220,
+      "machine_fact_count": 69
+    },
+    {
+      "ticker": "920033",
+      "company": "康普化学",
+      "year": "2023",
+      "path": "reports/920033_康普化学/年报/2024-03-12_2023年年度报告.pdf",
+      "sha256": "840554edc27d435b5405d8ee91486031d92c35728156cb6b029c7b04ba492f2f",
+      "bytes": 3089114,
+      "pages": 158,
+      "machine_fact_count": 64
+    },
+    {
+      "ticker": "920033",
+      "company": "康普化学",
+      "year": "2024",
+      "path": "reports/920033_康普化学/年报/2025-03-26_2024年年度报告.pdf",
+      "sha256": "7519940b1b05868b42bafbdb1a473c7750a2588043dade7854f8f3ea854e3ec8",
+      "bytes": 3310588,
+      "pages": 158,
+      "machine_fact_count": 66
+    },
+    {
+      "ticker": "920035",
+      "company": "精创电气",
+      "year": "2023",
+      "path": "reports/920035_精创电气/年报/2024-03-29_2023年年度报告.pdf",
+      "sha256": "a9f1d60fe7b4c0574d142ca5a6f6f3ee1670df542d55570ffc5d395bb4dd3dff",
+      "bytes": 1881877,
+      "pages": 133,
+      "machine_fact_count": 52
+    },
+    {
+      "ticker": "920036",
+      "company": "觅睿科技",
+      "year": "2023",
+      "path": "reports/920036_觅睿科技/年报/2024-03-26_2023年年度报告.pdf",
+      "sha256": "fdc15184bd0207d0d9e907f51ce4ee0621c9d2cdcb8b7243a45813bedbf5d167",
+      "bytes": 1448087,
+      "pages": 106,
+      "machine_fact_count": 58
+    },
+    {
+      "ticker": "920035",
+      "company": "精创电气",
+      "year": "2024",
+      "path": "reports/920035_精创电气/年报/2025-04-29_2024年年度报告.pdf",
+      "sha256": "f085eb7d11db99015fe0f66a08d060b3e5ec7fe7c30c39684ed252289226f82c",
+      "bytes": 2267750,
+      "pages": 177,
+      "machine_fact_count": 44
+    },
+    {
+      "ticker": "920036",
+      "company": "觅睿科技",
+      "year": "2024",
+      "path": "reports/920036_觅睿科技/年报/2025-03-06_2024年年度报告.pdf",
+      "sha256": "7500804103c35d854fa3849bab9a918adff9680912994ebd96f78c815873a994",
+      "bytes": 2660376,
+      "pages": 125,
+      "machine_fact_count": 54
+    },
+    {
+      "ticker": "920038",
+      "company": "森合高科",
+      "year": "2024",
+      "path": "reports/920038_森合高科/年报/2025-03-25_2024年年度报告.pdf",
+      "sha256": "756d400558accc35df5014468d4c14e0784353a63c5d911cbdc64f40e8634feb",
+      "bytes": 1651522,
+      "pages": 166,
+      "machine_fact_count": 50
+    },
+    {
+      "ticker": "920038",
+      "company": "森合高科",
+      "year": "2025",
+      "path": "reports/920038_森合高科/年报/2026-03-06_2025年年度报告.pdf",
+      "sha256": "3515b645e310eb4e6a52eb117ce99ff333a754ee99dbbcd907ee8dd36d5741cb",
+      "bytes": 2018223,
+      "pages": 187,
+      "machine_fact_count": 68
+    },
+    {
+      "ticker": "920039",
+      "company": "国义招标",
+      "year": "2023",
+      "path": "reports/920039_国义招标/年报/2024-03-12_2023年年度报告.pdf",
+      "sha256": "f0e1e507f790c89ea826e40049bf4f1346dbc9ce9aed4247dfd1038b580829ee",
+      "bytes": 2637946,
+      "pages": 175,
+      "machine_fact_count": 83
+    },
+    {
+      "ticker": "920039",
+      "company": "国义招标",
+      "year": "2024",
+      "path": "reports/920039_国义招标/年报/2025-03-31_2024年年度报告.pdf",
+      "sha256": "169fc5acdb467cd91e77f39b9d0117d444c69ef8392e81f25fd28936c39306bd",
+      "bytes": 2569103,
+      "pages": 206,
+      "machine_fact_count": 76
+    },
+    {
+      "ticker": "920046",
+      "company": "亿能电力",
+      "year": "2024",
+      "path": "reports/920046_亿能电力/年报/2025-04-29_2024年年度报告.pdf",
+      "sha256": "597d33a3dd84d85ae1bcd2447f79ae8c808370d1a612918ae3a89d9cd1657784",
+      "bytes": 1678178,
+      "pages": 126,
+      "machine_fact_count": 72
+    },
+    {
+      "ticker": "920046",
+      "company": "亿能电力",
+      "year": "2025",
+      "path": "reports/920046_亿能电力/年报/2025-07-21_年度报告重大差错责任追究制度.pdf",
+      "sha256": "b613b2e947da5a8f4014641342f6581defb114ed8aabbb0708a429651aa9c529",
+      "bytes": 245965,
+      "pages": 6,
+      "machine_fact_count": 0
+    },
+    {
+      "ticker": "920047",
+      "company": "诺思兰德",
+      "year": "2023",
+      "path": "reports/920047_诺思兰德/年报/2024-04-25_2023年年度报告.pdf",
+      "sha256": "99987ca03ca0cc46d343497494a92db6f7bd6a41211d7cdee6be28dc81710a94",
+      "bytes": 2116334,
+      "pages": 170,
+      "machine_fact_count": 72
+    },
+    {
+      "ticker": "920047",
+      "company": "诺思兰德",
+      "year": "2024",
+      "path": "reports/920047_诺思兰德/年报/2025-04-23_2024年年度报告.pdf",
+      "sha256": "11b2861186e009d00641df1f9267df430c7750e1b4bbb2216136f93e43e7c806",
+      "bytes": 2378010,
+      "pages": 180,
+      "machine_fact_count": 72
+    },
+    {
+      "ticker": "920050",
+      "company": "爱伦医疗",
+      "year": "2023",
+      "path": "reports/920050_爱伦医疗/年报/2024-04-18_2023年年度报告.pdf",
+      "sha256": "5bc65468231ac98780fa2ea592eb7ddf251c7e0cd32047384694de53ab37adbe",
+      "bytes": 1729014,
+      "pages": 145,
+      "machine_fact_count": 56
+    },
+    {
+      "ticker": "920050",
+      "company": "爱伦医疗",
+      "year": "2024",
+      "path": "reports/920050_爱伦医疗/年报/2025-02-25_2024年年度报告.pdf",
+      "sha256": "42a73c0ba458e4baff3644b01aac0033fc084471b1b812467ec8d663016c7fc0",
+      "bytes": 1926301,
+      "pages": 180,
+      "machine_fact_count": 56
+    },
+    {
+      "ticker": "920057",
+      "company": "百甲科技",
+      "year": "2023",
+      "path": "reports/920057_百甲科技/年报/2024-04-29_2023年年度报告.pdf",
+      "sha256": "95351696324baf43fd3320c257a2f301fec39550148761854567f696b38ee47e",
+      "bytes": 2979935,
+      "pages": 215,
+      "machine_fact_count": 72
+    },
+    {
+      "ticker": "920057",
+      "company": "百甲科技",
+      "year": "2024",
+      "path": "reports/920057_百甲科技/年报/2025-04-29_2024年年度报告.pdf",
+      "sha256": "c9d5d105e0f976d338ddd8cd3d755ed2d2dd97cc64842c34fa16769ac1307dde",
+      "bytes": 2935672,
+      "pages": 212,
+      "machine_fact_count": 69
+    },
+    {
+      "ticker": "920058",
+      "company": "华洋赛车",
+      "year": "2023",
+      "path": "reports/920058_华洋赛车/年报/2024-04-29_2023年年度报告.pdf",
+      "sha256": "ab290449e42c57ae14fc20fc511657831cbc64358a7724b76520276666c18911",
+      "bytes": 1954030,
+      "pages": 155,
+      "machine_fact_count": 38
+    },
+    {
+      "ticker": "920058",
+      "company": "华洋赛车",
+      "year": "2024",
+      "path": "reports/920058_华洋赛车/年报/2025-04-28_2024年年度报告.pdf",
+      "sha256": "c63c581f6798f3e3694f28efb523bdc920e6b897303d908b0730115af3d4498c",
+      "bytes": 2209353,
+      "pages": 200,
+      "machine_fact_count": 46
+    },
+    {
+      "ticker": "920059",
+      "company": "双英集团",
+      "year": "2024",
+      "path": "reports/920059_双英集团/年报/2025-03-17_2024年年度报告.pdf",
+      "sha256": "3a86a4e7bd8134e419990972410b5309dccd677a27c2ad22b2783e76a06e3097",
+      "bytes": 1887934,
+      "pages": 174,
+      "machine_fact_count": 60
+    },
+    {
+      "ticker": "920059",
+      "company": "双英集团",
+      "year": "2025",
+      "path": "reports/920059_双英集团/年报/2026-03-13_2025年年度报告.pdf",
+      "sha256": "f05fba076ba548e786192319332cf5ea2599b4375ca6ac8429dd0ef17c5b6797",
+      "bytes": 1824819,
+      "pages": 165,
+      "machine_fact_count": 54
+    },
+    {
+      "ticker": "920060",
+      "company": "万源通",
+      "year": "2025",
+      "path": "reports/920060_万源通/年报/2025-06-30_年度报告重大差错责任追究制度.pdf",
+      "sha256": "80189ff6690ce0240cb6fe10f347b1c7e1fb99530f8c7396de9e1d9f29d02025",
+      "bytes": 203990,
+      "pages": 7,
+      "machine_fact_count": 0
+    },
+    {
+      "ticker": "920060",
+      "company": "万源通",
+      "year": "2024",
+      "path": "reports/920060_万源通/年报/2025-03-31_2024年年度报告.pdf",
+      "sha256": "c4a065997c1caf2d80dcc1756d472b3c9ff9ec6d3dfd4e7d56d234bcace84c66",
+      "bytes": 2967735,
+      "pages": 171,
+      "machine_fact_count": 72
+    },
+    {
+      "ticker": "920061",
+      "company": "西磁科技",
+      "year": "2023",
+      "path": "reports/920061_西磁科技/年报/2024-04-26_2023年年度报告.pdf",
+      "sha256": "3321338f99c2f18d4554a01f7bec96a69823814994f3a0968b17c2cb92657c9e",
+      "bytes": 2537108,
+      "pages": 164,
+      "machine_fact_count": 80
+    },
+    {
+      "ticker": "920061",
+      "company": "西磁科技",
+      "year": "2024",
+      "path": "reports/920061_西磁科技/年报/2025-04-25_2024年年度报告.pdf",
+      "sha256": "8ad2bc675a88f41f80c52a7f2bd8c0eb9723bb494c300740a221fbf2dc3a146d",
+      "bytes": 2494910,
+      "pages": 168,
+      "machine_fact_count": 77
+    },
+    {
+      "ticker": "920062",
+      "company": "科润智控",
+      "year": "2025",
+      "path": "reports/920062_科润智控/年报/2025-07-16_年度报告重大差错责任追究制度.pdf",
+      "sha256": "f937cb3ac170c9a61b9b6265f44d1d836e9e0e8f96efa59233d1fb82f97a2daf",
+      "bytes": 202207,
+      "pages": 6,
+      "machine_fact_count": 0
+    },
+    {
+      "ticker": "920062",
+      "company": "科润智控",
+      "year": "2024",
+      "path": "reports/920062_科润智控/年报/2025-04-29_2024年年度报告.pdf",
+      "sha256": "62cec4a7504571cea924ada96f5415b7aa7437189faab0af36e965241595c7d9",
+      "bytes": 3326719,
+      "pages": 182,
+      "machine_fact_count": 64
+    },
+    {
+      "ticker": "920493",
+      "company": "并行科技",
+      "year": "2023",
+      "path": "reports/920493_并行科技/年报/2024-04-15_2023年年度报告.pdf",
+      "sha256": "595ba27f8900c41ceac19facbc2de5154b2c20bd71749b8affce1cc1f31dbeff",
+      "bytes": 2581417,
+      "pages": 194,
+      "machine_fact_count": 80
+    }
+  ]
+}

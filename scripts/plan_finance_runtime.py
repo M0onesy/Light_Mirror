@@ -286,7 +286,7 @@ def create_plan(upstream: Path) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--upstream", type=Path, default=DEFAULT_UPSTREAM)
-    parser.add_argument("--out", type=Path, default=ROOT / "runs/runtime-closure-plan")
+    parser.add_argument("--out", type=Path, default=ROOT / "evidence/runtime-closure-plan")
     args = parser.parse_args()
     plan = create_plan(args.upstream.resolve())
     args.out.mkdir(parents=True, exist_ok=True)

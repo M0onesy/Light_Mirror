@@ -63,7 +63,7 @@ def test_result_chat_and_task_switches_keep_registered_session_history(ui_host, 
     _, base = ui_host
     page, errors, external = browser_page
     sessions, requests, created = _host_routes(page)
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     _open_run(page, 'a')
     _ask(page, 'first-a')
     first = created[0]
@@ -99,7 +99,7 @@ def test_authoritative_history_refresh_removes_deleted_session_selection(ui_host
     _, base = ui_host
     page, errors, external = browser_page
     sessions, requests, created = _host_routes(page)
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     _open_run(page, 'a')
     _ask(page, 'before-removal')
     first = created[0]

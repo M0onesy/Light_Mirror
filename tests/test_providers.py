@@ -177,7 +177,7 @@ def test_provider_deletion_requires_repairing_referencing_route(tmp_path):
 
 def test_user_budget_defaults():
     agent = AppConfig().to_dict()["agent"]
-    assert agent["budget"] == {"max_model_calls": 128, "max_tool_calls": 1000, "max_total_tokens": 1000000, "max_runtime_s": 1800, "max_subagents": 2, "max_depth": 1}
+    assert agent["budget"] == {"max_model_calls": 128, "max_tool_calls": 1000, "max_total_tokens": 1000000, "max_runtime_s": 1800, "max_subagents": 2, "max_depth": 1, "binding_group_size": 16}
     assert agent["followup_budget"] == {"max_model_calls": 12, "max_tool_calls": 80, "max_total_tokens": 150000, "max_runtime_s": 180}
 
 

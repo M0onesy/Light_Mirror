@@ -86,6 +86,9 @@ def test_actual_source_launcher_web_task_evidence_export_replay_cancel_and_resta
     checks = result['checks']
     assert checks['kernel_run']['status'] == 'completed' and checks['kernel_run']['claims'] == 11
     assert all(checks['kernel_run']['summary'][status] for status in ('verified', 'violated', 'abstained'))
+    assert checks['root_serves_smart_workbench'] and checks['harness_serves_locked_ui']
+    assert {row['path'] for row in checks['smart_frontend_assets_locked']} == {
+        'web/smart/index.html', 'web/smart/app.js', 'web/smart/app.css', 'web/smart/decimal.js'}
     assert checks['all_served_frontend_assets_locked'] > 0
     assert checks['host_origin_bearer_authentication'] and checks['revision_conflict']
     assert checks['kernel_replay']['numeric_equal'] and checks['kernel_replay']['network_calls'] == 0

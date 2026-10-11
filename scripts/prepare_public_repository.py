@@ -7,7 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from scripts.create_core_review import select_files, configured_secret_values, scan_bytes, _canonical, BASELINES
+from scripts.create_core_review import select_files, configured_secret_values, scan_bytes, _canonical, BASELINES, _baseline_directory, _review_workspace
 from scripts.upstream_source import ROOT, DEFAULT_UPSTREAM, verify_upstream, locked_source, io_path
 
 
@@ -34,7 +34,7 @@ def scan_document(data: bytes, secrets: list[bytes], name: str) -> None:
 
 def project_documents(project_root: Path = ROOT) -> dict[str, Path]:
     """Select exact requirement baselines and the current review PDF only."""
-    requirements = _canonical(project_root.parent)
+    requirements = _canonical(_baseline_directory(project_root))
     selected = {}
     for name in BASELINES:
         path = _canonical(requirements / name)
@@ -53,8 +53,11 @@ def project_documents(project_root: Path = ROOT) -> dict[str, Path]:
 
 def export_repository(destination: Path) -> dict:
     destination = _canonical(destination, exists=False)
-    workspace = ROOT.parents[1]
-    if destination.parent != workspace or destination.exists():
+    workspace = _review_workspace(ROOT)
+    artifact_root = _canonical(ROOT / 'artifacts' / 'source', exists=False)
+    managed = destination != artifact_root and destination.is_relative_to(artifact_root)
+    if ((not managed and (destination.parent != workspace or destination.is_relative_to(ROOT)))
+            or destination.exists()):
         raise ValueError('Public export must be a new, separate directory at the workspace root')
     source_receipt = verify_upstream()
     secrets = configured_secret_values(ROOT)
@@ -63,7 +66,7 @@ def export_repository(destination: Path) -> dict:
         selected['vendor/harness/' + item['path']] = DEFAULT_UPSTREAM / item['path']
     selected.update(project_documents(ROOT))
     rows = []
-    destination.mkdir()
+    destination.mkdir(parents=True)
     # Each public member is explicitly selected, including immutable upstream
     # bytes. No inherited worktree metadata, binaries or private run caches.
     for member, source in sorted(selected.items()):
@@ -97,7 +100,7 @@ def export_repository(destination: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--out', type=Path, default=ROOT.parents[1] / 'Light_Mirror')
+    parser.add_argument('--out', type=Path, default=ROOT / 'artifacts' / 'source' / 'public-export')
     args = parser.parse_args()
     print(json.dumps(export_repository(args.out), ensure_ascii=False))
 

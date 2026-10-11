@@ -168,6 +168,7 @@ def test_spec_embeds_three_carrier_files_and_verifies_frontend_before_build(tmp_
     prepared = builder.prepare_finance_payload(tmp_path)
     calls = []
     monkeypatch.setattr(frontend, 'verify', lambda root: calls.append(('frontend', root)))
+    monkeypatch.setattr(frontend, 'verify_smart', lambda root: calls.append(('upload_frontend', root)))
     monkeypatch.setattr(hooks, 'collect_data_files', lambda *_: [])
     monkeypatch.setattr(hooks, 'copy_metadata', lambda *_args, **_kwargs: [])
     monkeypatch.setattr(hooks, 'collect_submodules', lambda *_args, **_kwargs: [])
@@ -180,7 +181,8 @@ def test_spec_embeds_three_carrier_files_and_verifies_frontend_before_build(tmp_
     runpy.run_path(str(ROOT/'MingJing.spec'), init_globals={'SPEC':str(tmp_path/'MingJing.spec'),
                    'Analysis':analyze, 'PYZ':lambda *_: [], 'EXE':lambda *_args, **_kwargs: None})
     assert calls[0] == ('frontend', tmp_path)
-    datas = calls[1][1]
+    assert ('upload_frontend', tmp_path) in calls
+    datas = next(value for kind, value in calls if kind == 'datas')
     carrier_files = [Path(source) for source, target in datas if target == 'runtime/finance-carrier']
     assert set(carrier_files) == set(prepared)
     assert not any('node_modules' in Path(source).parts for source, _ in datas)

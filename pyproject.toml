@@ -1,6 +1,6 @@
 [project]
 name = "mingjing"
-version = "1.0.0.dev2"
+version = "1.0.0.dev3"
 description = "MingJing financial research report fact checker"
 requires-python = ">=3.12"
 license = {text = "AGPL-3.0-only"}

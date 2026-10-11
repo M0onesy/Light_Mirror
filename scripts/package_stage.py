@@ -331,7 +331,7 @@ def main() -> int:
     parser.add_argument('--out', type=Path)
     args = parser.parse_args()
     version = tomllib.loads((ROOT / 'pyproject.toml').read_text(encoding='utf-8'))['project']['version']
-    out = args.out or ROOT.parents[1] / ('MingJing-stage-' + version)
+    out = args.out or ROOT / 'artifacts' / 'packages' / ('MingJing-stage-' + version)
     receipt = create_stage(ROOT, out, exe=args.exe.resolve(), build_path=args.build_receipt.resolve(),
                            smoke_path=args.smoke_receipt.resolve(), native_path=args.native_receipt.resolve(),
                            source_commit=args.source_commit)

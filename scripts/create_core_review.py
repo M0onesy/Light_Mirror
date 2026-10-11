@@ -15,12 +15,15 @@ import os
 from pathlib import Path
 import shutil
 import stat
+import sys
 import tomllib
 import uuid
 import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
+if not __package__:
+    sys.path.insert(0, str(ROOT))
 LIMIT_BYTES = 30_000_000  # Decimal MB: below both 30 MB and 30 MiB.
 MAX_FILE_BYTES = 16 * 1024 * 1024
 MAX_SOURCE_BYTES = 100 * 1024 * 1024
@@ -43,6 +46,9 @@ EXPLICIT = ('samples/demo_draft.md', 'samples/demo_draft_defined.md',
             'runtime/finance-carrier/bootstrap.mjs',
             'bench/README.md', 'bench/__init__.py', 'bench/evaluate.py',
             'bench/stats.py', 'bench/acceptance_cases.json', 'bench/samples_demo.jsonl')
+# 直传模式的虚构样例目录（年报、季报、半年报、含预埋错误的研报及金标），全部为可自由分发的生成材料
+SMART_SAMPLES = 'samples/smart'
+SMART_SAMPLE_SUFFIXES = {'.pdf', '.json', '.md'}
 BASELINES = ('明镜MingJing_项目计划书.docx', '明镜_计划书打磨与开发任务手册.md')
 PRIVATE_MARKERS = (b'-----BEGIN PRIVATE KEY-----', b'-----BEGIN RSA PRIVATE KEY-----',
                    b'-----BEGIN EC PRIVATE KEY-----', b'-----BEGIN OPENSSH PRIVATE KEY-----')
@@ -73,6 +79,33 @@ def _canonical(path: Path, *, exists: bool = True) -> Path:
     if path.resolve(strict=exists) != path:
         raise ValueError('Review paths must be canonical')
     return path
+
+
+def _review_workspace(root: Path) -> Path:
+    root = _canonical(root)
+    for candidate in root.parents:
+        if candidate == Path(candidate.anchor):
+            break
+        project_tree, delivery_tree = candidate / 'mainProj', candidate / '交付'
+        if (root.is_relative_to(project_tree) and project_tree.is_dir()
+                and delivery_tree.is_dir()):
+            _canonical(project_tree)
+            _canonical(delivery_tree)
+            return _canonical(candidate)
+    workspace = root.parent
+    if workspace == Path(workspace.anchor):
+        raise ValueError('Review workspace cannot be a filesystem root')
+    return _canonical(workspace)
+
+
+def _baseline_directory(root: Path) -> Path:
+    """Use the single current document source; retain older clone support."""
+    current = root / 'docs' / 'project'
+    return current if current.is_dir() else root.parent
+
+
+def _default_output(root: Path) -> Path:
+    return root / 'artifacts' / 'core-review' / 'MingJing-core-review'
 
 
 def _allowed(path: Path, root: Path) -> bool:
@@ -124,6 +157,11 @@ def review_sources(root: Path, requirements_dir: Path, *, include_baselines: boo
             dirs[:] = kept
             for name in sorted(files):
                 path = Path(current) / name
+                # Current baselines enter once under requirements/, including
+                # the DOCX which is intentionally outside the generic suffixes.
+                if (include_baselines and path.parent == requirements_dir
+                        and name in BASELINES):
+                    continue
                 if _allowed(path, root):
                     add(path, path.relative_to(root).as_posix())
     # Only top-level v1 evaluator/schema code enters; annotation candidates,
@@ -138,9 +176,17 @@ def review_sources(root: Path, requirements_dir: Path, *, include_baselines: boo
         add(root / name, name, required=name in {
             'samples/demo_draft_defined.md', 'samples/corpus/facts.json',
             'samples/corpus/demo_annual.pdf', 'runtime/harness/source_snapshot.json'})
+    smart_samples = root / SMART_SAMPLES
+    if smart_samples.exists():
+        _canonical(smart_samples)
+        for path in sorted(smart_samples.iterdir()):
+            if path.is_file() and path.suffix.lower() in SMART_SAMPLE_SUFFIXES and path.name.lower() not in DENIED_NAMES:
+                add(path, path.relative_to(root).as_posix(), required=False)
     if include_baselines:
+        baseline_prefix = ('docs/project/' if requirements_dir == root / 'docs/project'
+                           else 'requirements/')
         for name in BASELINES:
-            add(requirements_dir / name, 'requirements/' + name)
+            add(requirements_dir / name, baseline_prefix + name)
     if sum(path.stat().st_size for path in sources.values()) > MAX_SOURCE_BYTES:
         raise ValueError('Review source exceeds the total uncompressed limit')
     return sorted((path, name) for name, path in sources.items())
@@ -205,10 +251,39 @@ def _readme(version: str) -> str:
 - 项目介绍：[PROJECT_README.md](PROJECT_README.md)
 - 详细使用：[docs/USER_GUIDE.md](docs/USER_GUIDE.md)
 - 三种交付：[docs/DELIVERY_GUIDE.md](docs/DELIVERY_GUIDE.md)
-- 需求基线：requirements/ 下的计划书和内部开发任务手册
+- 需求基线：当前布局在 docs/project/ 下，旧布局兼容包在 requirements/ 下
 - Python 金融内核与宿主：mingjing/ 与 kernel/；规则包：rulepack/
 - 原生金融插件：runtime/finance-plugin/；界面：frontend/src/
 - 上游来源和运行时仅保留清单引用，完整二进制资产不在本包内。
+
+## 直传模式（1.0.0.dev2 之后新增，本包可独立运行）
+
+上传一份或一批研报/财报即可核查或分析，公司、报告期、日期从文件内容识别，材料自动进入本地知识库（去重、缓存、留痕）。年报、半年报、季报和招股说明书都可作为核对依据；研报日期之后才公告的材料自动排除。这一部分只依赖 Python 标准库和一个 PDF 文本后端（PyMuPDF、poppler 的 pdftotext 或 pdfplumber 任一），不需要 Harness 运行时。
+
+```bash
+# 命令行：自动识别后核查或分析（可同时给多份文件或目录）
+python -m mingjing.cli smart run 研报.pdf 年报.pdf --out runs
+python -m mingjing.cli smart check 研报.pdf            # 只给研报：自动调取知识库中同公司财报
+python -m mingjing.cli smart analysis 年报.pdf 半年报.pdf   # 财报分析（同比、环比、单季推算、异常信号）
+python -m mingjing.cli smart run 研报.pdf --llm        # 使用明镜配置中的模型做语义绑定与摘要
+python -m mingjing.cli smart replay runs/<任务>/<条目>  # 离线重放：同一批输入重算并逐条比较
+python -m mingjing.cli smart kb 目录或文件…             # 仅入库并查看知识库统计
+python -m mingjing.cli smart kb --list | --verify | --remove <编号前缀>   # 列出、留痕哈希链校验、删除
+
+# 界面：完整服务（首页即直传工作台，可“一键演示”；原生 Agent 界面在 /classic）
+python -m mingjing.launcher
+# 轻量界面：不加载原生 Agent 运行时
+python -m mingjing.smart.web --port 8765
+
+# 虚构样例：两家公司的年报、季报、半年报与三份研报，共23处预埋错误（覆盖E1–E7）
+python -m mingjing.cli smart run samples/smart/*.pdf --out runs
+
+# 测试
+python -m unittest tests.test_smart_pipeline      # 或 pytest tests/test_smart_pipeline.py
+python -m unittest tests.test_smart_web_ui        # 浏览器端到端（需 Playwright + Chromium，缺失时自动跳过）
+```
+
+设计与接口见 [docs/SMART_PIPELINE.md](docs/SMART_PIPELINE.md)。标准模式按通行惯例推定口径并在每条结论中写明所用推定；加 `--strict`（界面勾选“审慎模式”）可关闭口径推定。未能核实的陈述按缺口类型分组给出补材建议；财报分析附报表恒等式、披露同比重算、季度合计与跨表一致等勾稽检查。
 
 审阅者建议先读计划书，再对照手册尾部问题与解决指导。修改后把补丁或 Git 分支交给项目负责人合并；不要覆盖历史运行锁。离线内核可在 Python 3.12 环境安装锁定依赖后用 PROJECT_README 中的 CLI 示例运行；仅自带fixture的内核测试可独立执行，原生 Agent、上游来源、载体及外部证据闭包测试需要完整工程。
 
@@ -220,11 +295,13 @@ def create_core_review(root: Path, out: Path, *, requirements_dir: Path | None =
                        secret_values: list[bytes] | None = None,
                        max_archive_bytes: int = LIMIT_BYTES) -> dict:
     root = _canonical(root)
-    requirements_dir = _canonical(requirements_dir or root.parent)
-    workspace = _canonical(root.parents[1])
+    requirements_dir = _canonical(requirements_dir or _baseline_directory(root))
+    workspace = _review_workspace(root)
     out = _canonical(out, exists=False)
-    if (out == workspace or not out.is_relative_to(workspace)
-            or out.is_relative_to(root) or root.is_relative_to(out)):
+    managed_output = _canonical(root / 'artifacts' / 'core-review', exists=False)
+    managed = out != managed_output and out.is_relative_to(managed_output)
+    if (not managed and (out == workspace or not out.is_relative_to(workspace)
+            or out.is_relative_to(root) or root.is_relative_to(out))):
         raise ValueError('Core review destination must be a separate folder inside the authorized workspace')
     if type(max_archive_bytes) is not int or not 0 < max_archive_bytes <= LIMIT_BYTES:
         raise ValueError('Archive limit must not exceed 30,000,000 bytes')
@@ -325,8 +402,8 @@ def create_core_review(root: Path, out: Path, *, requirements_dir: Path | None =
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--out', type=Path, default=ROOT.parents[1] / 'MingJing-core-review')
-    parser.add_argument('--requirements-dir', type=Path, default=ROOT.parent)
+    parser.add_argument('--out', type=Path, default=_default_output(ROOT))
+    parser.add_argument('--requirements-dir', type=Path, default=_baseline_directory(ROOT))
     args = parser.parse_args(argv)
     receipt = create_core_review(ROOT, args.out, requirements_dir=args.requirements_dir)
     print(json.dumps(receipt, ensure_ascii=False))

@@ -14,6 +14,9 @@ EXTRACTOR_MODULES = (
     'parser.py', 'financial_notes.py', 'source_business_mode.py', 'source_customer_quotation.py', 'source_product_financial.py', 'source_quarter_quotation.py', 'issuer_identity.py', 'taxonomy.py',
     'mentions.py', 'dimensions.py', 'evidence.py', 'models.py', 'facts.py',
     'decimal_math.py', 'file_io.py', 'source_gap_catalog.py',
+    'smart/ingestion.py', 'smart/docio.py', 'smart/tables.py', 'smart/claims.py',
+    'smart/common.py', 'smart/taxonomy.py', 'smart/detect.py',
+    'smart/native_analysis.py',
 )
 _MACHINE_TYPES = {'primary_statement', 'financial_summary', 'financial_note'}
 
@@ -21,7 +24,7 @@ _MACHINE_TYPES = {'primary_statement', 'financial_summary', 'financial_note'}
 def is_machine_fact(row: dict, *, declared_cache: bool = False) -> bool:
     """A PDF source alone does not turn a manually structured fact into a cache."""
     return (row.get('source_type') in _MACHINE_TYPES
-            or str(row.get('extractor_version') or '').startswith(('financial-', 'pdf-'))
+            or str(row.get('extractor_version') or '').startswith(('financial-', 'pdf-', 'smart-'))
             or declared_cache and row.get('source_type') != 'structured')
 
 
@@ -50,7 +53,7 @@ def cache_admission(payload, rows, **control) -> dict:
     expected = declaration.get('modules')
     if not isinstance(expected, dict) or not set(EXTRACTOR_MODULES) <= set(expected):
         return {'status': 'reparse', 'reason': 'incomplete_extractor_lock'}
-    if any(not isinstance(name, str) or not re.fullmatch(r'[a-z_][a-z_0-9]*\.py', name)
+    if any(not isinstance(name, str) or not re.fullmatch(r'(?:smart/)?[a-z_][a-z_0-9]*\.py', name)
            or not isinstance(value, str) or not re.fullmatch(r'[a-f0-9]{64}', value)
            for name, value in expected.items()):
         return {'status': 'reparse', 'reason': 'invalid_extractor_lock'}

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>明镜 MingJing · 研报核查与财报分析</title>
+<link rel="stylesheet" href="/smart/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">镜</span><div><b>明镜 MingJing</b><small>金融投研核查智能体</small></div></div>
+  <nav id="nav">
+    <button data-view="work" class="active">工作台</button>
+    <button data-view="result">核查结果</button>
+    <button data-view="kb">知识库</button>
+    <button data-view="history">任务历史</button>
+    <button data-view="settings">设置</button>
+    <button data-view="about">说明</button>
+  </nav>
+  <div class="top-right"><span id="health" class="pill muted">连接中…</span><a class="ghost-link" href="/classic" title="原生 Agent 与高级配置界面">高级界面</a></div>
+</header>
+
+<main>
+<section id="view-work" class="view active">
+  <div class="hero">
+    <div>
+      <h1>上传即核查</h1>
+      <p>拖入研报或财报文件，明镜自动识别公司、报告期与日期，从知识库调取同公司财报，用确定性内核逐条核对数字、口径与公式。</p>
+    </div>
+    <div class="mode-cards" role="radiogroup" aria-label="任务类型">
+      <label class="mode-card"><input type="radio" name="mode" value="auto" checked><span class="mc-title">自动识别</span><span class="mc-desc">研报→核查，财报→分析</span></label>
+      <label class="mode-card"><input type="radio" name="mode" value="check"><span class="mc-title">研报核查</span><span class="mc-desc">数值·期间·口径·公式·估值</span></label>
+      <label class="mode-card"><input type="radio" name="mode" value="analysis"><span class="mc-title">财报分析</span><span class="mc-desc">指标·同比环比·异常信号</span></label>
+    </div>
+  </div>
+
+  <div id="drop" class="drop" tabindex="0">
+    <input id="file" type="file" multiple accept=".pdf,.docx,.md,.txt,.json" hidden>
+    <div class="drop-icon">⇪</div>
+    <div class="drop-main">拖入研报 / 财报文件，或 <u>点击选择</u></div>
+    <div class="drop-sub">支持 PDF、Word(.docx)、Markdown、TXT；可一次放入一批。文件自动存入知识库，重复文件按内容去重。</div>
+  </div>
+
+  <div class="drop-alt">已经上传过？<button class="link" id="addFromKb">从知识库选择已有材料</button> · 只传研报也可以：系统会自动调取库中同公司的财报。 · <button class="link" id="runDemo">一键演示（虚构样例，含预埋错误）</button></div>
+
+  <div class="panel" id="queuePanel" hidden>
+    <div class="panel-head"><h3>本次材料</h3><div><button class="link" id="clearQueue">清空</button></div></div>
+    <table class="table" id="queue"><thead><tr><th>文件</th><th>识别类型</th><th>公司</th><th>报告期/日期</th><th>状态</th><th></th></tr></thead><tbody></tbody></table>
+  </div>
+
+  <details class="panel options">
+    <summary>可选项（不填写也能运行）</summary>
+    <div class="grid3">
+      <label>公司（覆盖自动识别）<input id="optCompany" placeholder="如：并行科技"></label>
+      <label>研报日期（取数截止日）<input id="optDate" type="date"></label>
+      <label>任务口径声明<select id="optScope"><option value="">按原文识别／标准模式注明推定</option><option value="合并">合并（用户声明）</option><option value="母公司">母公司（用户声明）</option></select></label>
+      <label class="check"><input id="optKb" type="checkbox" checked> 从知识库补充同公司财报</label>
+      <label class="check"><input id="optStrict" type="checkbox"> 审慎模式（不做口径推定）</label>
+      <label class="check"><input id="optLlm" type="checkbox"> 启用模型语义绑定 <small id="llmState" class="muted"></small></label>
+      <label class="check"><input id="optText" type="checkbox" checked> 原文佐证（重新核对主体、期间、科目及单位）</label>
+    </div>
+  </details>
+
+  <div class="actions">
+    <button id="start" class="primary big" disabled>开始</button>
+    <span id="startHint" class="muted">请先放入文件</span>
+  </div>
+
+  <div class="panel progress" id="progressPanel" hidden>
+    <div class="progress-row"><b id="progressPhase">准备中</b><span id="progressPct">0%</span></div>
+    <div class="bar"><i id="progressBar"></i></div>
+    <div class="progress-row"><span id="progressRun" class="muted"></span><button class="link" id="cancelRun">取消</button></div>
+  </div>
+</section>
+
+<section id="view-result" class="view">
+  <div id="resultEmpty" class="empty">还没有结果。去<a href="#" data-goto="work">工作台</a>上传文件开始一次核查。</div>
+  <div id="resultBody" hidden>
+    <div class="result-head">
+      <div><h2 id="rTitle"></h2><div id="rMeta" class="muted"></div><p id="rNarrative" class="narrative"></p></div>
+      <div class="result-actions">
+        <select id="rItem" aria-label="批量结果切换"></select>
+        <a id="rHtml" class="btn" target="_blank">报告（HTML）</a>
+        <a id="rCsv" class="btn">修改清单（CSV）</a>
+        <a id="rZip" class="btn">导出全部</a>
+        <button id="rReplay" class="btn" title="用知识库中按哈希登记的同一批输入离线重算，逐条比较结论">重放验证</button>
+      </div>
+    </div>
+    <div class="panel" id="sessionPanel" hidden>
+      <div class="panel-head"><h3>材料会话与补证</h3><span id="sessionState" class="small muted"></span><button class="link" id="sessionRefresh">刷新</button></div>
+      <p id="nativeState" class="muted small"></p>
+      <div id="sessionMessages" class="session-messages" aria-live="polite"></div>
+      <div class="actions"><input id="sessionQuestion" placeholder="追问同一材料，例如：这个同比的分母和证据是什么？" aria-label="材料追问"><button class="primary" id="sessionSend">发送追问</button><button class="btn" id="sessionCancel">取消会话</button><button class="btn" id="sessionResume">恢复会话</button><button class="btn" id="sessionSupplement">添加补证并重查</button></div>
+      <div id="sessionActivities" class="small muted"></div>
+    </div>
+    <div id="checkView">
+      <div class="kpis">
+        <div class="kpi ok"><b id="kOk">0</b><span>已核实</span></div>
+        <div class="kpi bad"><b id="kBad">0</b><span>有误</span></div>
+        <div class="kpi unk"><b id="kUnk">0</b><span>未能核实</span></div>
+        <div class="kpi skip"><b id="kSkip">0</b><span>不判定</span></div>
+        <div class="kpi wide"><div class="stack" id="kStack"></div><div class="rates" id="kRates"></div></div>
+      </div>
+      <div class="panel tiers" id="kTiers"></div>
+      <div id="advice" class="advice" hidden></div>
+      <div class="tabs" id="rTabs">
+        <button data-tab="wrong" class="active">有误与修改建议 <em id="cWrong"></em></button>
+        <button data-tab="all">全部陈述 <em id="cAll"></em></button>
+        <button data-tab="gap">未能核实与补材 <em id="cGap"></em></button>
+        <button data-tab="assume">推定与假设 <em id="cAssume"></em></button>
+        <button data-tab="groups">分级统计</button>
+        <button data-tab="materials">参考材料</button>
+      </div>
+      <div class="tab" id="tab-wrong"></div>
+      <div class="tab" id="tab-all" hidden>
+        <div class="filters">
+          <input id="fText" placeholder="搜索原文、指标、数值…">
+          <select id="fStatus"><option value="">全部状态</option><option value="verified">已核实</option><option value="violated">有误</option><option value="unverifiable">未能核实</option><option value="skipped">不判定</option></select>
+          <select id="fCat"><option value="">全部分级</option></select>
+          <select id="fBasis"><option value="">全部依据</option><option value="disclosed">披露值比对</option><option value="derived">公式重算</option><option value="internal">研报内部勾稽</option><option value="identity">表内勾稽</option><option value="text">原文佐证</option></select>
+        </div>
+        <table class="table claims"><thead><tr><th>#</th><th>页</th><th>陈述</th><th>原文数值</th><th>核查值</th><th>状态</th><th>依据</th></tr></thead><tbody id="allRows"></tbody></table>
+        <div class="muted small" id="allMore"></div>
+      </div>
+      <div class="tab" id="tab-gap" hidden></div>
+      <div class="tab" id="tab-assume" hidden></div>
+      <div class="tab" id="tab-groups" hidden></div>
+      <div class="tab" id="tab-materials" hidden></div>
+    </div>
+    <div id="analysisView" hidden>
+      <div class="panel" id="aHighlights" hidden><div class="panel-head"><h3>要点</h3><span class="muted small">数字全部取自下方指标与勾稽结果</span></div><ul id="aHighlightList"></ul></div>
+      <div id="signals" class="signals"></div>
+      <div class="panel" id="checkPanel"><div class="panel-head"><h3>勾稽检查</h3><span class="muted small" id="aCheckSummary"></span></div><div class="filters inline"><select id="checkFilter"><option value="">全部结论</option><option value="fail">仅不一致</option><option value="na">仅无法判定</option></select></div><div class="scroll"><table class="table" id="checkTable"></table></div></div>
+      <div class="panel"><div class="panel-head"><h3>主要指标</h3><span class="muted small" id="aNote"></span></div><div class="scroll"><table class="table" id="metricTable"></table></div></div>
+      <div class="panel" id="quarterPanel"><div class="panel-head"><h3>分季度</h3></div><div class="scroll"><table class="table" id="quarterTable"></table></div></div>
+      <div class="panel"><div class="panel-head"><h3>参考材料</h3></div><div id="aMaterials"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-kb" class="view">
+  <div class="kb-stats" id="kbStats"></div>
+  <div class="panel">
+    <div class="panel-head"><h3>文档</h3><div class="filters inline"><input id="kbSearch" placeholder="搜索文件名、公司、代码"><select id="kbType"><option value="">全部类型</option></select><button class="btn" id="kbUpload">上传到知识库</button></div></div>
+    <table class="table" id="kbTable"><thead><tr><th>文件</th><th>类型</th><th>公司</th><th>报告期</th><th>日期</th><th>事实</th><th>上传/引用</th><th></th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="panel"><div class="panel-head"><h3>留痕日志</h3><span class="muted small">入库、去重命中、解析、被任务引用均写入哈希链日志</span><span><span id="journalState" class="small"></span> <button class="link" id="verifyJournal">校验哈希链</button></span></div><ol class="journal" id="journal"></ol></div>
+</section>
+
+<section id="view-history" class="view">
+  <div class="panel"><div class="panel-head"><h3>任务历史</h3><button class="link" id="refreshHistory">刷新</button></div>
+  <table class="table" id="historyTable"><thead><tr><th>时间</th><th>材料</th><th>类型</th><th>状态</th><th>结果</th><th></th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section id="view-settings" class="view">
+  <div class="panel">
+    <div class="panel-head"><h3>大模型（可选）</h3><span class="muted small" id="sPersist"></span></div>
+    <p class="muted">配置后，模型只在系统给出的指标、期间、关系与主体枚举中做语义选择，并按槽位撰写结果摘要；它不提供数值、公式或判定。每次调用按请求哈希缓存并写入审计日志，命中缓存不再消耗 Token。不配置也可以完整运行。</p>
+    <label class="check"><input type="checkbox" id="sEnabled"> 启用模型语义绑定与摘要</label>
+    <div class="settings-form">
+      <label>接口地址<input id="sBase" placeholder="如 https://api.deepseek.com" autocomplete="off"></label>
+      <label>模型名称<input id="sModel" placeholder="如 deepseek-chat" autocomplete="off"></label>
+      <label>对话路径<input id="sPath" placeholder="/chat/completions" autocomplete="off"></label>
+      <label>协议<select id="sProtocol"><option value="deepseek">DeepSeek 官方</option><option value="openai-completions">Chat Completions（Kimi / 兼容接口）</option><option value="openai-responses">OpenAI Responses</option><option value="anthropic-messages">Anthropic Messages</option></select></label>
+      <label><span id="sKeyLabel">API Key</span><input id="sKey" type="password" autocomplete="new-password" placeholder="留空则不修改"></label>
+    </div>
+    <div class="actions"><button class="primary" id="sSave">保存设置</button><span class="muted small" id="sEffective"></span></div>
+    <div class="actions"><button class="btn" id="sTest">测试连接</button><button class="btn" id="sTestAgent">测试 Agent 工具闭环</button><button class="btn" id="sDiscover">发现模型</button><a href="/classic#settings">角色路由与预算</a></div>
+    <pre id="sTestResult" class="test-result" hidden></pre>
+  </div>
+  <div class="panel"><div class="panel-head"><h3>运行环境</h3></div><div class="kv" id="sStatus"></div></div>
+  <div class="panel"><div class="panel-head"><h3>高级界面</h3></div><p>原生 Agent 会话、补证包、供应商路由等高级配置在 <a href="/classic">高级界面</a> 中。</p></div>
+</section>
+
+<section id="view-about" class="view">
+  <div class="panel prose">
+    <h3>明镜怎样核查</h3>
+    <ol>
+      <li><b>识别与入库</b>：按内容哈希去重存入本地知识库；从文件内容识别文档类型、公司、证券代码、报告期和研报日期。</li>
+      <li><b>抽取</b>：财报的三大报表、主要会计数据、分季度、非经常性损益、分产品收入、现金流补充资料逐格抽取为带页码证据的事实；研报的正文、财务摘要表、预测表与首页行情逐条抽取为陈述。</li>
+      <li><b>核查</b>：法定科目直接比对披露值；多义指标（净利率、ROE、EPS、周转率等）登记候选定义逐一计算并注明命中的口径；预测与估值用研报自身表格和行情做内部勾稽；所有比较按披露精度做 Decimal 区间相容判断。</li>
+      <li><b>归因与建议</b>：不相容时依次检验单位(E4)、期间(E2)、口径(E3)、计算(E5)，给出应为值、计算式、证据页与可直接替换的文本。</li>
+      <li><b>缺口</b>：真正缺材料的陈述列出缺哪一期哪一项，补充对应报告后重跑即可。</li>
+    </ol>
+    <p class="muted">模型（可选）只在宿主给定的枚举中做语义绑定，不提交数值、公式或判定。审慎模式下不做口径推定，与旧版内核策略一致。</p>
+    <h3>状态含义</h3>
+    <ul class="legend"><li><span class="tag ok">已核实</span>与披露或登记公式在披露精度下相容</li><li><span class="tag bad">有误</span>所有登记口径均不相容，并给出归因</li><li><span class="tag unk">未能核实</span>缺材料或指标定义缺口（不等于有误）</li><li><span class="tag skip">不判定</span>观点、目标价、行情输入等不属于事实核查</li></ul>
+    <h3>事实、推论与观点</h3>
+    <p>每条陈述标注性质：<b>事实</b>（历史财务与已发生的经营数据，对回原始披露核查）、<b>推论</b>（预测与基于预测的估值，检查与研报自身预测表和行情的勾稽）、<b>观点</b>（目标价、评级等，不作真伪判定）。内部勾稽要求独立操作数，自身与自身比较不能核实，历史事实仍需要外部披露依据。</p>
+    <h3>错误类型</h3>
+    <p>E1 数值错误 · E2 期间错误 · E3 口径错误 · E4 单位错误 · E5 计算错误 · E6 引用错误 · E7 逻辑比较错误 · E8 缺少核查前提（保留未能核实）· E9 披露版本错误。期间、口径和版本诊断需要来源证据，不能只凭相同金额反推。</p>
+    <h3>推定与假设</h3>
+    <p>标准模式按通行惯例推定并逐条披露：未写口径按合并报表、未写期间按上下文、多义指标按登记的候选定义逐一计算、负基数增速按 |基期|、报表“-”按零列报、单季由累计数推算、预测与估值改核研报内部勾稽。每条结果的“推定与假设”写明用到哪几项；审慎模式不做口径推定。</p>
+  </div>
+</section>
+</main>
+
+<aside id="drawer" class="drawer" hidden>
+  <div class="drawer-head"><b id="dTitle"></b><button class="link" id="dClose">关闭 ✕</button></div>
+  <div class="drawer-body" id="dBody"></div>
+</aside>
+<div id="modal" class="modal" hidden><div class="modal-card" id="modalCard"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="/smart/decimal.js"></script>
+<script src="/smart/app.js"></script>
+</body>
+</html>

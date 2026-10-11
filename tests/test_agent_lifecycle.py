@@ -154,7 +154,7 @@ class RuntimeBoundary:
                             call('mj_analyze', arguments)
                     elif boundary.batch_coordinator:
                         call('mj_get_facts', {'binding_ids': owned})
-                        call('mj_get_rule', {'rule_id': 'E1'})
+                        call('mj_get_rule', {'rule_id': 'SMART-registered-kernel' if hasattr(self.owner, 'smart_kernel') else 'E1'})
                         if boundary.coordinator_verify:
                             call('mj_verify_bindings', {'binding_ids': owned})
                     else:

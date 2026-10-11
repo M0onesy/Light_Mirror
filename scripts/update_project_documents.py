@@ -1,6 +1,8 @@
 """Reconcile the judge proposal with the implemented financial-agent architecture.
 
-This is a one-time document migration. OOXML styles, pictures, relationship files,
+This is an archived dev2 one-time document migration, not a dev3 updater.
+Execution is disabled; the template remains for source provenance only.
+OOXML styles, pictures, relationship files,
 and tables are retained. Word fields/PDF are refreshed by the companion COM step.
 No model, token, personal config, financial runs, or source data is read.
 """
@@ -114,7 +116,7 @@ def replace_table_rows(table, rows):
             set_text(cell, value)
 
 
-def main():
+def legacy_template_main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--main-root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--backup-root", type=Path)
@@ -231,6 +233,12 @@ def main():
     receipt_path = backup / "document_update_receipt.json"
     receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"receipt": str(receipt_path), "backup": str(backup), "paragraph_changes": receipt["paragraph_changes"], "table_changes": len(replacements), "missing_optional_anchors": missing}, ensure_ascii=False))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.parse_args()
+    parser.error('Archived dev2 template is read-only. Use scripts/documentation tools with an explicit new draft output; current dev3 documents cannot be overwritten.')
 
 
 if __name__ == "__main__":

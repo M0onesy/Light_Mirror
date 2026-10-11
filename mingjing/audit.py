@@ -144,7 +144,7 @@ def kernel_fingerprint() -> dict[str, str]:
     """Lock rule code in source and frozen builds without importing transports."""
     from .evidence import sha256_file
     hashes: dict[str, str] = {}
-    for name in ("models", "compute", "decimal_math", "thresholds", "rules", "dimensions", "dimension_tables", "metrics", "facts", "judge", "analysis", "financial_derivations", "taxonomy", "mentions", "scope", "source_semantics", "source_table_reference", "source_business_mode", "source_customer_quotation", "source_product_financial", "source_quarter_quotation", "source_method"):
+    for name in ("models", "compute", "decimal_math", "thresholds", "rules", "dimensions", "dimension_tables", "metrics", "facts", "judge", "analysis", "financial_derivations", "taxonomy", "mentions", "scope", "source_semantics", "source_table_reference", "source_business_mode", "source_customer_quotation", "source_product_financial", "source_quarter_quotation", "source_method", "smart.verify", "smart.analysis", "smart.claims", "smart.common", "smart.taxonomy", "smart.ingestion"):
         module = importlib.import_module(f"{__package__}.{name}")
         # Use the same semantic identity in source and PyInstaller builds.
         hashes[f"module:{name}"] = digest(_module_code_data(module))

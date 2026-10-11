@@ -381,8 +381,17 @@ def command_check(args: argparse.Namespace) -> int:
 
 
 def command_replay(args: argparse.Namespace) -> int:
-    from .replay import replay_run
-    output = replay_run(args.run)
+    if getattr(args, 'relocation_map', None):
+        if not args.out:
+            raise ValueError('--relocation-map requires a separate --out below evidence/relocation')
+        from .relocation_replay import replay_relocated
+        output = replay_relocated(mode=args.replay_mode, run=args.run, relocation_map=args.relocation_map,
+                                  out=args.out, session_file=args.session_file, message_id=args.message_id)
+    else:
+        if getattr(args, 'replay_mode', 'kernel') != 'kernel':
+            raise ValueError('Explicit agent/message relocation replay requires --relocation-map')
+        from .replay import replay_run
+        output = replay_run(args.run)
     print(json.dumps(output, ensure_ascii=False))
     return 0 if output["status"] == "passed" else 1
 
@@ -433,6 +442,58 @@ def command_package(args: argparse.Namespace) -> int:
     return subprocess.call([sys.executable, '-m', 'scripts.package_delivery', *options], cwd=root)
 
 
+def command_smart(args: argparse.Namespace) -> int:
+    """直传模式：给文件即可核查/分析，公司、期间等自动识别；材料自动进入知识库并去重。"""
+    from .smart.kb import KnowledgeBase
+    from .smart.pipeline import ingest, run_task
+    kb = KnowledgeBase(args.kb or None)
+    if args.smart_command == 'replay':
+        from .smart.pipeline import replay
+        receipt = replay(args.files[0], kb)
+        print(json.dumps(receipt, ensure_ascii=False, indent=2))
+        return 0 if receipt['status'] == 'identical' else 1
+    if args.smart_command == 'kb':
+        if getattr(args, 'remove', ''):
+            matches = [r for r in kb.list() if r['doc_id'].startswith(args.remove.strip().lower())]
+            if len(matches) != 1:
+                print('未找到该文档，或编号前缀对应多份文档；请用 --list 查看完整编号', file=sys.stderr)
+                return 2
+            kb.remove(matches[0]['doc_id'])
+            print(json.dumps({'removed': matches[0]['name'], 'doc_id': matches[0]['doc_id']}, ensure_ascii=False))
+            return 0
+        if getattr(args, 'verify', False):
+            receipt = kb.verify_journal()
+            print(json.dumps(receipt, ensure_ascii=False, indent=2))
+            return 0 if receipt['ok'] else 1
+        if args.files:
+            for record in ingest(args.files, kb, origin='cli'):
+                print(json.dumps({k: record.get(k) for k in ('name', 'type_label', 'company', 'period', 'report_date', 'duplicate', 'status')}, ensure_ascii=False))
+        if getattr(args, 'list', False):
+            for record in kb.list():
+                print('\t'.join([record['doc_id'][:12], record.get('type_label', ''), record.get('company', ''), record.get('stock_code', ''),
+                                 record.get('period', ''), record.get('report_date', ''), str(record.get('facts', '')), record['name']]))
+            return 0
+        print(json.dumps(kb.stats(), ensure_ascii=False, indent=2))
+        return 0
+    hints = {key: getattr(args, key) for key in ('company', 'period', 'report_date') if getattr(args, key, '')}
+    records = ingest(args.files, kb, hints=hints, origin='cli')
+    options = {'strict': args.strict, 'kb_lookup': not args.no_kb, **{k: v for k, v in hints.items() if k != 'period'}}
+    if getattr(args, 'llm', False):
+        from .config import LocalConfig
+        from .smart.llm_bind import config_from_app
+        local = LocalConfig()
+        llm = config_from_app(local.get(), local.secret)
+        if llm.get('enabled'):
+            options['llm'] = llm
+        else:
+            print('未在明镜配置中找到可用的模型，已按纯内核运行（可在高级界面配置供应商与模型）', file=sys.stderr)
+    progress = (lambda name, pct: print(f'[{pct:3d}%] {name}', flush=True)) if not args.quiet else None
+    batch = run_task([r['doc_id'] for r in records], kb, args.out, mode=args.smart_command if args.smart_command in ('check', 'analysis') else 'auto',
+                     options=options, progress=progress)
+    print(json.dumps({'run_id': batch['run_id'], 'out': batch['out'], 'task': batch['task'], 'items': batch['items'], 'failures': batch['failures']}, ensure_ascii=False, indent=2))
+    return 1 if batch['failures'] and not batch['items'] else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mingjing", description="明镜金融研究报告事实核查")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -458,15 +519,49 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument('--progress-json', action='store_true', help=argparse.SUPPRESS)
     check.add_argument('--run-timeout-s', type=float, default=0, help=argparse.SUPPRESS)
     check.set_defaults(func=command_check)
-    replay = sub.add_parser("replay"); replay.add_argument("--run", required=True); replay.set_defaults(func=command_replay)
+    replay = sub.add_parser("replay")
+    replay.add_argument("--run", required=True)
+    replay.add_argument('--relocation-map', help='Explicit read-only workspace location map; never rewrites saved locks')
+    replay.add_argument('--out', help='New relocation replay output below evidence/relocation')
+    replay.add_argument('--replay-mode', choices=('kernel', 'agent', 'message'), default='kernel')
+    replay.add_argument('--session-file', help='Frozen session JSON for message relocation replay')
+    replay.add_argument('--message-id', help='Frozen message identifier for message relocation replay')
+    replay.set_defaults(func=command_replay)
     evidence = sub.add_parser("evidence"); evidence_sub = evidence.add_subparsers(dest="evidence_command", required=True); show = evidence_sub.add_parser("show"); show.add_argument("evidence_id"); show.add_argument("--run", required=True); show.set_defaults(func=command_evidence)
     rules = sub.add_parser("rules"); rules_sub = rules.add_subparsers(dest="rules_command", required=True); check_rules = rules_sub.add_parser("check"); check_rules.set_defaults(func=command_rules)
     serve = sub.add_parser("serve"); serve.add_argument("--results", required=True); serve.set_defaults(func=command_serve)
     package = sub.add_parser("package"); package.add_argument('package_args', nargs=argparse.REMAINDER); package.set_defaults(func=command_package)
+    smart = sub.add_parser("smart", help="直传模式：上传文件即可核查/分析，自动识别公司与期间，材料进入知识库")
+    smart_sub = smart.add_subparsers(dest="smart_command", required=True)
+    for name, text in (("run", "按识别结果自动选择核查或分析"), ("check", "研报核查"), ("analysis", "财报分析"), ("kb", "知识库入库与统计"),
+                       ("replay", "离线重放：用同一批输入重算并逐条比较")):
+        item = smart_sub.add_parser(name, help=text)
+        item.add_argument("files", nargs="*" if name == "kb" else "+", help="研报/财报文件或目录，可多个" if name != "replay" else "运行结果目录（含 results.json）")
+        item.add_argument("--kb", default="", help="知识库目录，默认 MINGJING_HOME/kb")
+        if name == "kb":
+            item.add_argument("--list", action="store_true", help="列出知识库中的文档（编号前12位、类型、公司、期间、日期、事实数、文件名）")
+            item.add_argument("--remove", default="", help="按文档编号（或唯一前缀）从知识库删除原件与解析缓存")
+            item.add_argument("--verify", action="store_true", help="校验留痕日志哈希链是否完整")
+        if name not in ("kb", "replay"):
+            item.add_argument("--llm", action="store_true", help="使用明镜配置中的模型做语义绑定与摘要")
+            item.add_argument("--out", default="runs", help="输出根目录")
+            item.add_argument("--company", default="", help="可选：覆盖自动识别的公司")
+            item.add_argument("--period", default="", help="可选：覆盖自动识别的报告期")
+            item.add_argument("--report-date", dest="report_date", default="", help="可选：覆盖自动识别的研报日期")
+            item.add_argument("--strict", action="store_true", help="审慎模式：不做口径推定，备选定义命中不算核实")
+            item.add_argument("--no-kb", action="store_true", help="不从知识库补充同公司材料")
+            item.add_argument("--quiet", action="store_true")
+        item.set_defaults(func=command_smart)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
+    # The same UTF-8 contract applies to a Windows console and redirected
+    # subprocess output; platform locale must not corrupt Chinese JSON.
+    import sys
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8', errors='backslashreplace')
     parser = build_parser()
     args = parser.parse_args(argv)
     return args.func(args)

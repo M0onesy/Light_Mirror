@@ -1,6 +1,6 @@
 # 真实 Agent 开发验收输入与失败记录
 
-在 `mainProj/mingjing-next` 使用模块入口运行。脚本只复验已曝光的开发材料，沿用当前保存的模型与密钥，不修改用户配置、不打包 EXE，也不替代独立真人金标、D3 或干净 Windows 验收。
+在仓库根 `Light_Mirror` 使用模块入口运行，统一业务版本为 `1.0.0.dev3`。脚本只复验已曝光的开发材料，沿用当前保存的模型与密钥，不修改用户配置，也不替代独立真人金标、D3 或干净 Windows 验收。新运行使用明确 `--out evidence/<新任务目录>`，输出与既有 `evidence/dev3/` 原始记录分开；冻结EXE的源锁不因目录整理改写。
 
 ```powershell
 python -X utf8 -m scripts.source_agent_acceptance --help

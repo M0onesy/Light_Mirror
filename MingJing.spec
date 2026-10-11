@@ -11,12 +11,19 @@ datas = []
 for relative in ("web", "rulepack", "samples", "docs"):
     datas.append((str(ROOT / relative), relative))
 datas.append((str(ROOT / "LICENSE"), "."))
+# Parsing and replay verify source hashes inside the frozen application too.
+# Preserve the sources beside the compiled modules, under the same package
+# paths used by source_cache and execution_fingerprint.
+for source in (ROOT / "mingjing").rglob("*.py"):
+    if "__pycache__" not in source.parts:
+        datas.append((str(source), str(source.parent.relative_to(ROOT))))
 
 sys.path.insert(0, str(ROOT))
-from scripts.build_frontend import verify as verify_frontend
+from scripts.build_frontend import verify as verify_frontend, verify_smart
 from scripts.build_receipt import runtime_assets, finance_payload_assets
 
 verify_frontend(ROOT)
+verify_smart(ROOT)
 runtime_assets(ROOT)  # Verify compiled code, dependency resolution and provenance.
 # PyInstaller extracts three payload files, not thousands of npm files on
 # every start. The consumer validates and deploys one content-hash generation.
@@ -29,6 +36,9 @@ modules = [path.stem for path in (ROOT / "mingjing").glob("*.py")
            if path.stem not in {"__init__", "exe_entry", "streamlit_app"}]
 hiddenimports = ["mingjing"]
 hiddenimports += [f"mingjing.{name}" for name in modules]
+# 直传管线由服务端与命令行延迟导入，显式登记全部子模块
+hiddenimports += ["mingjing.smart"] + [f"mingjing.smart.{path.stem}" for path in (ROOT / "mingjing/smart").glob("*.py")
+                                         if path.stem != "__init__"]
 hiddenimports += ["fitz", "pymupdf", "mcp_types", "jsonschema", "jsonschema_specifications",
                   "referencing", "rpds", "pydantic", "pydantic_core", "httpx2"]
 # The optional upstream CLI imports typer and exits if its extra is absent.

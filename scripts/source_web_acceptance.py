@@ -1,4 +1,4 @@
-"""Actual loopback HTTP acceptance of the source launcher and Harness Web UI.
+"""Actual loopback HTTP acceptance of the source launcher and both Web UIs.
 
 Uses a new application home, synthetic redistributable materials, no saved
 credentials and no cloud API. It is not an EXE/clean-machine acceptance.
@@ -31,7 +31,7 @@ if str(ROOT) not in sys.path:
 from mingjing.audit import kernel_fingerprint
 from mingjing.config import validate_path
 from mingjing.evidence import sha256_file
-from scripts.build_frontend import verify as verify_frontend
+from scripts.build_frontend import verify as verify_frontend, verify_smart as verify_smart_frontend
 
 
 def isolated_environment(home, inherited=None):
@@ -216,6 +216,7 @@ def execute(args):
                        for path in (ROOT/'mingjing').glob('*.py')}
         receipt['application_source_lock'] = source_lock
         receipt['frontend'] = verify_frontend(ROOT)
+        receipt['smart_frontend'] = verify_smart_frontend(ROOT)
         with socket.socket() as occupied:
             occupied.bind(('127.0.0.1', 0))
             occupied.listen()
@@ -230,16 +231,34 @@ def execute(args):
                 'HTTP service identity differs from the actual launcher record')
         checks['actual_launcher_health'] = True
         index = http.request('GET', '/')
-        require(index == (ROOT/'web'/'harness'/'index.html').read_bytes(), 'Served HTML is not the actual Harness UI build')
+        require(index == (ROOT/'web'/'smart'/'index.html').read_bytes(), 'Served root HTML is not the actual smart workbench')
+        require("script-src 'self'" in http.records[-1]['response_headers'].get('Content-Security-Policy', '')
+                and http.records[-1]['response_headers'].get('X-Content-Type-Options') == 'nosniff',
+                'Actual smart workbench is missing its static security headers')
+        checks['root_serves_smart_workbench'] = True
+        smart_assets = []
+        for name in ('app.js', 'app.css', 'decimal.js'):
+            raw = http.request('GET', '/smart/'+name)
+            expected_raw = (ROOT/'web'/'smart'/name).read_bytes()
+            require(raw == expected_raw, 'Served smart asset differs from source: '+name)
+            smart_assets.append({'path': 'web/smart/'+name, 'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)})
+        checks['smart_frontend_assets_locked'] = [
+            {'path': 'web/smart/index.html', 'sha256': hashlib.sha256(index).hexdigest(), 'bytes': len(index)},
+            *smart_assets,
+        ]
+        harness_index = http.request('GET', '/harness')
+        require(harness_index == (ROOT/'web'/'harness'/'index.html').read_bytes(), 'Served /harness HTML is not the actual Harness UI build')
         require("script-src 'self'" in http.records[-1]['response_headers'].get('Content-Security-Policy', '')
                 and http.records[-1]['response_headers'].get('X-Content-Type-Options') == 'nosniff',
                 'Actual Harness UI is missing its static security headers')
+        checks['harness_serves_locked_ui'] = True
         web_receipt = http.request('GET', '/build_receipt.json')
         require(web_receipt == json.loads((ROOT/'web'/'harness'/'build_receipt.json').read_text(encoding='utf-8')),
                 'HTTP frontend receipt differs from the source build receipt')
         for entry in web_receipt['outputs']:
             path = entry['path'].removeprefix('web/harness/')
-            raw = http.request('GET', '/'+urllib.parse.quote(path, safe='/'))
+            endpoint = '/harness' if path == 'index.html' else '/'+urllib.parse.quote(path, safe='/')
+            raw = http.request('GET', endpoint)
             if isinstance(raw, dict):
                 raise ValueError('A frontend asset was unexpectedly returned as JSON')
             require(hashlib.sha256(raw).hexdigest() == entry['sha256'] and len(raw) == entry['bytes'],
@@ -362,6 +381,7 @@ def execute(args):
         require({path.relative_to(ROOT).as_posix(): sha256_file(path) for path in (ROOT/'mingjing').glob('*.py')} == source_lock,
                 'Application source changed during this HTTP acceptance')
         require(verify_frontend(ROOT) == receipt['frontend'], 'Frontend changed during this HTTP acceptance')
+        require(verify_smart_frontend(ROOT) == receipt['smart_frontend'], 'Smart workbench changed during this HTTP acceptance')
         for path in launcher.home.rglob('*'):
             if path.is_file():
                 require(token.encode() not in path.read_bytes(), 'Acceptance profile wrote a plaintext ephemeral bearer')

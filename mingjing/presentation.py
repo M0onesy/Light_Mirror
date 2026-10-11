@@ -65,6 +65,10 @@ def _plain_decimal(number: Decimal) -> str:
 
 
 def standard_unit(metric: str, record: dict | None = None) -> str:
+    if (record or {}).get('projection_source') == 'mingjing.smart.analysis.analyze':
+        unit = record.get('value_unit')
+        if unit in {'元', '元/股', '倍', '无量纲比例'}:
+            return unit
     if metric in _MULTIPLES:
         return '倍'
     if metric in _RATIOS or metric.endswith(('_YOY', '_QOQ')):
@@ -298,10 +302,16 @@ def analysis_record_text(category: str, record: dict, parameters: dict | None = 
     parameters = parameters or {}
     metric = str(record.get('metric') or '')
     if category == 'metrics':
-        lines = ['## ' + _metric_title(metric), *_context(record)]
+        title = _metric_title(metric)
+        if record.get('projection_source') == 'mingjing.smart.analysis.analyze':
+            from .smart.native_analysis import metric_catalog
+            title = next((row['label'] for row in metric_catalog(metric)), title)
+        lines = ['## ' + title, *_context(record)]
         statuses = {'verified': '内核结果可用', 'abstained': '弃权', 'violated': '发现差异'}
         lines.append('状态：' + statuses.get(record.get('status'), escape_markdown(record.get('status')) or '未提供'))
         presentation = metric_display_metadata(record)
+        if record.get('relation') == 'pp':
+            presentation['display_value'] = presentation['display_value'].replace('%', '个百分点')
         lines.append('数值：' + presentation['display_value'])
         if presentation.get('display_precision_note'):
             lines.append('显示精度：' + presentation['display_precision_note'])

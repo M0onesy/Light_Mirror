@@ -41,7 +41,7 @@ def test_browser_launcher_settings_export_and_shutdown(tmp_path, browser_page):
         assert record.exists(), child.communicate(timeout=1)[0]
         base = json.loads(record.read_text(encoding='utf-8'))['url']
         page, errors, external = browser_page
-        page.goto(base)
+        page.goto(base.rstrip('/') + '/classic')
         page.get_by_role('button', name='新建金融任务', exact=True).wait_for()
         page.get_by_role('button', name='设置', exact=True).click()
         page.get_by_role('button', name='服务与安全', exact=True).click()
@@ -67,7 +67,7 @@ def test_browser_launcher_settings_export_and_shutdown(tmp_path, browser_page):
 def test_browser_provider_routes_partial_ledger_and_followup_controls(ui_host, browser_page):
     state, base = ui_host
     page, errors, external = browser_page
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.get_by_role('button', name='设置', exact=True).click()
     page.get_by_label('供应商预设').select_option('kimi')
     page.get_by_label('模型 ID', exact=True).fill('kimi-fixture')

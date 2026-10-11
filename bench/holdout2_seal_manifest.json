@@ -1,0 +1,70 @@
+{
+  "schema_version": "mingjing.holdout.seal.v1",
+  "sealed_at": "2026-10-06T07:44:30.914166+00:00",
+  "selection": "Five paths at offset 5 in lexicographic order among 2024 disclosures of 2023 annual reports, excluding the development company 920493",
+  "selection_offset": 5,
+  "historical_cutoff": "2024-06-30",
+  "source_fingerprint": {
+    "module:models": "cb9995f59a78beea42cf350d594cb667c78a80e3d330b8f86ff10a934c104f1c",
+    "module:compute": "a254ef95630da719f4fef249720d7c594bf8fd33cb2089b0a14e325100b2aeec",
+    "module:facts": "fa0324708a8f1450d88f6b0e8e821d0a9f83618822d076539829e8c5267046c7",
+    "module:judge": "ceb651cb07390c5090c545a2abd2d6651f55bc590ba52873503e6b0415e0edf9",
+    "module:analysis": "3fe961f545e521c1c6c863ecf63627b9750c6691bdd61eb7234a812f8e3a0bed",
+    "pipeline:parser": "b2e0e3d07f3c87bedb13cefeb742da268c4d9209191a24058a4a8ea58278dd77",
+    "pipeline:mentions": "1c4ca189059959a123cdd0b02b239edc7e92ac396e7056e0912d4b7f8408617d"
+  },
+  "rulepack_metadata_at_seal": {
+    "rule:cards.json": "dcc42c44e339c38cd845c11640d8b623f86a981a95f8fd5a59ecb4da2591b1d7",
+    "rule:sources.json": "0b97d3cfc2501079b38514d03cf25cc47629441d7e633cfedb61413311741ed0"
+  },
+  "reports": [
+    {
+      "ticker": "920010",
+      "company": "凯添燃气",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920010_凯添燃气\\年报\\2024-04-23_2023年年度报告.pdf",
+      "relative_path": "920010_凯添燃气/年报/2024-04-23_2023年年度报告.pdf",
+      "sha256": "b8a9b405adfb9fd15bba0b1ef4bc68faba809c49398fa4578b236d147c2e0efa",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-23"
+    },
+    {
+      "ticker": "920014",
+      "company": "特瑞斯",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920014_特瑞斯\\年报\\2024-04-29_2023年年度报告.pdf",
+      "relative_path": "920014_特瑞斯/年报/2024-04-29_2023年年度报告.pdf",
+      "sha256": "3ff2cc23bde74e7f206753e4d3c773fd823db80d160604ccc3f19458b4327d66",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-29"
+    },
+    {
+      "ticker": "920017",
+      "company": "星昊医药",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920017_星昊医药\\年报\\2024-04-22_2023年年度报告.pdf",
+      "relative_path": "920017_星昊医药/年报/2024-04-22_2023年年度报告.pdf",
+      "sha256": "5eb73e43100a107e438f3118fb668480adb902a41a73e4e971cd94f2372621e1",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-22"
+    },
+    {
+      "ticker": "920021",
+      "company": "流金科技",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920021_流金科技\\年报\\2024-04-26_2023年年度报告.pdf",
+      "relative_path": "920021_流金科技/年报/2024-04-26_2023年年度报告.pdf",
+      "sha256": "ae84dbce70c6303c91c4c71a919e73cfc761cf2febd4aade65a9adef249b00b7",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-26"
+    },
+    {
+      "ticker": "920023",
+      "company": "_ST田野",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920023__ST田野\\年报\\2024-03-20_2023年年度报告.pdf",
+      "relative_path": "920023__ST田野/年报/2024-03-20_2023年年度报告.pdf",
+      "sha256": "be585fb8acdb9d26b49895e210be9f0c602ad2122f326f4c172032eaada140f4",
+      "report_period": "2023Y",
+      "publish_date": "2024-03-20"
+    }
+  ],
+  "gold_generation": "Manual original-PDF table review; production parser output is prohibited as gold",
+  "review_status": "awaiting_manual_gold",
+  "sample_scope": "Five annual reports, three financial accounts and two periods each; small holdout, not full CRRV-Bench"
+}

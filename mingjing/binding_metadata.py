@@ -39,6 +39,8 @@ def compact_binding_metadata(dimensions: dict, *, redact=None) -> dict:
         'scope_declaration_sha256', 'period_comparison_explicit',
         'percentage_point_direction_conflict', 'hedge_kind', 'hedge_rule_basis',
         'source_cagr_period',
+        'source_provenance', 'scope_assumption', 'validation_policy', 'smart_segment',
+        'smart_entity', 'smart_notes', 'smart_dimensions',
     }
     view = {key: deepcopy(value) for key, value in dimensions.items() if key in fields}
     view.update(metadata_view='compact-binding.v1', source_metadata_sha256=digest(dimensions))

@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import zipfile
 
 import pytest
@@ -14,6 +18,7 @@ from scripts import create_core_review as core
 def project(tmp_path: Path) -> Path:
     root = tmp_path / 'workspace/mainProj/project'
     root.mkdir(parents=True)
+    (root.parents[1] / '交付').mkdir()
 
     def write(name: str, content: str | bytes = 'fixture\n') -> None:
         path = root / name
@@ -156,6 +161,122 @@ def test_destination_must_be_separate_and_inside_workspace(project: Path):
     for out in (project / 'review', project.parents[1], project.parents[2] / 'outside'):
         with pytest.raises(ValueError, match='separate folder'):
             core.create_core_review(project, out, secret_values=[])
+
+
+def test_nested_project_can_publish_directly_to_delivery(project: Path):
+    workspace, requirements = project.parents[1], project.parent
+    nested = requirements / '新版/project'
+    nested.parent.mkdir()
+    project.rename(nested)
+    out = workspace / '交付/新版/MingJing-core-review'
+    receipt = core.create_core_review(nested, out, requirements_dir=requirements, secret_values=[])
+    assert receipt['status'] == 'passed' and out.is_dir()
+    assert core._review_workspace(nested) == workspace
+    with pytest.raises(ValueError, match='separate folder'):
+        core.create_core_review(nested, workspace.parent / 'outside',
+                                requirements_dir=requirements, secret_values=[])
+
+
+def test_nearest_matching_workspace_wins(project: Path):
+    nearer = project.parent / 'nested-workspace'
+    nested = nearer / 'mainProj/新版/project'
+    nested.mkdir(parents=True)
+    (nearer / '交付').mkdir()
+    assert core._review_workspace(nested) == nearer
+
+
+def test_plain_clone_uses_its_immediate_parent_boundary(project: Path):
+    (project.parents[1] / '交付').rmdir()
+    assert core._review_workspace(project) == project.parent
+    receipt = core.create_core_review(project, project.parent / 'review', secret_values=[])
+    assert receipt['status'] == 'passed'
+    with pytest.raises(ValueError, match='separate folder'):
+        core.create_core_review(project, target(project), secret_values=[])
+
+
+def test_workspace_never_expands_to_a_filesystem_root(project: Path):
+    with pytest.raises(ValueError, match='filesystem root'):
+        core._review_workspace(Path(project.anchor))
+
+
+@pytest.mark.parametrize('competition', [True, False])
+def test_default_output_stays_in_managed_artifacts(project: Path, monkeypatch, competition):
+    if not competition:
+        (project.parents[1] / '交付').rmdir()
+    captured = {}
+    def capture(root, out, *, requirements_dir):
+        captured.update(root=root, out=out, requirements_dir=requirements_dir)
+        return {'status': 'fixture_only'}
+    monkeypatch.setattr(core, 'ROOT', project)
+    monkeypatch.setattr(core, 'create_core_review', capture)
+    assert core.main([]) == 0
+    assert captured == {'root': project, 'out': project / 'artifacts/core-review/MingJing-core-review',
+                        'requirements_dir': project.parent}
+
+
+def test_managed_artifact_output_and_single_current_baselines(project: Path):
+    requirements = project / 'docs/project'
+    requirements.mkdir(parents=True)
+    for name in core.BASELINES:
+        shutil.copyfile(project.parent / name, requirements / name)
+    out = project / 'artifacts/core-review/MingJing-core-review'
+    receipt = core.create_core_review(project, out, secret_values=[])
+    manifest = json.loads((out / 'core-review-manifest.json').read_text(encoding='utf-8'))
+    members = {row['path'] for row in manifest['files']}
+    assert receipt['status'] == 'passed'
+    assert core._baseline_directory(project) == requirements
+    assert {'docs/project/' + name for name in core.BASELINES} <= members
+    assert not {'requirements/' + name for name in core.BASELINES} & members
+
+
+@pytest.mark.parametrize('relative', ['artifacts/core-review', 'artifacts/source/review',
+                                    'docs/review', 'artifacts/core-review/../outside'])
+def test_managed_output_does_not_allow_other_source_subtrees(project: Path, relative: str):
+    with pytest.raises(ValueError):
+        core.create_core_review(project, project / relative, secret_values=[])
+
+
+def test_single_current_baselines_take_precedence_over_stale_parent(project: Path):
+    requirements = project / 'docs/project'
+    requirements.mkdir(parents=True)
+    for name in core.BASELINES:
+        shutil.copyfile(project.parent / name, requirements / name)
+        (project.parent / name).write_bytes(b'stale parent source must not enter review')
+    out = project / 'artifacts/core-review/selected'
+    core.create_core_review(project, out, secret_values=[])
+    for name in core.BASELINES:
+        assert (out / 'docs/project' / name).read_bytes() == (requirements / name).read_bytes()
+
+
+def test_direct_script_imports_its_own_package_from_an_independent_cwd(project: Path, tmp_path: Path):
+    script = project / 'scripts/create_core_review.py'
+    script.parent.mkdir()
+    shutil.copyfile(Path(core.__file__), script)
+    (script.parent / 'package_delivery.py').write_text(
+        'def configured_secret_values(root):\n    return []\n', encoding='utf-8')
+    env = dict(os.environ)
+    env.pop('PYTHONPATH', None)
+    out = target(project)
+    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(script), '--out', str(out),
+                             '--requirements-dir', str(project.parent)], cwd=tmp_path, env=env,
+                            capture_output=True, text=True, encoding='utf-8', timeout=30)
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt['status'] == 'passed' and receipt['credential_scan']['references_checked'] == 0
+    assert out.with_name(out.name + '.zip').is_file()
+
+
+def test_linked_delivery_marker_cannot_expand_the_workspace(project: Path, tmp_path: Path):
+    delivery = project.parents[1] / '交付'
+    delivery.rmdir()
+    external = tmp_path / 'outside'
+    external.mkdir()
+    try:
+        delivery.symlink_to(external, target_is_directory=True)
+    except OSError:
+        pytest.skip('This Windows user cannot create symbolic links')
+    with pytest.raises(ValueError, match='symlinks'):
+        core.create_core_review(project, delivery / 'review', secret_values=[])
 
 
 def test_missing_baseline_fails_instead_of_silently_omitting_it(project: Path):

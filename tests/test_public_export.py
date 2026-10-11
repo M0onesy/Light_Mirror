@@ -98,3 +98,23 @@ def test_valid_pdf_can_be_selected_and_scanned():
         page.insert_text((72, 72), 'Synthetic public submission')
         data = document.tobytes(deflate=True)
     public.scan_document(data, [b'private-key-not-in-document'], 'current.pdf')
+
+
+def test_consolidated_project_documents_use_only_current_source(project: Path):
+    current = project / 'docs/project'
+    current.mkdir(parents=True)
+    for name in BASELINES:
+        (current / name).write_bytes(b'current baseline')
+    selected = public.project_documents(project)
+    assert {path.parent for path in selected.values()} == {current}
+    assert {path.name for path in selected.values()} == set(BASELINES)
+
+
+def test_export_refuses_other_project_subtrees_before_credential_access(project: Path, monkeypatch):
+    monkeypatch.setattr(public, 'ROOT', project)
+    def must_not_resolve_keys(*_):
+        pytest.fail('Invalid destination must fail before credential access')
+    monkeypatch.setattr(public, 'configured_secret_values', must_not_resolve_keys)
+    for destination in (project / 'docs/export', project / 'artifacts/source', project):
+        with pytest.raises(ValueError, match='new, separate'):
+            public.export_repository(destination)

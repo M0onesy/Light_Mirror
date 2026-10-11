@@ -89,8 +89,8 @@
     },
     {
       "path": "frontend/src/Settings.tsx",
-      "bytes": 29422,
-      "sha256": "494b7a10c87a0716f85f7af55c32f8d9b2ca724d8af5c2dbe4df9fb00c17fa60"
+      "bytes": 29543,
+      "sha256": "cbc74bcb30b309d091c21f6fa99f0d4926df434b42eb450e33fd8351e690a510"
     },
     {
       "path": "frontend/src/TaskForm.tsx",
@@ -775,14 +775,14 @@
       "sha256": "21b1434a82cad81174ffdc1bc99fffffbef06a25b9838632e99eccc8c89ceeff"
     },
     {
+      "path": "web/harness/assets/index-CfdEE4MQ.js",
+      "bytes": 1120348,
+      "sha256": "d9b2d824dffc448f141819e680ec3969a68e93cb094eb50c02e3e7308dddfbf2"
+    },
+    {
       "path": "web/harness/assets/index-D3DmEOei.css",
       "bytes": 86950,
       "sha256": "0e463faca0f6c7739e9716dc3d45ade809575fb93cf27755c4a099e419afc775"
-    },
-    {
-      "path": "web/harness/assets/index-IdRjLcst.js",
-      "bytes": 1120231,
-      "sha256": "4dda6e1a0ca74f1fa2603dd4f9300b0f9f8e1c737842d09dee30f4fd3d83d96b"
     },
     {
       "path": "web/harness/assets/ini-BEwlwnbL.js",
@@ -1115,9 +1115,9 @@
       "sha256": "c2c652334464f6085341dd1c46e32717e22556890fbc0d2651d9200f372069bb"
     },
     {
-      "path": "web/harness/assets/php-BHekQmeY.js",
+      "path": "web/harness/assets/php-B2qz-Z-x.js",
       "bytes": 113068,
-      "sha256": "9a444abf94115af032e6fadae661068a8691059ff6f6e77712bcbf9394ca8884"
+      "sha256": "f142490749d1e9c8b028644bfd59f952b9f9907d2c210a1059997e146bcaab50"
     },
     {
       "path": "web/harness/assets/python-B6aJPvgy.js",
@@ -1125,9 +1125,9 @@
       "sha256": "7652ab863f920a5959c4aa52d6decb8c11d23fd590773977ce8aa0fbb3c555c4"
     },
     {
-      "path": "web/harness/assets/ruby-CoO1ABFx.js",
+      "path": "web/harness/assets/ruby-Bz9uJ2ik.js",
       "bytes": 425747,
-      "sha256": "fcdfbbbc6f1c475c9837f99b6ec9d166c4cb80b9f5c6b0a2db6fe07ec91bf25e"
+      "sha256": "0afa069b4b857fe230fd3c3e4dccc952f05f31771c7bec5d11b181e0b5702d41"
     },
     {
       "path": "web/harness/assets/rust-B1yitclQ.js",
@@ -1167,12 +1167,12 @@
     {
       "path": "web/harness/index.html",
       "bytes": 367,
-      "sha256": "f5dd94ab958f267be2031903cb6bac13495fecf9f45592537c1c9309f0030bd4"
+      "sha256": "2053568fd24284ad06d5cb2b85e94129993ecfa980a7eb00791afe73ae044294"
     }
   ],
-  "source_sha256": "aaa9bc5cda74acdebb4f431c693824ee428f191b714bc4badac6acbbed301ce8",
-  "assets_sha256": "e4b01425522c9d8c2b8d8971cfcf2dc8e66c474606505cbc47ac7bee4383f731",
-  "recorded_at": "2026-10-07T20:15:31.891416+00:00",
+  "source_sha256": "d75a5c2fb881b61d7773fade368fc61024782004f96d9d311588e116ea54b471",
+  "assets_sha256": "fe4adf71f375a8cccf8bb301ef9a3044020aa7f2f1d4f972e045c1fbb369306f",
+  "recorded_at": "2026-10-10T06:52:45.809171+00:00",
   "tools": {
     "vite": "6.4.1",
     "typescript": "6.0.3",

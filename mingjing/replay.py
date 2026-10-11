@@ -160,6 +160,39 @@ def _frozen_pending(original: dict, frozen_claims: list[dict]) -> tuple[set[str]
     return pending_set if not issues else set(), issues
 
 
+def _trusted_preflight_exclusion(claim: AtomicClaim, result: dict, kernel, execution: dict) -> bool:
+    """Rebuild the host's source-rule proof from this fresh kernel result."""
+    if kernel is None or not isinstance(execution, dict):
+        return False
+    preflight = execution.get('preflight_claim_ids', [])
+    exclusions = execution.get('preflight_source_exclusions', {})
+    if (not isinstance(preflight, list) or claim.claim_id not in preflight
+            or not isinstance(exclusions, dict) or claim.claim_id not in exclusions):
+        return False
+    source = kernel.claim_map.get(claim.claim_id)
+    if not source or source != claim.table_context.get('smart_claim'):
+        return False
+    forecast_input = source.get('forecast') is True and source.get('category') == 'forecast'
+    market_input = (source.get('category') == 'market' and source.get('entity') == 'market'
+                    and source.get('kind') == 'box')
+    if not (forecast_input or market_input):
+        return False
+    smart = result.get('smart_result') or {}
+    if (result.get('claim_id') != claim.claim_id or smart.get('cid') != source.get('cid')
+            or smart.get('status') != 'skipped' or result.get('status') != 'abstained'
+            or result.get('verification_basis') != 'not_independently_checked'
+            or result.get('observed') != source.get('value')
+            or result.get('validation_policy') != kernel.policy):
+        return False
+    proof = {'rule': 'smart_frozen_input_not_independently_checked',
+             'entrypoint': 'mingjing.smart.verify.verify_model', 'smart_cid': source['cid'],
+             'category': source['category'], 'source_claim_hash': digest(source),
+             'verdict_hash': digest(result), 'status': smart['status'],
+             'abstention_code': result.get('abstention_code'), 'reason': result.get('reason'),
+             'validation_policy': kernel.policy, 'native_verification': False}
+    return exclusions[claim.claim_id] == proof
+
+
 def replay_run(run: str | Path) -> dict[str, Any]:
     started = time.monotonic()
     root = record_path(io_path(run).resolve())
@@ -189,6 +222,26 @@ def replay_run(run: str | Path) -> dict[str, Any]:
     pending, pending_issues = _frozen_pending(original, frozen_claims)
     issues.extend(pending_issues)
     judge = Judge(FactStore(facts), original.get("report_date"))
+    smart_kernel = None
+    smart_context = None
+    if original.get('material_profile') == 'smart':
+        from .smart.ingestion import SmartKernel, report_model_from_dict
+        from .source_cache import extractor_source_modules
+        agent_lock = _read_json(root / 'agent_lock.json')
+        if agent_lock.get('smart_extractor') != extractor_source_modules():
+            issues.append({'kind': 'smart_extractor_changed'})
+        if agent_lock.get('resource_lock') != digest({k: v for k, v in agent_lock.items() if k != 'resource_lock'}):
+            issues.append({'kind': 'agent_resource_lock_mismatch'})
+        if original.get('resource_lock') != agent_lock.get('resource_lock'):
+            issues.append({'kind': 'smart_resource_lock_mismatch'})
+        raw = _read_json(root / 'smart_report_model.json')
+        smart_context = _read_json(root / 'smart_kernel_context.json')
+        policy = original.get('validation_policy')
+        if policy not in {'standard', 'strict'} or smart_context.get('policy') != policy:
+            issues.append({'kind': 'smart_policy_mismatch'})
+        model = report_model_from_dict(raw)
+        smart_kernel = SmartKernel(facts, model, policy, smart_context['doc_index'], smart_context['texts'],
+                                  {c.claim_id: c.table_context['smart_claim'] for c in claims if c.table_context.get('smart_claim')})
     replayed = []
     replayed_analysis = None
     with localcontext() as context:
@@ -202,7 +255,14 @@ def replay_run(run: str | Path) -> dict[str, Any]:
         for claim in claims:
             if claim.claim_id in pending:
                 continue
-            result = judge.verify(claim).to_dict()
+            result = smart_kernel.verify(claim) if smart_kernel else None
+            if result is None:
+                result = judge.verify(claim).to_dict()
+            elif (original.get('model', {}).get('status') in {'success', 'partial', 'cancelled'}
+                  and claim.binding_status != 'agreed'
+                  and not _trusted_preflight_exclusion(claim, result, smart_kernel, original.get('execution', {}))):
+                result.update(status='abstained', abstention_code='X3', reason='两路原生绑定未达成一致')
+                result['smart_result'].update(status='unverifiable', abstain_code='X3', reason=result['reason'])
             result["claim_text"] = claim.text
             result["source_span"] = {"start": claim.start, "end": claim.end}
             replayed.append(result)
@@ -222,6 +282,13 @@ def replay_run(run: str | Path) -> dict[str, Any]:
     if original.get("summary") != summary:
         differences.append({"field": "summary", "original": original.get("summary"), "replayed": summary})
     differences.extend(_analysis_differences(original.get("analysis"), replayed_analysis))
+    replayed_smart_analysis = None
+    if smart_context is not None and original.get('smart_analysis') is not None:
+        from .smart.analysis import analyze
+        replayed_smart_analysis = analyze(facts, original['company'], texts=smart_context['texts'],
+                                         report_date=original.get('report_date', ''), policy=smart_context['policy'],
+                                         scope=original.get('scope_declaration') or '')
+    differences.extend(_analysis_differences(original.get('smart_analysis'), replayed_smart_analysis, 'smart_analysis'))
     if original.get('coverage_statistics') is not None:
         from .coverage_stats import coverage_statistics
         recomputed_statistics = coverage_statistics(original.get('coverage'), frozen_claims, replayed)

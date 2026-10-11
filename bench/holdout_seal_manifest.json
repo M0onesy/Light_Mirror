@@ -1,0 +1,69 @@
+{
+  "schema_version": "mingjing.holdout.seal.v1",
+  "sealed_at": "2026-10-06T07:35:24.020070+00:00",
+  "selection": "First five paths in lexicographic order among 2024 disclosures of 2023 annual reports, excluding the development company 920493",
+  "historical_cutoff": "2024-06-30",
+  "source_fingerprint": {
+    "module:models": "cb9995f59a78beea42cf350d594cb667c78a80e3d330b8f86ff10a934c104f1c",
+    "module:compute": "a254ef95630da719f4fef249720d7c594bf8fd33cb2089b0a14e325100b2aeec",
+    "module:facts": "fa0324708a8f1450d88f6b0e8e821d0a9f83618822d076539829e8c5267046c7",
+    "module:judge": "ceb651cb07390c5090c545a2abd2d6651f55bc590ba52873503e6b0415e0edf9",
+    "module:analysis": "3fe961f545e521c1c6c863ecf63627b9750c6691bdd61eb7234a812f8e3a0bed",
+    "pipeline:parser": "5ae2b3b2daa52ce9286df827237ceef51bc0839a0ed81062689a1f8128e1ffbc",
+    "pipeline:mentions": "4e18c53dc410bd04826ba3a6295d322a22bbf9f9a71245d4ad55c669afdaf958"
+  },
+  "rulepack_metadata_at_seal": {
+    "rule:cards.json": "6c7919e7f528efc41379be2e13a06618a2172570a85146238d7cdec3ebee566b",
+    "rule:sources.json": "95568b303f05ffb983f843466e18741bc717a2868b2e73b0a856591e820b7b3f"
+  },
+  "reports": [
+    {
+      "ticker": "920000",
+      "company": "安徽凤凰",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920000_安徽凤凰\\年报\\2024-04-26_2023年年度报告.pdf",
+      "relative_path": "920000_安徽凤凰/年报/2024-04-26_2023年年度报告.pdf",
+      "sha256": "b61ba27faf9819b4c78f046688ad7723041ae440e1725dcb2bf660a928a78ad3",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-26"
+    },
+    {
+      "ticker": "920001",
+      "company": "纬达光电",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920001_纬达光电\\年报\\2024-03-22_2023年年度报告.pdf",
+      "relative_path": "920001_纬达光电/年报/2024-03-22_2023年年度报告.pdf",
+      "sha256": "d12aea90c798c94ec9d8a8967056b01d245967073718f5cb90cdb687135448d3",
+      "report_period": "2023Y",
+      "publish_date": "2024-03-22"
+    },
+    {
+      "ticker": "920003",
+      "company": "中诚咨询",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920003_中诚咨询\\年报\\2024-03-28_2023年年度报告.pdf",
+      "relative_path": "920003_中诚咨询/年报/2024-03-28_2023年年度报告.pdf",
+      "sha256": "3ecc849244508c9c2ecf9c096d33a032a41af8db2eb977c8fecccbd8be9ff0df",
+      "report_period": "2023Y",
+      "publish_date": "2024-03-28"
+    },
+    {
+      "ticker": "920006",
+      "company": "晟楠科技",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920006_晟楠科技\\年报\\2024-04-23_2023年年度报告.pdf",
+      "relative_path": "920006_晟楠科技/年报/2024-04-23_2023年年度报告.pdf",
+      "sha256": "ef9c2c46e52910fd376f2885e3787228e92ca8004a55db25a8f0efdfb76b3471",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-23"
+    },
+    {
+      "ticker": "920009",
+      "company": "丹娜生物",
+      "path": "D:\\Competition\\金融人工智能竞赛\\mainProj\\年报和半年报\\reports\\920009_丹娜生物\\年报\\2024-04-29_2023年年度报告.pdf",
+      "relative_path": "920009_丹娜生物/年报/2024-04-29_2023年年度报告.pdf",
+      "sha256": "514dcc6bd4d49a8682b96651461dfaf1d9da96f182e916d25feaf11241ef26ad",
+      "report_period": "2023Y",
+      "publish_date": "2024-04-29"
+    }
+  ],
+  "gold_generation": "Manual original-PDF table review; production parser output is prohibited as gold",
+  "review_status": "awaiting_manual_gold",
+  "sample_scope": "Five annual reports, three financial accounts and two periods each; small holdout, not full CRRV-Bench"
+}

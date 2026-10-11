@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-__version__ = "1.0.0.dev2"
+__version__ = "1.0.0.dev3"
 
 # When executed from ``mainProj/mingjing`` the delivery modules (bench, docs,
 # etc.) sit beside this implementation package.  Expose that directory as a

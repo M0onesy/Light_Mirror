@@ -55,7 +55,7 @@ def test_long_source_reader_preserves_all_quotes_and_numeric_sections(ui_host, b
             route.fulfill(json={'page': 2, 'reference_status': 'unverified_source_quotation'})
 
     page.route('**/api/evidence/*?*', evidence)
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.locator('.history-row').filter(has_text='材料追问').click()
     page.get_by_role('heading', name='同一材料内追问', exact=True).wait_for()
     from playwright.sync_api import expect
@@ -143,7 +143,7 @@ def test_logical_knowledge_evidence_displays_original_without_requesting_pdf(ui_
             'effective_status': 'declared_dates_only'})
 
     page.route('**/api/evidence/*?*', evidence)
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.locator('.history-row').filter(has_text='材料追问').click()
     page.get_by_role('button', name='查看原文证据 · 文本片段', exact=True).click()
     page.locator('.inspector-body .evidence-link').click()

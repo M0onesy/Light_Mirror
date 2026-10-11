@@ -65,7 +65,7 @@ def screenshot(page, name):
 def test_harness_ui_followup_budget_defaults_and_saved_user_limits(ui_host, browser_page):
     state, base = ui_host
     page, errors, external = browser_page
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.get_by_role('button', name='设置', exact=True).click()
     page.get_by_role('button', name='角色与预算', exact=True).click()
     token_input = page.get_by_label('追问Token 总预算', exact=True)
@@ -99,7 +99,7 @@ def test_harness_ui_followup_budget_defaults_and_saved_user_limits(ui_host, brow
 def test_harness_ui_demo_evidence_preferences_analysis(ui_host, browser_page):
     state, base = ui_host
     page, errors, external = browser_page
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.get_by_role('button', name='运行内置离线演示', exact=True).click()
     page.locator('.verdict-row').first.wait_for(timeout=20000)
     assert page.locator('.summary').inner_text().count('0\n') < 3
@@ -158,7 +158,7 @@ def test_harness_ui_demo_evidence_preferences_analysis(ui_host, browser_page):
 def test_harness_ui_material_clarification_without_first_sending_a_question(ui_host, browser_page):
     state, base = ui_host
     page, errors, external = browser_page
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.get_by_role('button', name='运行内置离线演示', exact=True).click()
     page.locator('.verdict-row').first.wait_for(timeout=20000)
     original = next(iter(state.tasks.values()))
@@ -183,7 +183,7 @@ def test_harness_ui_bearer_login_evidence_download_and_mobile(ui_host, browser_p
     secret = 'test-local-service-token-not-a-provider-key'
     state.config.set_secret('server_bearer', secret)
     state.config.update({'server': {'bearer_token_required': True, 'bearer_token_ref': 'server_bearer'}}, 0)
-    response = page.goto(base)
+    response = page.goto(base.rstrip('/') + '/classic')
     assert response.status == 200
     page.get_by_label('本地服务访问令牌').fill(secret)
     page.get_by_role('button', name='连接本地服务').click()

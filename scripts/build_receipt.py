@@ -262,10 +262,11 @@ def main() -> int:
     parser.add_argument("--mode", choices=("onefile", "onedir"), default="onefile")
     args = parser.parse_args()
     try:
-        from .build_frontend import verify as verify_frontend
+        from .build_frontend import verify as verify_frontend, verify_smart
     except ImportError:
-        from build_frontend import verify as verify_frontend
+        from build_frontend import verify as verify_frontend, verify_smart
     verify_frontend(root)
+    verify_smart(root)
     runtime, paths = runtime_assets(root)
     dependencies = installed_dependencies(root)
     version = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]

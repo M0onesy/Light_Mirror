@@ -23,7 +23,7 @@ def test_harness_source_reader_preserves_supplementary_characters(ui_host, brows
     page.route(f'**/api/runs/{run["id"]}/reparse-packets', lambda route: route.fulfill(json={'packets': []}))
     page.route(f'**/api/runs/{run["id"]}/reparse-proposals', lambda route: route.fulfill(json={'proposals': []}))
     page.route('**/api/sessions', lambda route: route.fulfill(json={'sessions': []}))
-    page.goto(base)
+    page.goto(base.rstrip('/') + '/classic')
     page.locator('.history-row').first.click()
     page.get_by_role('button', name='原文', exact=True).click()
     mark = page.locator('.source-text mark')

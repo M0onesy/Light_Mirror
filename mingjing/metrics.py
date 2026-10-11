@@ -89,3 +89,20 @@ def metric_definitions():
              'definition_id':item.definition_id,'definition_required':item.definition_required,'scopes':list(item.scopes),
              'inputs':[{'name':x.name,'account':x.account,'dimension':x.dimension,'prior_year':x.prior_year} for x in item.inputs]}
             for item in _SPECS]
+
+
+def unified_definition_catalog(profile: str = 'all') -> list[dict]:
+    """Source-specific definitions share one discoverable, locked catalog.
+
+    The smart entries describe registered execution functions; they do not
+    accept an expression from a model and do not replace signed AST cards.
+    """
+    if profile not in {'all', 'canonical', 'smart'}:
+        raise ValueError('Unknown financial material profile')
+    result = [{**row, 'execution_profile': 'canonical'} for row in metric_definitions()] if profile != 'smart' else []
+    if profile != 'canonical':
+        from .smart.verify import registered_definitions
+        result.extend({**row, 'execution_profile': 'smart', 'definition_required': True,
+                       'professional_signoff': 'pending', 'scopes': ['合并', '母公司']}
+                      for row in registered_definitions())
+    return result

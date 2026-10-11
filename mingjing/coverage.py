@@ -15,9 +15,12 @@ TERMINAL = {"judged", "abstained", "out_of_scope", "rule_excluded"}
 
 
 def partition_document(path: Path, *, cancel_event=None, progress_callback=None,
-                       deadline_monotonic=None) -> tuple[str, list[dict[str, Any]], list[dict[str, Any]]]:
+                       deadline_monotonic=None, material_profile='') -> tuple[str, list[dict[str, Any]], list[dict[str, Any]]]:
     from .parser import _control_options, _parse_checkpoint
     control = _control_options(cancel_event, progress_callback, deadline_monotonic)
+    if material_profile == 'smart':
+        from .smart.ingestion import partition_smart
+        return partition_smart(path, **control)
     pages = extract_text(path, **control)
     text_parts, regions, blocks = [], [], []
     offset = 0
@@ -60,7 +63,7 @@ class CoverageLedger:
     entries: list[dict] = field(default_factory=list)
 
     @classmethod
-    def build(cls, text: str, pages: list[dict], blocks: list[dict], company: str, period: str):
+    def build(cls, text: str, pages: list[dict], blocks: list[dict], company: str, period: str, *, trusted_claims=None):
         claims = extract_mentions(text, company, period, preserve_occurrences=True)
         by_span = {(c.start, c.end): c for c in claims if c.claim_type != 'comparison'}
         from .table_mentions import extract_table_mentions
@@ -73,9 +76,17 @@ class CoverageLedger:
                 claims.remove(overlap)
             if table_claim.modality == 'fact':
                 claims.append(table_claim)
+        smart_profile = trusted_claims is not None
+        if smart_profile:
+            selected_starts = {c.start for c in trusted_claims} | {fragment['start'] for c in trusted_claims for fragment in c.table_context.get('source_numeric_fragments', [])}
+            # The smart parser owns the executable claim set. Raw scanning
+            # remains exhaustive below without adding heuristic duplicates.
+            claims = list(trusted_claims)
+            table_claims = [c for c in table_claims if c.start not in selected_starts] + list(trusted_claims)
         claims.sort(key=lambda c: (c.start, c.end))
         by_span = {(c.start, c.end): c for c in claims if c.claim_type != 'comparison'}
         table_by_start = {c.start: c for c in table_claims}
+        continuation_by_start = {fragment['start']: c for c in trusted_claims or [] for fragment in c.table_context.get('source_numeric_fragments', [])}
         table_headers = {(header['start'], header['end']) for c in table_claims
                          for header in c.table_context.get('headers', [])}
         source_scopes = _policy_table_regions(text, pages)
@@ -94,7 +105,7 @@ class CoverageLedger:
             # the next line (e.g. the second number in ``7 / 44``).
             line_end = text.find("\n", match.end('num'))
             line = text[line_start:line_end if line_end >= 0 else len(text)]
-            claim = by_span.get((start, end)) or next((c for c in claims if c.start == start and c.claim_type != 'comparison'), None)
+            claim = continuation_by_start.get(start) or by_span.get((start, end)) or next((c for c in claims if c.start == start and c.claim_type != 'comparison'), None)
             table = table_by_start.get(start)
             prose_exclusion = prose_exclusions.get(match.start('num'))
             modality_basis = None
@@ -112,7 +123,13 @@ class CoverageLedger:
             if not excluded and chart_exclusion:
                 excluded = chart_exclusion['reason']
             source_scope = next((scope for scope in source_scopes if scope['start'] <= start < scope['end']), None)
-            if excluded:
+            if claim and claim.table_context.get('smart_cid'):
+                # Smart extraction retains forecast/market checks as distinct,
+                # source-addressed work; its verifier controls external truth.
+                status, reason = 'pending', 'smart_source_occurrence'
+                modality_basis = {'schema_version': 'smart-source-modality.v1', 'modality': claim.modality,
+                                  'category': claim.table_context['smart_claim'].get('category')}
+            elif excluded:
                 if claim:
                     claims.remove(claim)
                     by_span.pop((claim.start, claim.end), None)
@@ -161,7 +178,9 @@ class CoverageLedger:
                 nearby = text[max(0, line_start - 140):start]
                 if not has_financial_context(nearby):
                     status, reason = "rule_excluded", "no_financial_context"
-            if status == 'pending' and claim is None:
+            if smart_profile and status == 'pending' and claim is None:
+                reason = 'smart_source_parse_gap'
+            if status == 'pending' and claim is None and not smart_profile:
                 # A source candidate that deterministic parsing cannot bind
                 # is still executable work. X6 can mean incomplete source
                 # dimensions/structure, not necessarily a damaged number.
@@ -185,8 +204,8 @@ class CoverageLedger:
                 )
                 claims.append(claim)
                 reason = 'source_addressed_parse_failure'
-            ledger.entries.append({"id": claim.claim_id if claim else f"mention-{digest([start, end, match[0]])[:20]}",
-                                   "start": start, "end": end, "page_id": region.get('id'),
+            ledger.entries.append({"id": claim.claim_id if claim and not smart_profile else f"mention-{digest([start, end, match[0]])[:20]}",
+                                   "start": start, "end": end, "page_id": region.get('id'), "page": region.get('page'),
                                    "block_id": block.get('id'), "text": match[0],
                                    "status": status, "reason": reason, "claim_id": claim.claim_id if claim else None})
             from .source_classification import classify_occurrence
@@ -274,6 +293,11 @@ def _source_occurrence_rules(text: str, pages: list[dict]) -> dict[int, dict]:
         for match in pattern.finditer(text):
             spans.append({'start':match.start(),'end':match.end(),'text':match[0],
                           'status':status,'reason':reason})
+    rating_definition = re.compile(r'(?:评级\s*说明\s*[:：]\s*)?(?:买入|增持|中性|减持)\s*指\s*预计\s*相对\s*'
+                                   r'(?:强于|弱于|跑赢|跑输)\s*市场表现\s*\d+(?:\.\d+)?\s*[%％]\s*(?:以上|以下|以内)?')
+    for match in rating_definition.finditer(text):
+        spans.append({'start': match.start(), 'end': match.end(), 'text': match[0],
+                      'status': 'out_of_scope', 'reason': 'analyst_rating_definition'})
     # A numbered prose item needs a real closing enumeration marker and a
     # clause/line boundary. A monetary amount with adjacent punctuation does
     # not become an ordinal merely because it is small.
@@ -326,9 +350,17 @@ def _source_identifier_reason(text, match, line_start: int, line: str,
         return 'table_of_contents_entry'
     if re.fullmatch(r'\s*\d{1,4}\s*/\s*\d{1,4}\s*', line):
         return 'page_number_ratio'
+    footer = re.search(r'(?:请务必[^\n]*(?:信息披露|法律声明)|(?:信息披露|法律声明))\s*'
+                       r'(?P<page_number>\d{1,4}\s*/\s*\d{1,4})\s*$', line)
+    if footer and footer.start('page_number') <= start - line_start and end - line_start <= footer.end('page_number'):
+        return 'source_footer_page_number_ratio'
     if any(left <= start and end <= right for left, right in table_headers):
         return 'financial_table_period_header'
     relative_start = start - line_start
+    for security_code in re.finditer(r'(?<!\d)\d{6}\.(?:SH|SZ|BJ|HK)(?![A-Za-z0-9])|'
+                                    r'(?:证券代码|股票代码)\s*[:：]\s*\d{6}(?!\d)', line, re.I):
+        if security_code.start() <= relative_start and end - line_start <= security_code.end():
+            return 'source_security_code'
     # Keep exact declared periods, including both halves of 2023H1/Q4,
     # out of the numeric candidate ledger. A bare amount equal to 2023 is
     # deliberately not inferred to be a year.
@@ -340,9 +372,9 @@ def _source_identifier_reason(text, match, line_start: int, line: str,
             # value (e.g. 2023亿元 is a genuine candidate amount).
             if not match['unit']:
                 return 'declared_period'
-    figure = re.match(r'\s*(?:图|表)\s*\d+(?:[-－]\d+)?\s*[:：]', line)
-    if figure and relative_start < figure.end():
-        return 'figure_or_table_identifier'
+    for figure in re.finditer(r'(?<![\w])(?:图|表)\s*\d+(?:[-－]\d+)?\s*[:：]', line):
+        if figure.start() <= relative_start < figure.end():
+            return 'figure_or_table_identifier'
     section = re.match(r'\s*\d+(?:[.．]\d+)*\s*[、．.]\s*(?=[^\d\s])', line)
     if section and relative_start < section.end():
         return 'section_identifier'

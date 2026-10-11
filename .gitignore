@@ -17,3 +17,20 @@ runtime/finance-carrier/staged/
 runtime/finance-carrier/bundles/
 runtime/tooling/
 temp-*.txt
+
+# Local data, private evidence and immutable release downloads are not Git source.
+/artifacts/
+/data/
+/evidence/
+/.audit_finance/
+/.tmp_sample_render/
+/.pytest_cache/
+/.mypy_cache/
+/.ruff_cache/
+/profile/
+/profiles/
+/source-export-manifest.json
+*.exe
+*.dll
+*.pyd
+~$*

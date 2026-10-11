@@ -18,6 +18,24 @@ class RuleError(ValueError):
     pass
 
 
+def registered_rule_description(rule_id: str) -> dict:
+    """Return a registered method; free formulas are never evaluated here."""
+    if not isinstance(rule_id, str):
+        raise RuleError('Rule ID must be a registered string')
+    if rule_id.startswith('SMART:'):
+        from .metrics import unified_definition_catalog
+        item = next((row for row in unified_definition_catalog('smart') if row['rule_id'] == rule_id), None)
+        if item is None:
+            raise RuleError('Unregistered financial definition')
+        return {**item, 'kind': 'registered_function', 'version': '1.0.0.dev3',
+                'basis': '登记的来源指标方法；标准模式展示定义选择，审慎模式要求来源支持',
+                'accepts_model_formula': False}
+    item = next((row for row in load_rule_cards() if row['id'] == rule_id), None)
+    if item is None:
+        raise RuleError('Unregistered financial rule')
+    return {**item, 'kind': 'formula_ast', 'accepts_model_formula': False}
+
+
 _REGISTERED_CONSTANTS = {"ZERO": "0", "ONE": "1", "HALF": "0.5", "HUNDRED": "100",
                          "TEN_THOUSAND": "10000", "HUNDRED_MILLION": "100000000",
                          "CASH_THRESHOLD": "0.5", "NRI_THRESHOLD": "0.30"}

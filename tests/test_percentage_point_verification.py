@@ -5,7 +5,7 @@ from decimal import Decimal
 import pytest
 
 from mingjing.facts import FactStore
-from mingjing.financial_tools import FinancialDispatcher, BIND_RELATIONS, TOOL_SCHEMAS, ToolDenied
+from mingjing.financial_tools import FinancialArgumentError, FinancialDispatcher, BIND_RELATIONS, TOOL_SCHEMAS, ToolDenied
 from mingjing.judge import Judge
 from mingjing.mentions import extract_mentions
 from mingjing.models import Fact
@@ -223,8 +223,14 @@ def test_native_tools_allow_independent_pp_binding_but_reject_forged_baseline():
     for role in ('planner', 'verifier', 'coordinator'):
         dispatcher.register_session(role, role)
     for role in ('planner', 'verifier'):
-        call(role, 'mj_submit_binding', {'mention_id': claim.claim_id,
-             'binding': {**binding, 'base_period': '2021Y'}}, role + '-forged')
-    dispatcher.freeze_bindings()
+        with pytest.raises(FinancialArgumentError) as caught:
+            call(role, 'mj_submit_binding', {'mention_id': claim.claim_id,
+                 'binding': {**binding, 'base_period': '2021Y'}}, role + '-forged')
+        rejection = caught.value.rejection()
+        assert rejection['error']['code'] == 'binding_source_conflict'
+        assert rejection['error']['conflicting_fields'] == ['base_period']
+        assert rejection['error']['source_dimensions']['base_period'] == '2022Y'
+        assert not dispatcher.bindings[role]
+    assert dispatcher.freeze_bindings()[0].binding_status == 'disagreed'
     with pytest.raises(ToolDenied, match='no consistent binding'):
         call('coordinator', 'mj_verify', {'binding_id': claim.claim_id}, 'forged-verify')

@@ -26,7 +26,7 @@ LOCK_NAMES = {
     'source_snapshot.json', 'code_lock.json', 'knowledge_lock.json',
 }
 SCAN_EXCLUDES = {'node_modules', '.git', 'runs', 'runtime', 'vendor', 'baseline',
-                 'evidence', 'bench', 'frontend', 'web', 'samples'}
+                 'evidence', 'bench', 'frontend', 'web', 'samples', 'data', 'artifacts', '存档'}
 
 
 def native_path(path: Path) -> str:
@@ -174,14 +174,15 @@ def registered_paths(value, base: Path, workspace: Path, protected_trees: tuple[
 
 def dependencies(workspace: Path) -> tuple[set[Path], list[dict]]:
     main = workspace / 'mainProj'
-    projects = (main / 'mingjing', main / 'mingjing-next')
+    projects = (workspace / 'Light_Mirror', main / 'mingjing', main / 'mingjing-next')
     protected = {main / '年报和半年报', main / '存放会计准则', main / 'agent架构参考',
-                 main / 'runs', main / '项目书前期探索计划', workspace / '报名材料', workspace / '论文参考'}
+                 main / 'runs', main / '项目书前期探索计划', workspace / '报名材料', workspace / '论文参考',
+                 workspace / '存档'}
     frozen = []
     for project in projects:
         if project.is_dir():
             protected.update(git_roots(project))
-            for name in ('runs', 'runtime', 'vendor', 'baseline', 'evidence', 'samples', 'node_modules'):
+            for name in ('runs', 'runtime', 'vendor', 'baseline', 'evidence', 'samples', 'node_modules', 'data', 'artifacts'):
                 protected.add(project / name)
     protected_trees = tuple(os.path.normcase(str(path.absolute())) for path in protected)
     for project in projects:
@@ -240,7 +241,7 @@ def candidates(workspace: Path) -> list[tuple[Path, str]]:
     for path in (workspace / '.pytest_cache', main / '.pytest_cache'):
         if path.is_dir():
             result.append((path, 'rebuildable_test_cache'))
-    for project in (old, main / 'mingjing-next'):
+    for project in (workspace / 'Light_Mirror', old, main / 'mingjing-next'):
         if not project.is_dir():
             continue
         for name in ('temp-annual.txt', 'temp-prospectus.txt'):
@@ -289,8 +290,8 @@ def write_receipt(path: Path, data: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--workspace', type=Path, default=ROOT.parents[1])
-    parser.add_argument('--out', type=Path, default=ROOT / 'runs' / 'workspace-cleanup-stage')
+    parser.add_argument('--workspace', type=Path, default=ROOT.parent)
+    parser.add_argument('--out', type=Path, default=ROOT / 'evidence' / 'cleanup-preview')
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
     workspace = args.workspace.resolve(strict=True)
@@ -298,7 +299,7 @@ def main() -> int:
     receipt = {'schema': 'mingjing.cleanup.v2', 'workspace': str(workspace), 'started_at': time.time(),
                'apply': args.apply, 'status': 'inventoried', 'entries': [], 'protected_manifests': frozen,
                'protected_paths': sorted(str(path) for path in protected),
-               'preserved_run_trees': [str(workspace / 'mainProj' / project / 'runs') for project in ('mingjing', 'mingjing-next')],
+               'preserved_run_trees': [str(workspace / 'Light_Mirror' / 'runs'), str(workspace / 'Light_Mirror' / 'evidence'), str(workspace / '存档')],
                'size_basis': 'logical_file_bytes; physical_reclaim_excludes_observed_hardlinked_files'}
     out = args.out.resolve() / 'cleanup_receipt.json'
     for path, reason in candidates(workspace):

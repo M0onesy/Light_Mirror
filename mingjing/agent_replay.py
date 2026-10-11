@@ -84,6 +84,7 @@ def replay_agent(run: Path | str) -> dict:
             differences.extend(_analysis_differences(original.get('analysis'), agent.analysis))
             execution_equal = (original.get('pending_claim_ids', []) == agent.pending_claim_ids
                                and original.get('execution', {}).get('preflight_claim_ids', []) == agent.preflight_claim_ids
+                               and original.get('execution', {}).get('preflight_source_exclusions', {}) == agent.preflight_source_exclusions
                                and original.get('execution', {}).get('native_analysis_completed', False) == bool(agent.native_analysis_sessions()))
             original_bindings = read('bindings.json')
             bindings_equal = original_bindings['A'] == agent.dispatcher.bindings['planner'] and original_bindings['B'] == agent.dispatcher.bindings['verifier']

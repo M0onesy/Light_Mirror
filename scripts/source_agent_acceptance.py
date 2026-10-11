@@ -201,8 +201,10 @@ def execute(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--state',type=Path,default=Path('../mingjing/runs/native-real-report-freeze-07/agent_state.json'))
-    parser.add_argument('--out',type=Path,default=Path('runs/source-real-next-01'))
+    parser.add_argument('--state',type=Path,required=True,
+                        help='Explicit exposed frozen agent_state.json; historical sibling defaults are not used')
+    parser.add_argument('--out',type=Path,required=True,
+                        help='New task evidence directory, normally evidence/<new-task>; existing receipts are not overwritten')
     parser.add_argument('--task-type',choices=('check','analysis'),default='check')
     parser.add_argument('--expect-event', action='append', choices=EVENT_KINDS, default=[],
                         help='Repeat for a pre-reviewed accounting event required from these development materials')

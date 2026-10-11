@@ -32,11 +32,13 @@ def material_version_request(accepted: dict, results: dict, *, inherit_supplemen
     if not inherit_supplements:
         assert_plain_version_allowed(accepted, results)
     fields = {'draft', 'corpus', 'corpus_additions', 'facts', 'company', 'period',
-              'report_date', 'mode', 'task_type', 'scope_declaration', 'scope_clarifications', 'knowledge_root'}
+              'report_date', 'mode', 'task_type', 'scope_declaration', 'scope_clarifications', 'knowledge_root',
+              'material_profile', 'validation_policy', 'smart_options', 'smart_draft_metadata'}
     request = {key: value for key, value in accepted.items() if key in fields}
     request['draft'] = results['draft']
     for key in ('corpus', 'corpus_additions', 'company', 'period', 'report_date',
-                'task_type', 'scope_declaration', 'scope_clarifications', 'knowledge_root'):
+                'task_type', 'scope_declaration', 'scope_clarifications', 'knowledge_root',
+                'material_profile', 'validation_policy', 'smart_options', 'smart_draft_metadata'):
         if key in results:
             request[key] = results[key]
     return request

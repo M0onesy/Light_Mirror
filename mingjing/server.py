@@ -502,11 +502,15 @@ def _effective_run_request(request: dict[str, Any], config: dict[str, Any]) -> d
     workspace, run = config.get('workspace', {}), config.get('run', {})
     for field, setting in (('draft', 'draft_path'), ('corpus', 'corpus_root'), ('facts', 'facts_path'),
                            ('knowledge_root', 'knowledge_root')):
+        if value.get('material_profile') == 'smart' and field in {'draft', 'corpus', 'facts'}:
+            continue
         if not value.get(field) and workspace.get(setting):
             if field == 'draft' and value.get('task_type') == 'analysis':
                 continue
             value[field] = workspace[setting]
     for field in ('company', 'period', 'report_date', 'mode'):
+        if value.get('material_profile') == 'smart':
+            continue
         if not value.get(field) and run.get(field):
             value[field] = run[field]
     value.setdefault('mode', 'kernel')
@@ -721,7 +725,7 @@ class RunTask:
             # Preserve accepted resource paths per task instead of reconstructing
             # old tasks from whichever paths happen to be configured today.
             from .agent import write_json
-            accepted_request = {key: self.request[key] for key in ('company', 'period', 'report_date', 'task_type', 'mode', 'facts', 'knowledge_root', 'parent_run_id', 'source_session_id', 'scope_declaration', 'scope_clarifications', 'corpus_additions', 'reparse_packets', 'reparse_packet_ids', 'reparse_parent_run', '_controlled_reparse_root', 'reparse_inheritance')
+            accepted_request = {key: self.request[key] for key in ('company', 'period', 'report_date', 'task_type', 'mode', 'facts', 'knowledge_root', 'parent_run_id', 'source_session_id', 'scope_declaration', 'scope_clarifications', 'corpus_additions', 'reparse_packets', 'reparse_packet_ids', 'reparse_parent_run', '_controlled_reparse_root', 'reparse_inheritance', 'material_profile', 'validation_policy', 'smart_options', 'smart_draft_metadata', 'parent_batch_id')
                                 if key in self.request}
             accepted_request.update(draft=str(local_draft), corpus=str(corpus))
             write_json(request_path, accepted_request)
@@ -968,6 +972,11 @@ class AppState:
         self._remember_root(workspace, config_snapshot=data)
         from .sessions import FinancialSessions
         self.sessions = FinancialSessions(storage['service.sessions_root'], self.get_task, self.config)
+        # 直传模式：上传即核查/分析，知识库去重缓存（mingjing/smart）
+        from .smart.web import SmartService
+        upload_mb = int((data.get('security') or {}).get('max_upload_mb') or 200)
+        self.smart = SmartService(_default_root() / 'kb', workspace / 'smart', config=self.config.get,
+                                  secret=self.config.secret, store=self.config, max_upload_mb=upload_mb, host=self)
         self.sessions.launch_run = self.launch
 
     def _save_registry(self, roots: list[str], records: dict[str, dict[str, Any]], *, config_snapshot=None) -> None:
@@ -1155,14 +1164,26 @@ class AppState:
         return {'available': True, 'report_id': report_id, 'page': info['page']}
 
     def launch(self, request: dict[str, Any], *, reparse_packets: list[dict[str, Any]] | None = None,
-               reparse_inheritance: dict[str, Any] | None = None) -> RunTask:
+               reparse_inheritance: dict[str, Any] | None = None,
+               config_snapshot: dict[str, Any] | None = None) -> RunTask:
         if self.sessions.closing:
             raise ValueError('服务正在退出，不能启动新任务')
         run_id = str(request.get("run_id") or f"web-{uuid.uuid4().hex[:12]}")
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,79}", run_id):
             raise ValueError("invalid run_id")
-        if any(key in request for key in ("candidate_value", "value", "facts_data", "results")):
+        if any(key in request for key in ("candidate_value", "value", "facts_data", "results", "config_snapshot")):
             raise ValueError("run requests cannot contain candidate facts or verdicts")
+        if request.get('facts') is not None and not isinstance(request['facts'], str):
+            raise ValueError('facts只能引用材料路径，不能接收事实数组')
+        if request.get('material_profile', '') not in {'', 'smart'}:
+            raise ValueError('unsupported material parser profile')
+        if request.get('material_profile') == 'smart':
+            from .agent import task_request_semantics
+            task_request_semantics(request)
+            if request.get('mode') != 'harness':
+                raise ValueError('上传解析任务必须使用原生宿主运行')
+            if not isinstance(request.get('smart_options', {}), dict) or set(request.get('smart_options', {})) - {'use_llm', 'text_evidence'}:
+                raise ValueError('invalid frozen smart policy options')
         if any(key in request for key in ('reparse_packets', 'reparse_packet_ids', 'reparse_packet_paths', 'reparse_parent_run', '_controlled_reparse_root', 'reparse_inheritance', 'inherit_supplements_from')):
             raise ValueError('重解析包只能通过原任务受控补证版本应用')
         if request.get('task_type', 'check') not in {'check', 'analysis'}:
@@ -1172,7 +1193,7 @@ class AppState:
         from .clarifications import request_scope_clarifications
         if 'scope_clarifications' in request:
             request = {**request, 'scope_clarifications': request_scope_clarifications(request)}
-        cfg = self.config.get()
+        cfg = json.loads(json.dumps(self.config.get() if config_snapshot is None else config_snapshot, ensure_ascii=False))
         from .materials import normalize_corpus_additions
         security = cfg.get('security', {})
         roots = None if security.get('allow_external_paths', True) else list(security.get('allowed_roots') or [])
@@ -1264,6 +1285,9 @@ class AppState:
             if not isinstance(accepted, dict):
                 raise ValueError('原任务的材料参数损坏，请选择材料新建任务')
         request = {key: value for key, value in accepted.items() if key in fields and isinstance(value, str)}
+        for key in ('material_profile', 'validation_policy', 'smart_options', 'smart_draft_metadata', 'parent_batch_id'):
+            if key in accepted:
+                request[key] = accepted[key]
         if 'corpus_additions' in accepted:
             request['corpus_additions'] = accepted['corpus_additions']
         if 'scope_clarifications' in accepted:
@@ -1378,7 +1402,7 @@ class AppState:
                     task.request['corpus_additions'] = accepted['corpus_additions']
                 if isinstance(accepted.get('scope_clarifications'), list):
                     task.request['scope_clarifications'] = accepted['scope_clarifications']
-                for key in ('reparse_packets', 'reparse_packet_ids', 'reparse_parent_run', '_controlled_reparse_root', 'reparse_inheritance'):
+                for key in ('reparse_packets', 'reparse_packet_ids', 'reparse_parent_run', '_controlled_reparse_root', 'reparse_inheritance', 'material_profile', 'validation_policy', 'smart_options', 'smart_draft_metadata', 'parent_batch_id'):
                     if key in accepted:
                         task.request[key] = accepted[key]
             events = out / "web_events.jsonl"
@@ -1448,6 +1472,8 @@ class Handler(BaseHTTPRequestHandler):
         # validation still applies; every data API requires its bearer.
         if not self._authorized(require_token=path == '/api' or path.startswith('/api/')):
             _json(self, HTTPStatus.UNAUTHORIZED, {"error": "unauthorized"}); return
+        if self.state.smart.handle(self, 'GET', path, parsed.query):
+            return
         try:
             if path == "/api/health":
                 from . import __version__
@@ -1618,6 +1644,8 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/config/export":
                 _json(self, 200, {"config": self.state.config.public(), "exported_at": time.time(), "secrets": "omitted"}); return
             if path == "/" or path == "/index.html":
+                self.state.smart.static(self, "index.html"); return
+            if path in {"/classic", "/harness"}:
                 self._static("index.html"); return
             self._static(path.removeprefix("/"))
         except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
@@ -1642,6 +1670,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         if not self._authorized(): _json(self, 401, {"error": "unauthorized"}); return
         path = urlparse(self.path).path.rstrip("/")
+        if self.state.smart.handle(self, 'POST', path, urlparse(self.path).query):
+            return
         try:
             payload = _body(self)
             if self.state.sessions.closing and path != '/api/shutdown':
@@ -1930,8 +1960,17 @@ class Handler(BaseHTTPRequestHandler):
     def _pdf_available() -> bool:
         return Handler._module_available("fitz")
 
+    def do_DELETE(self) -> None:
+        if not self._authorized(): _json(self, 401, {"error": "unauthorized"}); return
+        parsed = urlparse(self.path)
+        if not self.state.smart.handle(self, 'DELETE', parsed.path.rstrip('/'), parsed.query):
+            _json(self, 404, {"error": "not found"})
+
     def do_PATCH(self) -> None:
         if not self._authorized(): _json(self, 401, {"error": "unauthorized"}); return
+        parsed = urlparse(self.path)
+        if self.state.smart.handle(self, 'PATCH', parsed.path.rstrip('/'), parsed.query):
+            return
         try:
             payload = _body(self)
             secrets_payload = payload.pop("secrets", {}) if isinstance(payload.get("secrets"), dict) else {}
@@ -1971,6 +2010,7 @@ class MingJingServer(ThreadingHTTPServer):
         self._bound_ready = True
 
     def cancel_activities(self) -> None:
+        self.state.smart.cancel_all()
         with self.state.lock:
             self.state.sessions.closing = True
             diagnostics = list(self.state.diagnostics.values())
@@ -2003,6 +2043,10 @@ class MingJingServer(ThreadingHTTPServer):
         for task in list(self.state.tasks.values()):
             if task.thread is not threading.current_thread() and task.thread.is_alive():
                 task.thread.join(max(0, deadline - time.monotonic()))
+        for record in list(self.state.smart.runs.values()):
+            worker = record.get('_thread')
+            if worker and worker is not threading.current_thread() and worker.is_alive():
+                worker.join(max(0, deadline - time.monotonic()))
         with self.state.lock:
             diagnostics = list(self.state.diagnostics.values())
         for record in diagnostics:

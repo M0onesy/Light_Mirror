@@ -1,40 +1,54 @@
-# 明镜 MingJing 金融 Agent
+# 明镜 MingJing 1.0.0.dev3
 
-明镜提供研报纠错核查、财报分析和材料追问。它复用锁定的 DeepSeek Harness 原生 Agent Loop，由模型调用受控金融工具完成检索和语义绑定；事实、公式、金额和判定由明镜自己的 Decimal 内核产生。可选择 DeepSeek、Kimi、OpenAI GPT 或兼容服务，模型不绑定于框架供应商。
+明镜面向研究报告事实核查、财报分析和材料追问。首页上传研报/财报并存入本地知识库，在线任务复用锁定的 DeepSeek Harness 原生 Agent Loop，通过受控金融工具调用统一的 MetricSpec、规则和 Decimal 内核。模型负责语义、检索与报告组织；金额事实、计算、判定和替换数字由宿主产生。
 
-Windows用户以 `MingJing.exe` 为唯一启动入口，在本地Harness Web设置材料、密钥、模型、角色与预算，查看原文、证据、公式、补证、恢复、重放和导出。默认纯内核离线演示，大型财报保留外部引用，API密钥使用当前Windows用户DPAPI保存。
+唯一当前工程是本目录 **Light_Mirror**，版本为 **1.0.0.dev3 阶段候选**。计划书与任务手册只在 `docs/project/` 维护；实际验收说明在 `docs/acceptance/`，成品在 `artifacts/`，本地原始证据在 `evidence/`，外置材料在 `data/`。旧工程集中在工作区的 `存档/历史版本/`，不能作为另一个开发入口。
 
-当前版本为 **1.0.0.dev2 阶段候选**。阶段包以自身构建哈希及测试回执为准，不替代完整金融金标、独立保留集或干净Windows验收；历史RC程序不代表当前源码。
+普通用户下载 [当前 GitHub Release](https://github.com/M0onesy/Light_Mirror/releases/tag/mingjing-1.0.0.dev3)，解压后双击 `MingJing.exe`。本地对应入口为 `artifacts/program/MingJing.exe`。该程序保留原已冻结构建字节；本轮目录整理和辅助说明不构成新的金融验收或重打包。
 
-## 从哪里开始
+```text
+Light_Mirror/
+├─ mingjing/ kernel/ rulepack/   宿主、金融内核与规则
+├─ frontend/ web/               界面源码与已构建静态资源
+├─ runtime/ vendor/             原生金融插件、载体与锁定上游
+├─ scripts/ tests/ bench/        工具、测试与评测
+├─ docs/project/                唯一计划书、PDF及开发任务手册
+├─ docs/acceptance/             阶段验收摘要和当前问题
+├─ artifacts/                   程序、ZIP、视频、源码及核心审阅包
+├─ evidence/                    只读原始收据、运行记录及迁移映射
+└─ data/                        外置财报、准则及本地工作材料
+```
 
-- 普通用户：[详细使用手册](docs/USER_GUIDE.md)
-- GitHub协作、完整项目拷贝、30MB核心审阅：[交付指南](docs/DELIVERY_GUIDE.md)
-- 源码启动和针对性验证：[开发运行手册](docs/RUNBOOK.md)
-- 单EXE构建：[重建说明](scripts/REBUILD_SOURCE.md)及[EXE交付说明](docs/EXE_DELIVERY.md)
-- 架构与闸门：[原生Agent说明](docs/NATIVE_AGENT_ACCEPTANCE.md)
-- 当前专业问题与局部证据：[小样本记录](docs/ABSTENTION_SMALL_SAMPLE.md)、[专业审阅](docs/PROFESSIONAL_REVIEW.md)
-
-当前工程根为 `mainProj/mingjing-next`；公开GitHub导出后它本身就是仓库根。旧工程和历史锁保持独立，程序拒绝混用模块来源。
-
-## 源码快速体验
-
-开发者使用Python 3.12，在当前工程根安装锁定依赖：
+## 使用与任务
 
 ```powershell
+Set-Location -LiteralPath D:\Competition\金融人工智能竞赛\Light_Mirror
 python -m pip install -r requirements-build.lock
-python -m mingjing.cli rules check
-python -m mingjing.cli check --draft samples/demo_draft_defined.md --corpus samples/corpus --report-date 2025-03-31 --out runs/demo --mode kernel
-python -m mingjing.cli replay --run runs/demo
 python -m mingjing.launcher
 ```
 
-原生Harness模式另外需要同版本金融载体，公开源码仓库不携带二进制载体或node_modules。重建流程见[重建说明](scripts/REBUILD_SOURCE.md)，供应商设置与真实工具闭环测试均在Web完成。默认失败后降级到纯内核，不静默把材料发送给另一供应商。
+工作台上传材料后确认识别的公司、报告期间、研报日期及参考文件，选择标准或审慎策略。在线模式进入原生模型—工具—观察循环，绑定与核查轨迹可在任务/会话中查看。知识库会话支持财报分析、追问、补证和重放；追加材料、口径澄清及局部重解析建立新版本，父结果只读。无模型或运行时不可用时明确采用纯内核演示/降级，保留缺证与未处理项。
 
-所有原文出现位置保留在覆盖账本；已核实、有误、弃权、待处理、范围外与规则排除分别展示。处理完成率不等于金融有效判定覆盖率，局部小样本通过也不等于全文成绩。金额精度、口径、披露时点和方法定义均须有来源。
+标准模式在事先登记的定义和假设下核查，并逐条显示默认合并、备选定义、横线及其他条件；审慎模式拒绝没有来源证明的口径与方法，不能凭相近金额补造定义。直接披露、授权推算、内部勾稽、恒等式和文本佐证分别展示；预测与估值一致不表示真实历史事实已独立核实。
 
-## 许可与数据边界
+模型可按用户路由配置 DeepSeek、Kimi、OpenAI GPT 或兼容协议。连接测试和 Agent 多工具能力测试分开，供应商真实请求与 mock 分别登记。密钥使用当前 Windows 用户 DPAPI，配置导出不含明文；已有用户模型、凭据和角色路由不得自动改换。
 
-明镜自有代码采用 [AGPL-3.0-only](LICENSE)。第三方组件保留各自许可，说明见 [LICENSE_GUIDE.md](docs/LICENSE_GUIDE.md) 和 [THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。虚构演示样例随源码提供；真实报告、运行历史、API响应缓存、个人配置、Token和约8GB外部财报不进入公开仓库。
+## 结果、复现与交付
 
-协作地址：<https://github.com/M0onesy/Light_Mirror>。请以分支和PR提交可复现的小样本修复，保护历史资源锁与材料闭包。
+输出结构化结果、证据页、操作数与公式、错误/弃权/提示和修改文本。全文账本保留数字原位置、范围外、排除和待处理；覆盖率与执行进度不是独立真人召回或正确率。正式数字必须有样本、分母、版本及原始收据。
+
+内核重放重算金融产物，Agent/消息重放用匹配缓存重跑实际循环。先验输入、输出、源码和资源锁，缓存缺失或变化明确失败，不联网补齐。知识库原件也必须重新验哈希，未来或未知公告日期材料不能进入事实、佐证、引用及补证。
+
+完整开发包与核心审阅包不同：完整原生运行需锁定上游源码和金融载体闭包；≤30MB核心包供源码审阅，排除完整载体、真实语料、用户配置和历史。普通用户的单 EXE 在同版源码、UI、资源稳定后构建，按实际 build/smoke 与独立环境记录验收。
+
+- [使用手册](docs/USER_GUIDE.md)
+- [源码运行与验证](docs/RUNBOOK.md)
+- [统一入口与知识库设计](docs/SMART_PIPELINE.md)
+- [五工作包与关闭账本](docs/PROJECT_TASK_MANUAL.md)
+- [计划书与项目文档](docs/project/README.md)
+- [阶段验收与当前问题](docs/acceptance/README.md)
+- [交付及复现闭包](docs/DELIVERY_GUIDE.md)
+- [EXE构建与发行](docs/EXE_DELIVERY.md)
+- [许可](LICENSE)、[第三方范围](docs/THIRD_PARTY_NOTICES.md)
+
+明镜自有代码使用 AGPL-3.0-only，第三方组件保留各自许可。公开仓库不提交 Token、DPAPI、个人配置、真实模型缓存、全量语料或未获授权材料。完整源码应与现场展示版一致。

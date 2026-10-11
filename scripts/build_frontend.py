@@ -63,6 +63,43 @@ def verify(root=ROOT):
             'assets_sha256': receipt['assets_sha256']}
 
 
+def smart_files(root):
+    folder = Path(root)/'web'/'smart'
+    return inventory(root, [p for p in folder.rglob('*') if p.is_file() and p.name != RECEIPT])
+
+
+def verify_smart(root=ROOT):
+    root = Path(root).resolve()
+    receipt = json.loads((root/'web'/'smart'/RECEIPT).read_text(encoding='utf-8'))
+    if receipt.get('kind') != 'mingjing-upload-ui-source.v1' or receipt.get('status') != 'checked':
+        raise ValueError('Upload workbench has no checked source receipt')
+    if receipt.get('files') != smart_files(root):
+        raise ValueError('Upload workbench changed after its source checks')
+    return {'status': 'passed_source_as_assets', 'files': len(receipt['files']), 'sha256': receipt['sha256']}
+
+
+def record_smart(root=ROOT):
+    """The upload UI serves original source files; validate JS before freezing."""
+    root = Path(root).resolve()
+    before = smart_files(root)
+    node = root/'runtime'/'finance-carrier'/'staged'/'bin'/'node.exe'
+    if not node.is_file():
+        candidate = shutil.which('node')
+        if not candidate:
+            raise ValueError('A checked Node runtime is required to validate JavaScript')
+        node = Path(candidate)
+    for row in before:
+        if row['path'].endswith('.js'):
+            subprocess.run([str(node), '--check', str(root/row['path'])], check=True)
+    if before != smart_files(root):
+        raise ValueError('Upload UI changed during JavaScript validation')
+    canonical = json.dumps(before, sort_keys=True, separators=(',', ':')).encode()
+    receipt = {'kind': 'mingjing-upload-ui-source.v1', 'status': 'checked', 'files': before,
+               'sha256': hashlib.sha256(canonical).hexdigest(), 'recorded_at': datetime.now(timezone.utc).isoformat()}
+    (root/'web'/'smart'/RECEIPT).write_text(json.dumps(receipt, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    return verify_smart(root)
+
+
 def build(root=ROOT):
     root = Path(root).resolve()
     front = root/'frontend'
@@ -94,8 +131,10 @@ def build(root=ROOT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--verify', action='store_true')
+    parser.add_argument('--smart', action='store_true')
     args = parser.parse_args()
-    print(json.dumps(verify() if args.verify else build(), ensure_ascii=False))
+    action = verify_smart if args.verify else record_smart
+    print(json.dumps(action() if args.smart else verify() if args.verify else build(), ensure_ascii=False))
 
 
 if __name__ == '__main__':
