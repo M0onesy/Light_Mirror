@@ -302,7 +302,7 @@ def command_check(args: argparse.Namespace) -> int:
     _checkpoint(args, "确定性核查", 65)
     audit.emit("tool_call", tool="claim_decompose", input={"draft_sha256": digest(text)}, output={"claims": len(claims)})
     results = []
-    judge = Judge(store, args.report_date)
+    judge = Judge(store, args.report_date, enable_probe=getattr(args, 'enable_probe', False))
     for claim in claims:
         _checkpoint(args, "确定性核查", 65)
         result = judge.verify(claim).to_dict()
@@ -335,6 +335,11 @@ def command_check(args: argparse.Namespace) -> int:
     payload['partial'] = payload['coverage']['partial']
     (out / 'coverage.json').write_text(json.dumps(payload['coverage'], ensure_ascii=False, indent=2), encoding='utf-8')
     if getattr(args, 'task_type', 'check') == 'analysis':
+        # 注意：分析模式（task_type='analysis'）不产出 verdict，此处的 '合并' 回落
+        # 仅用于展示层指标计算，不构成事实判定依据。**切勿**把该默认值引入
+        # check（事实核查）路径——那将违反 docs/FINANCIAL_SOURCE_POLICY.md 第 13 行
+        # 「报表口径不明时仍要求源材料或用户有来源的补充声明，不能默认为合并口径」，
+        # 且库内同一指标并存合并/母公司两套事实，默认猜测会产出错误结论。
         from .analysis import analyze_financials
         from .disclosures import disclosures_from_facts
         payload['accounting_disclosures'] = disclosures_from_facts(facts, control=parsing)
@@ -516,6 +521,8 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument("--scope-declaration", choices=('', '合并', '母公司'), default='', help='用户口径澄清；默认仅按原文')
     check.add_argument('--scope-clarifications-json', default='[]', help='仅对选定原文提及、指标或表补充口径的 JSON 数组；创建条件核查')
     check.add_argument("--run-id")
+    check.add_argument('--enable-probe', dest='enable_probe', action='store_true',
+                       help='诊断旁证探查：对已被前置守卫短路的条目补做只读事实探查（只增加诊断信息，永不改变 verdict）；默认关闭')
     check.add_argument('--progress-json', action='store_true', help=argparse.SUPPRESS)
     check.add_argument('--run-timeout-s', type=float, default=0, help=argparse.SUPPRESS)
     check.set_defaults(func=command_check)

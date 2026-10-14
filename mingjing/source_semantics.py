@@ -695,6 +695,14 @@ def unresolved_source_definition_issue(claim) -> tuple[str, str] | None:
     """Agreement is not evidence for a broader/undefined original label."""
     if not semantic_review_required(claim):
         return None
+    # —— C 改造新增：显式口径映射的原文验证放行（子方案 C1：保守放行）——
+    # 仅当 registry 命中且出处四元组完整可核验时才放行；放行只是"不再产生
+    # X3/X2 来源定义缺口"，不改写 claim（AtomicClaim 为 frozen dataclass）。
+    # 是否最终核实仍取决于后续事实查询与前置换行 A 行为不变。
+    # 子方案 C2（把映射写回 source_dimensions 以改变 binding 比对）本轮不做。
+    from .source_method_registry import validated_mapping
+    if validated_mapping(claim) is not None:
+        return None
     # This source identifier was saved by the numeric parser before binding.
     # It is independent of a model's canonical account and nearby fact value.
     account = claim.table_context['source_account_unresolved']

@@ -229,9 +229,14 @@ def _asserts_latest_source(claim):
     return bool(re.search(r'最新(?:披露|报告|年报|数据)|(?:调整后|更正后|重述后)(?:的)?(?:金额|数据|营业收入|营收|净利润|归母净利润)?', local))
 
 class Judge:
-    def __init__(self, facts: FactStore, report_date: str | None = None, *, strict_caliber: bool = False, confidence_threshold: str = "0.95", require_dual_binding: bool = False, approximate_multiplier: str | None = None, hedge_relative: str = "0.02"):
+    def __init__(self, facts: FactStore, report_date: str | None = None, *, strict_caliber: bool = False, confidence_threshold: str = "0.95", require_dual_binding: bool = False, approximate_multiplier: str | None = None, hedge_relative: str = "0.02", enable_probe: bool = False):
         self.facts, self.report_date = facts, report_date
         self.strict_caliber = strict_caliber
+        # A 部分旁证探查开关。默认关闭：被前置守卫短路的条目原本零事实查询，
+        # 且既有测试明确禁止对无效来源执行事实查询（见
+        # tests/test_cagr_source_preconditions.py、tests/test_metric_coverage_registry.py）。
+        # 仅在显式打开时才执行只读旁证探查，探查结果永不回流到 verdict。
+        self.enable_probe = enable_probe
         confidence = Decimal(str(confidence_threshold))
         if not confidence.is_finite() or not Decimal('0') <= confidence <= Decimal('1'):
             raise ValueError('事实置信度阈值须为零至一')
@@ -364,6 +369,34 @@ class Judge:
         result.advisories = list(dict.fromkeys(result.advisories))
         return result
 
+    # === A 部分唯一新增：旁证探查入口（无副作用、不产生 verdict） ===
+    def _probe_fact_lookup(self, claim, scope, nr, spec):
+        """对已被前置守卫短路的条目执行一次性只读事实探查。
+
+        返回一个自包含、仅用于诊断的旁证 dict。绝不被任何判定逻辑读取：
+        调用方只把它并入 blockers（诊断列表），从不写回 result 的
+        status / abstention_code / error_type / expected / observed /
+        operands / correction，也不把它 return 到 _all_blockers 之外。
+        """
+        if not (claim.company and claim.account not in {'', 'UNKNOWN'}
+                and claim.period and self.report_date):
+            return {'probe_status': 'not_applicable',
+                    'probe_reason': '缺少公司、科目、期间或回溯日期，无法探查'}
+        try:
+            outcome = self._lookup(claim, scope, nr)   # 与 402/410 行同一只读入口
+        except Exception as exc:                       # 探查失败绝不外溢到判定
+            return {'probe_status': 'missing',
+                    'probe_reason': f'探查异常：{type(exc).__name__}'}
+        # 只暴露"是否存在唯一同维度事实"这一布尔旁证；不暴露金额，
+        # 避免下游把金额当作可用证据（宁弃权不造假的护城河）。
+        if outcome.fact is not None:
+            return {'probe_status': 'found',
+                    'probe_reason': '探查到同维度事实（仅旁证，不参与判定）',
+                    'probe_fact_id': outcome.fact.fact_id,
+                    'probe_publish_date': getattr(outcome.fact, 'publish_date', '')}
+        return {'probe_status': 'missing',
+                'probe_reason': outcome.reason or '探查未命中同维度事实'}
+
     def _all_blockers(self,claim,result):
         """Independent source guards and operand lookups, without creating verdicts."""
         blockers=list(result.blockers)
@@ -395,6 +428,14 @@ class Judge:
         if (source_failures or claim.parse_status!='parsed' or result.abstention_code in {'X3','X6'}
                 or claim.binding_status in {'unknown','unresolved','disagreed','pending'}):
             add('X3','fact_lookup','源维度或语义前置验证未通过，依赖事实查询未执行',lookup_status='not_executed')
+            # —— A 改造新增：旁证探查（只写诊断，零回流）——
+            # 397 行原样保留，既有诊断语义'依赖查询未执行'仍成立；探查结果落在
+            # 独立 blocker 与独立 probe_* 键，不触碰任何 verdict 字段。
+            if self.enable_probe:
+                probe=self._probe_fact_lookup(claim,scope,nr,spec)
+                add('PROBE','diagnostic_probe',
+                    '前置守卫已阻断判定；以下为旁证探查结果，不参与任何 verdict 计算',
+                    lookup_status='not_executed',**probe)
             return blockers
         if claim.company and claim.account not in {'','UNKNOWN'} and claim.period and self.report_date:
             if spec:

@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-base text-text-primary font-sans text-base;
+    /* 数字一律等宽 + tabular figures（金融终端列对齐观感） */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 高密度滚动条（终端气质） */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0e13;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1f2937;
+    border-radius: 0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #374151;
+  }
+}
+
+@layer components {
+  /* 面板：信息层级靠分隔线与字重，而非大量留白 */
+  .mj-panel {
+    @apply bg-panel border border-border rounded-sm;
+  }
+
+  /* 等宽数字 */
+  .mj-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* 分区小标题 */
+  .mj-label {
+    @apply text-2xs uppercase tracking-[0.14em] text-text-muted font-medium;
+  }
+
+  /* 顶栏/表头分隔线 */
+  .mj-divider {
+    @apply border-b border-border;
+  }
+}

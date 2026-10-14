@@ -1,0 +1,175 @@
+// abstention-diagnosis.v1 核心类图 —— 数据模型 + 视图模型
+classDiagram
+    class DiagnosisData {
+        +DiagnosisMeta meta
+        +VersionSnapshot[] versions
+        +XCodeDef[] x_code_defs
+        +GapKindDef[] gap_kind_defs
+        +CompositionEntry[] composition
+        +RootCauseNode root_cause_tree
+        +DiagnosisItem[] items
+        +Requirement[] requirements
+        +Redline[] redlines
+        +Metrics metrics
+    }
+    class DiagnosisMeta {
+        +string report_hash
+        +number report_pages
+        +string generated_at
+        +string primary_version
+        +string compare_version
+        +enum denominator_scope
+    }
+    class VersionSnapshot {
+        +string id
+        +string label
+        +number total_candidates
+        +number verified
+        +number violated
+        +number abstained
+        +Record~XCode,number~ x_codes
+    }
+    class XCodeDef {
+        +XCode code
+        +string name
+        +GapKind kind
+        +Amendability amendability
+        +boolean is_redline
+        +string desc
+    }
+    class GapKindDef {
+        +GapKind kind
+        +string name
+        +XCode? x_code
+        +string desc
+    }
+    class CompositionEntry {
+        +string id
+        +string cause
+        +number count
+        +XCode x_code
+        +GapKind gap_kind
+        +Amendability amendability
+        +string evidence_ref
+        +string note
+    }
+    class RootCauseNode {
+        +string id
+        +string label
+        +number count
+        +XCode? x_code
+        +boolean? leaf
+        +boolean? actionable
+        +boolean? redline
+        +string? requirement_ref
+        +string? evidence_ref
+        +RootCauseNode[]? children
+    }
+    class DiagnosisItem {
+        +string id
+        +number page
+        +number seq
+        +string raw_label
+        +XCode x_code
+        +GapKind gap_kind
+        +string cause
+        +Amendability amendability
+        +string evidence_ref
+        +string? requirement_ref
+    }
+    class Requirement {
+        +string id
+        +Priority priority
+        +string title
+        +number rescue_estimate
+        +string cost
+        +FakeRisk fake_risk
+        +boolean is_redline
+        +string[] linked_causes
+        +string[] linked_root_leaves
+        +string? redline_constraint
+    }
+    class Redline {
+        +string id
+        +string forbidden
+        +string reason
+        +string evidence_ref
+        +number count
+    }
+    class Metrics {
+        +NorthStarMetric north_star
+        +DriverMetric[] drivers
+        +OutcomeMetric[] outcomes
+        +CounterMetric[] counter_metrics
+    }
+    class NorthStarMetric {
+        +string name
+        +string formula
+        +number current_value
+        +MetricStage[] stages
+        +string guardrail
+    }
+    class DriverMetric {
+        +string name
+        +number current_value
+        +number? target
+        +string leverage
+    }
+    class CounterMetric {
+        +string name
+        +number value
+        +number threshold
+        +boolean must_be_zero
+    }
+
+    class DiagnosisContext {
+        +DiagnosisData data
+        +UIState uiState
+        +dispatch(action)
+    }
+    class UIState {
+        +ViewKey view
+        +XCode? activeXCode
+        +string? activeRequirement
+    }
+    class useDiagnosis {
+        +number evr
+        +number amendableCount
+        +number redlineCount
+        +CompositionEntry[] compositionByAmendability
+        +DiagnosisItem[] itemsByXCode(code)
+        +SimResult simulate(params)
+    }
+    class SimResult {
+        +number rescued
+        +number evr
+        +number riskWeighted
+        +boolean redlineTouched
+    }
+
+    DiagnosisData "1" *-- "1" DiagnosisMeta
+    DiagnosisData "1" *-- "1..*" VersionSnapshot
+    DiagnosisData "1" *-- "1..*" XCodeDef
+    DiagnosisData "1" *-- "1..*" GapKindDef
+    DiagnosisData "1" *-- "1..*" CompositionEntry
+    DiagnosisData "1" *-- "1" RootCauseNode
+    DiagnosisData "1" *-- "0..*" DiagnosisItem
+    DiagnosisData "1" *-- "0..*" Requirement
+    DiagnosisData "1" *-- "0..*" Redline
+    DiagnosisData "1" *-- "1" Metrics
+    Metrics "1" *-- "1" NorthStarMetric
+    Metrics "1" *-- "1..*" DriverMetric
+    Metrics "1" *-- "0..*" CounterMetric
+
+    XCodeDef "1" --> "1" GapKindDef : maps
+    CompositionEntry "1" --> "1" XCodeDef : refs
+    DiagnosisItem "1" --> "1" XCodeDef : refs
+    DiagnosisItem "0..*" --> "0..1" Requirement : linked
+    RootCauseNode "0..*" --> "0..1" Requirement : requirement_ref
+    Requirement "0..*" --> "0..*" CompositionEntry : linked_causes
+    Requirement "0..*" --> "0..*" RootCauseNode : linked_root_leaves
+
+    DiagnosisContext "1" o-- "1" DiagnosisData
+    DiagnosisContext "1" o-- "1" UIState
+    useDiagnosis ..> DiagnosisContext : uses
+    useDiagnosis ..> SimResult : produces

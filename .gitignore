@@ -25,6 +25,8 @@ temp-*.txt
 /.audit_finance/
 /.tmp_sample_render/
 /.pytest_cache/
+/.pytest_tmp/
+/.ptmp_*/
 /.mypy_cache/
 /.ruff_cache/
 /profile/
@@ -34,3 +36,7 @@ temp-*.txt
 *.dll
 *.pyd
 ~$*
+
+# Vite / 构建临时产物
+*.timestamp-*.mjs
+.build/

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="明镜 MingJing 弃权率归因诊断看板 —— 弃权是护城河，不是缺陷"
+    />
+    <title>明镜 MingJing · 弃权率归因诊断看板</title>
+    <style>
+      /* 首屏防白闪：先铺深色终端底色 */
+      html,
+      body,
+      #root {
+        height: 100%;
+        margin: 0;
+        background-color: #0b0e13;
+        color: #e5e7eb;
+      }
+      body {
+        font-feature-settings: 'tnum' 1, 'cv01' 1;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

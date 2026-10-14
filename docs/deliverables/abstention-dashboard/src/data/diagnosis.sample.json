@@ -1,0 +1,670 @@
+{
+  "$schema": "abstention-diagnosis.v1",
+  "meta": {
+    "report_hash": "66869cb",
+    "report_pages": 44,
+    "generated_at": "2026-01-01T00:00:00Z",
+    "primary_version": "stable-04",
+    "compare_version": "stable-08",
+    "denominator_scope": "all_candidates"
+  },
+  "versions": [
+    {
+      "id": "stable-02",
+      "label": "stable-02",
+      "total_candidates": 324,
+      "verified": 6,
+      "violated": 0,
+      "abstained": 318,
+      "x_codes": { "X1": 0, "X2": 36, "X3": 145, "X4": 0, "X5": 0, "X6": 137 },
+      "note": "最早的稳定版本，解析能力最弱"
+    },
+    {
+      "id": "stable-04",
+      "label": "stable-04",
+      "total_candidates": 319,
+      "verified": 6,
+      "violated": 0,
+      "abstained": 313,
+      "x_codes": { "X1": 0, "X2": 42, "X3": 163, "X4": 0, "X5": 0, "X6": 108 },
+      "note": "解析能力较弱的基线版本"
+    },
+    {
+      "id": "stable-05",
+      "label": "stable-05",
+      "total_candidates": 319,
+      "verified": 6,
+      "violated": 0,
+      "abstained": 313,
+      "x_codes": { "X1": 0, "X2": 42, "X3": 165, "X4": 0, "X5": 0, "X6": 106 },
+      "note": "定义登记小幅提升，X3 微增"
+    },
+    {
+      "id": "stable-08",
+      "label": "stable-08",
+      "total_candidates": 314,
+      "verified": 6,
+      "violated": 0,
+      "abstained": 308,
+      "x_codes": { "X1": 0, "X2": 58, "X3": 191, "X4": 0, "X5": 0, "X6": 59 },
+      "note": "解析提升后，弃权从 X6 迁移至 X3；根因重心位移而非消失"
+    },
+    {
+      "id": "stable-11",
+      "label": "stable-11",
+      "total_candidates": 313,
+      "verified": 6,
+      "violated": 0,
+      "abstained": 307,
+      "x_codes": { "X1": 0, "X2": 44, "X3": 175, "X4": 0, "X5": 0, "X6": 88 },
+      "note": "过渡版本（04→08 之间）；DEVELOPMENT_DEV3.md 未拆分三码，此处为插值估计"
+    },
+    {
+      "id": "stable-16-full",
+      "label": "stable-16-full",
+      "total_candidates": 295,
+      "verified": 97,
+      "violated": 0,
+      "abstained": 198,
+      "x_codes": { "X1": 12, "X2": 9, "X3": 112, "X4": 0, "X5": 0, "X6": 65 },
+      "note": "仅主范围 198 弃权 / 97 verified，与主版本差异大，仅供探索"
+    }
+  ],
+  "x_code_defs": [
+    {
+      "code": "X1",
+      "name": "缺少可用事实",
+      "kind": "missing_report",
+      "amendability": "amendable",
+      "is_redline": false,
+      "desc": "材料未入库或事实缺失，补材料可改善"
+    },
+    {
+      "code": "X2",
+      "name": "公式前提不成立",
+      "kind": "premise",
+      "amendability": "intentional",
+      "is_redline": true,
+      "desc": "负/零基数等数学前提不成立，设计上有意保守，不可降（护城河）"
+    },
+    {
+      "code": "X3",
+      "name": "指标/口径定义缺口",
+      "kind": "definition",
+      "amendability": "amendable_partial",
+      "is_redline": false,
+      "desc": "定义库缺登记或口径未声明；部分需用户显式声明，禁止代填"
+    },
+    {
+      "code": "X4",
+      "name": "来源冲突",
+      "kind": "conflict",
+      "amendability": "intentional",
+      "is_redline": true,
+      "desc": "来源冲突/置信不足，护城河，不可降（护城河）"
+    },
+    {
+      "code": "X5",
+      "name": "缺回溯日期",
+      "kind": "missing_detail",
+      "amendability": "amendable",
+      "is_redline": false,
+      "desc": "缺回溯日期，补材料可改善"
+    },
+    {
+      "code": "X6",
+      "name": "主体或维度待确认",
+      "kind": "mention",
+      "amendability": "amendable",
+      "is_redline": false,
+      "desc": "原文未写明期间/主体/指标，属解析/语义绑定不足，可改善"
+    }
+  ],
+  "gap_kind_defs": [
+    {
+      "kind": "missing_report",
+      "name": "缺整份报告",
+      "x_code": "X1",
+      "desc": "基于 item.missing[].period 缺整份报告"
+    },
+    {
+      "kind": "missing_detail",
+      "name": "缺报表明细",
+      "x_code": "X5",
+      "desc": "基于 item.missing[].dimension/label 缺报表明细"
+    },
+    {
+      "kind": "definition",
+      "name": "定义缺口",
+      "x_code": "X3",
+      "desc": "券商/数据商自定义口径指标未登记"
+    },
+    {
+      "kind": "external",
+      "name": "需外部来源",
+      "x_code": "X1",
+      "desc": "需宿主内核之外的外部来源，政策禁止"
+    },
+    {
+      "kind": "mention",
+      "name": "提及待确认",
+      "x_code": "X6",
+      "desc": "原文未写明期间/主体/指标"
+    },
+    {
+      "kind": "premise",
+      "name": "公式前提不成立",
+      "x_code": "X2",
+      "desc": "负/零基数、CAGR 起止期等数学前提，设计保守"
+    },
+    {
+      "kind": "conflict",
+      "name": "来源冲突",
+      "x_code": "X4",
+      "desc": "来源冲突/置信不足"
+    }
+  ],
+  "composition": [
+    {
+      "id": "c01",
+      "cause": "来源指标方法未知",
+      "count": 65,
+      "x_code": "X3",
+      "gap_kind": "definition",
+      "amendability": "amendable",
+      "evidence_ref": "第42页集中 54/65",
+      "note": "需券商模板/历史字段字典"
+    },
+    {
+      "id": "c02",
+      "cause": "公司总量合并/母公司口径未明示",
+      "count": 20,
+      "x_code": "X3",
+      "gap_kind": "definition",
+      "amendability": "needs_user_declaration",
+      "evidence_ref": "source_gap_catalog.py:80",
+      "note": "需用户声明，政策禁止代填"
+    },
+    {
+      "id": "c03",
+      "cause": "缺事实或公式操作数",
+      "count": 12,
+      "x_code": "X1",
+      "gap_kind": "missing_report",
+      "amendability": "amendable",
+      "evidence_ref": "item.missing[]",
+      "note": "补材料"
+    },
+    {
+      "id": "c04",
+      "cause": "业务或客户口径未知",
+      "count": 9,
+      "x_code": "X3",
+      "gap_kind": "definition",
+      "amendability": "amendable",
+      "evidence_ref": "source-customer-table 先例",
+      "note": "来源表核查路径"
+    },
+    {
+      "id": "c05",
+      "cause": "占比分母或维度不完整",
+      "count": 9,
+      "x_code": "X3",
+      "gap_kind": "definition",
+      "amendability": "amendable",
+      "evidence_ref": "—",
+      "note": "净利率/占比定义登记"
+    },
+    {
+      "id": "c06",
+      "cause": "券商残项绑定及后续依赖",
+      "count": 8,
+      "x_code": "X3",
+      "gap_kind": "definition",
+      "amendability": "amendable",
+      "evidence_ref": "已修 1 处",
+      "note": "公式登记"
+    },
+    {
+      "id": "c07",
+      "cause": "负/零基数规则前提不成立",
+      "count": 7,
+      "x_code": "X2",
+      "gap_kind": "premise",
+      "amendability": "intentional",
+      "evidence_ref": "verify.py:985",
+      "note": "设计保守·红线"
+    },
+    {
+      "id": "c08",
+      "cause": "分部维度不完整",
+      "count": 6,
+      "x_code": "X3",
+      "gap_kind": "definition",
+      "amendability": "amendable_partial",
+      "evidence_ref": "—",
+      "note": "部分可改善"
+    },
+    {
+      "id": "c09",
+      "cause": "原文结构未完成解析",
+      "count": 5,
+      "x_code": "X6",
+      "gap_kind": "mention",
+      "amendability": "amendable",
+      "evidence_ref": "judge.py:374",
+      "note": "解析增强"
+    },
+    {
+      "id": "c10",
+      "cause": "CAGR 起止期不完整",
+      "count": 2,
+      "x_code": "X2",
+      "gap_kind": "premise",
+      "amendability": "intentional",
+      "evidence_ref": "—",
+      "note": "设计保守·红线"
+    }
+  ],
+  "root_cause_tree": {
+    "id": "root",
+    "label": "高弃权率 313（≈98%）· stable-04",
+    "count": 313,
+    "aggregation_note": "整树对齐主版本 stable-04：root=313=A(163)+B(108)+C(42) 严格自洽；leaf 为 PRD 已量化子因（子集量化），非穷举，不追求与上级分支等和；未列出部分为无逐条证据的残余量",
+    "children": [
+      {
+        "id": "A",
+        "label": "X3 定义缺口",
+        "count": 163,
+        "x_code": "X3",
+        "note": "聚合计数 = 主版本 stable-04 的 X3 弃权数（163）；叶子为已量化子因（子集），本不对齐父级",
+        "children": [
+          {
+            "id": "A1",
+            "label": "券商自定义指标定义库缺登记",
+            "count": 65,
+            "x_code": "X3",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P0-1",
+            "evidence_ref": "FINANCIAL_SOURCE_POLICY.md"
+          },
+          {
+            "id": "A2",
+            "label": "口径（合并/母公司）声明缺失",
+            "count": 20,
+            "x_code": "X3",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P0-3",
+            "evidence_ref": "judge.py:192"
+          },
+          {
+            "id": "A3",
+            "label": "双盲绑定未达成一致",
+            "count": 0,
+            "x_code": "X3",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P0-2",
+            "evidence_ref": "judge.py:375"
+          },
+          {
+            "id": "A4",
+            "label": "占比分母/维度不完整",
+            "count": 9,
+            "x_code": "X3",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P1-3",
+            "evidence_ref": "—"
+          },
+          {
+            "id": "A5",
+            "label": "券商残项公式依赖",
+            "count": 8,
+            "x_code": "X3",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P1-4",
+            "evidence_ref": "—"
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "label": "X6 主体/维度待确认",
+        "count": 108,
+        "x_code": "X6",
+        "note": "聚合计数 = 主版本 stable-04 的 X6 弃权数（108）；叶子为已量化子因（子集），本不对齐父级",
+        "children": [
+          {
+            "id": "B1",
+            "label": "原文结构未完整解析",
+            "count": 5,
+            "x_code": "X6",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P1-1",
+            "evidence_ref": "judge.py:374"
+          },
+          {
+            "id": "B2",
+            "label": "未确定期间/币种/单位",
+            "count": 0,
+            "x_code": "X6",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P1-1",
+            "evidence_ref": "judge.py:818"
+          },
+          {
+            "id": "B3",
+            "label": "主体待确认",
+            "count": 0,
+            "x_code": "X6",
+            "leaf": true,
+            "actionable": true,
+            "requirement_ref": "P1-2",
+            "evidence_ref": "judge.py:962"
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "label": "X2 公式前提不成立",
+        "count": 42,
+        "x_code": "X2",
+        "note": "聚合计数 = 主版本 stable-04 的 X2 弃权数（42）；叶子为已量化子因（子集），本不对齐父级",
+        "children": [
+          {
+            "id": "C1",
+            "label": "负/零基数",
+            "count": 7,
+            "x_code": "X2",
+            "leaf": true,
+            "actionable": false,
+            "redline": true,
+            "requirement_ref": null,
+            "evidence_ref": "verify.py:985"
+          },
+          {
+            "id": "C2",
+            "label": "CAGR 起止期不完整",
+            "count": 2,
+            "x_code": "X2",
+            "leaf": true,
+            "actionable": false,
+            "redline": true,
+            "requirement_ref": null,
+            "evidence_ref": "—"
+          },
+          {
+            "id": "C3",
+            "label": "无登记公式",
+            "count": 0,
+            "x_code": "X2",
+            "leaf": true,
+            "actionable": true,
+            "redline": false,
+            "requirement_ref": "P1-4",
+            "evidence_ref": "judge.py:389"
+          }
+        ]
+      }
+    ]
+  },
+  "items": [
+    { "id": "i0001", "page": 42, "seq": 5, "raw_label": "承销净收入率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0002", "page": 42, "seq": 6, "raw_label": "经纪业务净收入率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0003", "page": 42, "seq": 7, "raw_label": "自营收益率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0004", "page": 42, "seq": 8, "raw_label": "资管净收入率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0005", "page": 42, "seq": 9, "raw_label": "信用业务净收入率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0006", "page": 42, "seq": 10, "raw_label": "投行净收入率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0007", "page": 42, "seq": 11, "raw_label": "净资本收益率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0008", "page": 42, "seq": 12, "raw_label": "ROE（加权）", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第42页", "requirement_ref": "P0-1" },
+    { "id": "i0009", "page": 41, "seq": 3, "raw_label": "两融余额占比", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第41页", "requirement_ref": "P0-1" },
+    { "id": "i0010", "page": 41, "seq": 4, "raw_label": "股票质押规模", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第41页", "requirement_ref": "P0-1" },
+    { "id": "i0011", "page": 39, "seq": 2, "raw_label": "分公司净收入率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第39页", "requirement_ref": "P0-1" },
+    { "id": "i0012", "page": 37, "seq": 6, "raw_label": "营业部产能", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第37页", "requirement_ref": "P0-1" },
+    { "id": "i0013", "page": 35, "seq": 5, "raw_label": "交易单元佣金率", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第35页", "requirement_ref": "P0-1" },
+    { "id": "i0014", "page": 33, "seq": 8, "raw_label": "客户资金余额占比", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第33页", "requirement_ref": "P0-1" },
+    { "id": "i0015", "page": 30, "seq": 1, "raw_label": "自营权益敞口", "x_code": "X3", "gap_kind": "definition", "cause": "来源指标方法未知", "amendability": "amendable", "evidence_ref": "第30页", "requirement_ref": "P0-1" },
+    { "id": "i0016", "page": 12, "seq": 31, "raw_label": "营业收入（合并）", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:80", "requirement_ref": "P0-3" },
+    { "id": "i0017", "page": 12, "seq": 32, "raw_label": "净利润（合并）", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:80", "requirement_ref": "P0-3" },
+    { "id": "i0018", "page": 13, "seq": 4, "raw_label": "总资产（母公司）", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:80", "requirement_ref": "P0-3" },
+    { "id": "i0019", "page": 13, "seq": 5, "raw_label": "净资产（合并）", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:80", "requirement_ref": "P0-3" },
+    { "id": "i0020", "page": 14, "seq": 7, "raw_label": "归母净利润", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:83", "requirement_ref": "P0-3" },
+    { "id": "i0021", "page": 14, "seq": 8, "raw_label": "营业支出（合并）", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:83", "requirement_ref": "P0-3" },
+    { "id": "i0022", "page": 18, "seq": 2, "raw_label": "总资产规模", "x_code": "X3", "gap_kind": "definition", "cause": "公司总量合并/母公司口径未明示", "amendability": "needs_user_declaration", "evidence_ref": "source_gap_catalog.py:83", "requirement_ref": "P0-3" },
+    { "id": "i0023", "page": 20, "seq": 1, "raw_label": "货币资金", "x_code": "X1", "gap_kind": "missing_report", "cause": "缺事实或公式操作数", "amendability": "amendable", "evidence_ref": "item.missing[]", "requirement_ref": null },
+    { "id": "i0024", "page": 20, "seq": 3, "raw_label": "交易性金融资产", "x_code": "X1", "gap_kind": "missing_report", "cause": "缺事实或公式操作数", "amendability": "amendable", "evidence_ref": "item.missing[]", "requirement_ref": null },
+    { "id": "i0025", "page": 21, "seq": 2, "raw_label": "卖出回购金融资产款", "x_code": "X1", "gap_kind": "missing_report", "cause": "缺事实或公式操作数", "amendability": "amendable", "evidence_ref": "item.missing[]", "requirement_ref": null },
+    { "id": "i0026", "page": 22, "seq": 5, "raw_label": "代理买卖证券款", "x_code": "X1", "gap_kind": "missing_detail", "cause": "缺事实或公式操作数", "amendability": "amendable", "evidence_ref": "item.missing[]", "requirement_ref": null },
+    { "id": "i0027", "page": 23, "seq": 1, "raw_label": "利息净收入", "x_code": "X1", "gap_kind": "missing_report", "cause": "缺事实或公式操作数", "amendability": "amendable", "evidence_ref": "item.missing[]", "requirement_ref": null },
+    { "id": "i0028", "page": 34, "seq": 6, "raw_label": "经纪业务收入（客户口径）", "x_code": "X3", "gap_kind": "definition", "cause": "业务或客户口径未知", "amendability": "amendable", "evidence_ref": "source-customer-table", "requirement_ref": "P1-2" },
+    { "id": "i0029", "page": 35, "seq": 2, "raw_label": "两融利息收入（客户）", "x_code": "X3", "gap_kind": "definition", "cause": "业务或客户口径未知", "amendability": "amendable", "evidence_ref": "source-customer-table", "requirement_ref": "P1-2" },
+    { "id": "i0030", "page": 38, "seq": 4, "raw_label": "股票质押利息（客户）", "x_code": "X3", "gap_kind": "definition", "cause": "业务或客户口径未知", "amendability": "amendable", "evidence_ref": "source-customer-table", "requirement_ref": "P1-2" },
+    { "id": "i0031", "page": 40, "seq": 1, "raw_label": "资管业务收入（客户）", "x_code": "X3", "gap_kind": "definition", "cause": "业务或客户口径未知", "amendability": "amendable", "evidence_ref": "source-customer-table", "requirement_ref": "P1-2" },
+    { "id": "i0032", "page": 44, "seq": 2, "raw_label": "净利率（分部口径）", "x_code": "X3", "gap_kind": "definition", "cause": "占比分母或维度不完整", "amendability": "amendable", "evidence_ref": "—", "requirement_ref": "P1-3" },
+    { "id": "i0033", "page": 44, "seq": 3, "raw_label": "收入占比（业务）", "x_code": "X3", "gap_kind": "definition", "cause": "占比分母或维度不完整", "amendability": "amendable", "evidence_ref": "—", "requirement_ref": "P1-3" },
+    { "id": "i0034", "page": 43, "seq": 7, "raw_label": "毛利率（分公司）", "x_code": "X3", "gap_kind": "definition", "cause": "占比分母或维度不完整", "amendability": "amendable", "evidence_ref": "—", "requirement_ref": "P1-3" },
+    { "id": "i0035", "page": 43, "seq": 9, "raw_label": "费用率（分子口径）", "x_code": "X3", "gap_kind": "definition", "cause": "占比分母或维度不完整", "amendability": "amendable", "evidence_ref": "—", "requirement_ref": "P1-3" },
+    { "id": "i0036", "page": 28, "seq": 3, "raw_label": "其他流动资产（残项）", "x_code": "X3", "gap_kind": "definition", "cause": "券商残项绑定及后续依赖", "amendability": "amendable", "evidence_ref": "已修 1 处", "requirement_ref": "P1-4" },
+    { "id": "i0037", "page": 28, "seq": 4, "raw_label": "其他非流动负债（残项）", "x_code": "X3", "gap_kind": "definition", "cause": "券商残项绑定及后续依赖", "amendability": "amendable", "evidence_ref": "—", "requirement_ref": "P1-4" },
+    { "id": "i0038", "page": 29, "seq": 1, "raw_label": "其他业务收入（残项）", "x_code": "X3", "gap_kind": "definition", "cause": "券商残项绑定及后续依赖", "amendability": "amendable", "evidence_ref": "—", "requirement_ref": "P1-4" },
+    { "id": "i0039", "page": 8, "seq": 12, "raw_label": "同比增长率", "x_code": "X2", "gap_kind": "premise", "cause": "负/零基数规则前提不成立", "amendability": "intentional", "evidence_ref": "verify.py:985", "requirement_ref": null },
+    { "id": "i0040", "page": 9, "seq": 4, "raw_label": "净利润同比", "x_code": "X2", "gap_kind": "premise", "cause": "负/零基数规则前提不成立", "amendability": "intentional", "evidence_ref": "verify.py:985", "requirement_ref": null },
+    { "id": "i0041", "page": 10, "seq": 2, "raw_label": "环比增长率", "x_code": "X2", "gap_kind": "premise", "cause": "负/零基数规则前提不成立", "amendability": "intentional", "evidence_ref": "verify.py:985", "requirement_ref": null },
+    { "id": "i0042", "page": 11, "seq": 6, "raw_label": "增速（低基数）", "x_code": "X2", "gap_kind": "premise", "cause": "负/零基数规则前提不成立", "amendability": "intentional", "evidence_ref": "verify.py:985", "requirement_ref": null },
+    { "id": "i0043", "page": 26, "seq": 5, "raw_label": "分部收入（区域）", "x_code": "X3", "gap_kind": "definition", "cause": "分部维度不完整", "amendability": "amendable_partial", "evidence_ref": "—", "requirement_ref": "P2-1" },
+    { "id": "i0044", "page": 27, "seq": 1, "raw_label": "分部利润（业务线）", "x_code": "X3", "gap_kind": "definition", "cause": "分部维度不完整", "amendability": "amendable_partial", "evidence_ref": "—", "requirement_ref": "P2-1" },
+    { "id": "i0045", "page": 15, "seq": 3, "raw_label": "期间口径未明", "x_code": "X6", "gap_kind": "mention", "cause": "原文结构未完成解析", "amendability": "amendable", "evidence_ref": "judge.py:374", "requirement_ref": "P1-1" },
+    { "id": "i0046", "page": 16, "seq": 8, "raw_label": "币种/单位未明", "x_code": "X6", "gap_kind": "mention", "cause": "原文结构未完成解析", "amendability": "amendable", "evidence_ref": "judge.py:818", "requirement_ref": "P1-1" },
+    { "id": "i0047", "page": 17, "seq": 2, "raw_label": "主体未确认", "x_code": "X6", "gap_kind": "mention", "cause": "原文结构未完成解析", "amendability": "amendable", "evidence_ref": "judge.py:962", "requirement_ref": "P1-2" },
+    { "id": "i0048", "page": 24, "seq": 4, "raw_label": "CAGR（3年）", "x_code": "X2", "gap_kind": "premise", "cause": "CAGR 起止期不完整", "amendability": "intentional", "evidence_ref": "—", "requirement_ref": null },
+    { "id": "i0049", "page": 25, "seq": 2, "raw_label": "CAGR（5年）", "x_code": "X2", "gap_kind": "premise", "cause": "CAGR 起止期不完整", "amendability": "intentional", "evidence_ref": "—", "requirement_ref": null },
+    { "id": "i0050", "page": 31, "seq": 5, "raw_label": "周转率（无登记公式）", "x_code": "X2", "gap_kind": "premise", "cause": "无登记公式", "amendability": "amendable", "evidence_ref": "judge.py:389", "requirement_ref": "P1-4" }
+  ],
+  "requirements": [
+    {
+      "id": "P0-1",
+      "priority": "P0",
+      "title": "券商/数据商指标定义登记库",
+      "rescue_estimate": 65,
+      "cost": "中",
+      "fake_risk": "低",
+      "is_redline": false,
+      "linked_causes": ["c01"],
+      "linked_root_leaves": ["A1"],
+      "redline_constraint": "定义必须带来源（模板/字段字典哈希），禁止凭常见财经公式猜测"
+    },
+    {
+      "id": "P0-2",
+      "priority": "P0",
+      "title": "前置 guard 短路修复",
+      "rescue_estimate": 130,
+      "cost": "中",
+      "fake_risk": "中",
+      "is_redline": false,
+      "linked_causes": [],
+      "linked_root_leaves": ["A3"],
+      "redline_constraint": "内核取数仍只接受已登记事实，不得因『能查』放宽定义权限"
+    },
+    {
+      "id": "P0-3",
+      "priority": "P0",
+      "title": "口径声明澄清入口",
+      "rescue_estimate": 20,
+      "cost": "低",
+      "fake_risk": "中",
+      "is_redline": false,
+      "linked_causes": ["c02"],
+      "linked_root_leaves": ["A2"],
+      "redline_constraint": "绝对不能代填口径，必须用户有来源声明"
+    },
+    {
+      "id": "P0-4",
+      "priority": "P0",
+      "title": "有效核实率 + 缺口可闭环率指标看板",
+      "rescue_estimate": 0,
+      "cost": "低-中",
+      "fake_risk": "无",
+      "is_redline": false,
+      "linked_causes": [],
+      "linked_root_leaves": [],
+      "redline_constraint": "指标须区分已核查与合法弃权，防止刷指标"
+    },
+    {
+      "id": "P1-1",
+      "priority": "P1",
+      "title": "结构解析增强",
+      "rescue_estimate": 59,
+      "cost": "中",
+      "fake_risk": "低",
+      "is_redline": false,
+      "linked_causes": ["c09"],
+      "linked_root_leaves": ["B1", "B2"],
+      "redline_constraint": "解析只产出『待审』不产出判定"
+    },
+    {
+      "id": "P1-2",
+      "priority": "P1",
+      "title": "来源表核查路径推广",
+      "rescue_estimate": 40,
+      "cost": "中",
+      "fake_risk": "低",
+      "is_redline": false,
+      "linked_causes": ["c04"],
+      "linked_root_leaves": ["B3"],
+      "redline_constraint": "按发行人+引用+期间取数，金额不参与选源"
+    },
+    {
+      "id": "P1-3",
+      "priority": "P1",
+      "title": "占比/净利率分母定义登记",
+      "rescue_estimate": 9,
+      "cost": "低",
+      "fake_risk": "低",
+      "is_redline": false,
+      "linked_causes": ["c05"],
+      "linked_root_leaves": ["A4"],
+      "redline_constraint": "分母必须原文显式，禁止猜测"
+    },
+    {
+      "id": "P1-4",
+      "priority": "P1",
+      "title": "券商残项公式补齐",
+      "rescue_estimate": 8,
+      "cost": "低-中",
+      "fake_risk": "中",
+      "is_redline": false,
+      "linked_causes": ["c06"],
+      "linked_root_leaves": ["A5", "C3"],
+      "redline_constraint": "公式须逐项登记组成行，禁止原表内部相加当外部核实"
+    },
+    {
+      "id": "P2-1",
+      "priority": "P2",
+      "title": "分部维度完整性提升",
+      "rescue_estimate": 6,
+      "cost": "中",
+      "fake_risk": "中",
+      "is_redline": false,
+      "linked_causes": ["c08"],
+      "linked_root_leaves": [],
+      "redline_constraint": "需明确维度来源"
+    },
+    {
+      "id": "P2-2",
+      "priority": "P2",
+      "title": "缺材料指引自动化",
+      "rescue_estimate": 0,
+      "cost": "低",
+      "fake_risk": "无",
+      "is_redline": false,
+      "linked_causes": [],
+      "linked_root_leaves": [],
+      "redline_constraint": null
+    },
+    {
+      "id": "P2-3",
+      "priority": "P2",
+      "title": "外部数据源接入",
+      "rescue_estimate": 0,
+      "cost": "高",
+      "fake_risk": "中",
+      "is_redline": false,
+      "linked_causes": [],
+      "linked_root_leaves": [],
+      "redline_constraint": "外部源须独立登记，不得与宿主事实混用"
+    }
+  ],
+  "redlines": [
+    {
+      "id": "R1",
+      "forbidden": "负/零基数强行计算（X2，7 条）",
+      "reason": "数学前提不成立",
+      "evidence_ref": "verify.py:985",
+      "count": 7
+    },
+    {
+      "id": "R2",
+      "forbidden": "CAGR 跨报告拼接（2 条）",
+      "reason": "无同一报告版本",
+      "evidence_ref": "ABSTENTION_SMALL_SAMPLE.md",
+      "count": 2
+    },
+    {
+      "id": "R3",
+      "forbidden": "凭金额巧合/双模型一致升格定义",
+      "reason": "造假风险",
+      "evidence_ref": "FINANCIAL_SOURCE_POLICY.md",
+      "count": 0
+    },
+    {
+      "id": "R4",
+      "forbidden": "代填合并口径/默认合并",
+      "reason": "无来源授权",
+      "evidence_ref": "FINANCIAL_SOURCE_POLICY.md",
+      "count": 0
+    },
+    {
+      "id": "R5",
+      "forbidden": "用相近数值选择更接近的口径",
+      "reason": "选择偏差",
+      "evidence_ref": "ABSTENTION_SMALL_SAMPLE.md",
+      "count": 0
+    }
+  ],
+  "metrics": {
+    "north_star": {
+      "name": "有效核实率 EVR",
+      "formula": "(verified+violated)/total_candidates",
+      "current_value": 0.019,
+      "unit": "ratio",
+      "stages": [
+        { "label": "现状", "value": 0.019 },
+        { "label": "阶段一", "value": 0.15 },
+        { "label": "阶段二", "value": 0.35 }
+      ],
+      "guardrail": "verified 精确率 ≥98%"
+    },
+    "drivers": [
+      { "name": "事实查询执行率", "current_value": 0.59, "target": 0.85, "leverage": "P0-2" },
+      { "name": "定义覆盖率", "current_value": 0.1, "target": 0.6, "leverage": "P0-1" },
+      { "name": "解析完成率", "current_value": 0.55, "target": 0.9, "leverage": "P1-1" },
+      { "name": "口径声明覆盖率", "current_value": 0.0, "target": 0.8, "leverage": "P0-3" }
+    ],
+    "outcomes": [
+      { "name": "缺口可闭环率", "current_value": 0.3, "target": 0.8 },
+      { "name": "verified 精确率", "current_value": null, "target": 0.98, "status": "待确认（需真人盲标）" },
+      { "name": "首次核查有效产出率", "current_value": null, "target": null }
+    ],
+    "counter_metrics": [
+      { "name": "verified 但无内核来源比例", "value": 0, "threshold": 0, "must_be_zero": true },
+      { "name": "凭数值巧合判定数", "value": 0, "threshold": 0, "must_be_zero": true },
+      { "name": "定义猜测登记数", "value": 0, "threshold": 0, "must_be_zero": true }
+    ]
+  }
+}

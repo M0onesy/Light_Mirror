@@ -1,0 +1,25 @@
+%% 弃权率归因诊断看板 —— 程序调用流程
+
+%% 1. 应用初始化与派生计算
+sequenceDiagram
+    autonumber
+    participant M as main.tsx
+    participant A as App.tsx
+    participant P as DiagnosisContext(Provider)
+    participant H as useDiagnosis
+    participant V as OverviewView
+    participant C as MetricCard / AbstentionBar
+
+    M->>A: render <App/>
+    A->>P: <DiagnosisProvider data={diagnosis.sample.json}>
+    P->>P: useReducer(uiReducer, {view:'overview', activeXCode:null, activeRequirement:null})
+    P-->>A: {data, uiState, dispatch}
+    A->>A: 读取 uiState.view
+    A->>V: <OverviewView/>
+    V->>H: useDiagnosis()
+    H->>P: useContext()
+    H->>H: useMemo 派生 {evr, amendableCount, redlineCount, compositionByAmendability}
+    H-->>V: {derived, activeVersion, compareVersion}
+    V->>C: <MetricCard variant="northstar"/>
+    V->>C: <AbstentionBar segments=compositionByAmendability/>
+    C-->>V: 渲染完成
