@@ -106,3 +106,60 @@ def test_empty_registry_judge_still_abstains():
     """空表下 judge 链路维持弃权（护城河回归）。"""
     result = Judge(FactStore([]), '2024-04-22').verify(_roe_claim())
     assert result.status == 'abstained'
+
+
+# ---- 方向 B：出处真实性（抗"一源多标"凑数）---------------------------------
+
+def _mapping_for(canonical_account, definition_id, quote, page=42, account=None):
+    """构造一条挂到指定原文片段上的映射。"""
+    span = {'start': 0, 'end': len(quote), 'text': quote}
+    return {
+        'schema_version': SCHEMA,
+        'source_account': account or f'{canonical_account}_UNSPECIFIED',
+        'canonical_account': canonical_account,
+        'definition_id': definition_id,
+        'rule_id': None,
+        'source_page': page,
+        'source_quote': quote,
+        'source_span': span,
+        'report_date': '2024-04-22',
+        'text_sha256': hashlib.sha256(quote.encode('utf-8')).hexdigest(),
+        'provenance': 'report_original_footnote',
+    }
+
+
+def test_shared_source_across_accounts_is_rejected(monkeypatch):
+    """同一原文片段被过多互异指标共用 → 判定为凑数，整组拒绝。"""
+    from mingjing.metrics import METRIC_SPECS
+    from mingjing.source_method_registry import MAX_ACCOUNTS_PER_SOURCE
+    # 构造 N 条不相关指标共用同一段通用规定（仿 caliber.json 的"一源多标"）
+    quote = '适用范围为所有报表项目。'
+    accounts = [a for a in ('QUICK_RATIO', 'AP_TURNOVER', 'AR_TURNOVER', 'ASSET_TURNOVER')
+                if a in METRIC_SPECS and METRIC_SPECS[a].definition_id]
+    assert len(accounts) > MAX_ACCOUNTS_PER_SOURCE, '测试前提：需多于阈值的登记指标'
+    rows = [_mapping_for(a, METRIC_SPECS[a].definition_id, quote) for a in accounts]
+    monkeypatch.setattr(reg, 'registry', rows)
+    # 每一条都因共用出处的条目过多而被拒
+    for row in rows:
+        assert _mapping_evidence_ok(row) is False, row['canonical_account']
+
+
+def test_distinct_sources_are_accepted(monkeypatch):
+    """每指标锚定各自独立原文 → 通过（对照：证明阈值只拦公用，不拦正常映射）。"""
+    quote_a = '速动比率=速动资产/流动负债'
+    row = _mapping_for('QUICK_RATIO', 'metric:quick-ratio-inventory', quote_a)
+    monkeypatch.setattr(reg, 'registry', [row])
+    assert _mapping_evidence_ok(row) is True
+
+
+def test_shared_source_within_threshold_is_accepted(monkeypatch):
+    """共用未超阈值（≤MAX_ACCOUNTS_PER_SOURCE 个互异指标）仍放行。"""
+    from mingjing.metrics import METRIC_SPECS
+    from mingjing.source_method_registry import MAX_ACCOUNTS_PER_SOURCE
+    quote = '同一段原文可支撑的少量指标。'
+    accounts = [a for a in ('QUICK_RATIO', 'AP_TURNOVER') if a in METRIC_SPECS and METRIC_SPECS[a].definition_id]
+    assert len(accounts) <= MAX_ACCOUNTS_PER_SOURCE
+    rows = [_mapping_for(a, METRIC_SPECS[a].definition_id, quote) for a in accounts]
+    monkeypatch.setattr(reg, 'registry', rows)
+    for row in rows:
+        assert _mapping_evidence_ok(row) is True, row['canonical_account']

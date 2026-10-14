@@ -24,6 +24,13 @@ SCHEMA = 'source-method-mapping.v1'
 PROVENANCE_ALLOWED = ('report_original_footnote', 'report_original_table',
                       'report_original_disclosure')
 
+# 抗凑数阈值：同一原文片段（text_sha256）最多可支撑多少个**互不相同**的
+# 目标指标（canonical_account）。超过即判定为"一源多标"式的格式凑数，
+# 整组拒绝放行。理由：真实的口径依据是"一个指标锚定一条最相关原文"，
+# 而非"几十个不相关指标共用一条通用规定"（如所有指标都挂到"公式运算符白名单"）。
+# 这一常量与 A+C 护城河一致：宁可维持弃权，也不接受出处凑数的映射。
+MAX_ACCOUNTS_PER_SOURCE = 2
+
 # 每条映射必须携带原文出处四元组 + 内容哈希；缺一不可。
 # 初始为空：见模块 docstring 第 4 点。真实条目必须逐个从原 PDF 取证后填入。
 registry: list[dict] = [
@@ -47,6 +54,24 @@ registry: list[dict] = [
 def _sha256_text(value: str) -> str:
     """与 ``source_semantics._text_hash`` 同构的原文片段哈希（utf-8）。"""
     return hashlib.sha256(str(value).encode('utf-8')).hexdigest()
+
+
+def _shared_source_accounts(text_sha256: str) -> set[str]:
+    """返回 registry 中与给定片段哈希关联的全部互异 canonical_account。
+
+    只做"来源共享度"统计，不读取任何金额、候选事实或模型输出。
+    用于识别"一源多标"式出处凑数（详见 MAX_ACCOUNTS_PER_SOURCE）。
+    """
+    accounts: set[str] = set()
+    for row in registry:
+        if not isinstance(row, dict):
+            continue
+        if row.get('text_sha256') != text_sha256:
+            continue
+        account = row.get('canonical_account')
+        if isinstance(account, str) and account:
+            accounts.add(account)
+    return accounts
 
 
 def _mapping_evidence_ok(row: dict) -> bool:
@@ -92,6 +117,11 @@ def _mapping_evidence_ok(row: dict) -> bool:
     from .metrics import METRIC_SPECS
     spec = METRIC_SPECS.get(row['canonical_account'])
     if spec is None or spec.definition_id != row.get('definition_id'):
+        return False
+    # 10) 抗凑数：同一原文片段不得被过多互异指标共用（一源多标 → 整组拒绝）。
+    #     真实的口径依据是一标一条最相关原文；几十条不相关指标共用同一条
+    #     通用规定（如"公式运算符白名单"）属格式凑数，一律不放行。
+    if len(_shared_source_accounts(row['text_sha256'])) > MAX_ACCOUNTS_PER_SOURCE:
         return False
     return True
 
