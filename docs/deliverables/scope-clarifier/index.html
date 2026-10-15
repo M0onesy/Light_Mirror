@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>明镜 · 报表口径澄清工具</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --panel:#ffffff; --ink:#1f2a37; --muted:#5c6b7a; --line:#dde3ea;
+    --accent:#3b5b8c; --accent-soft:#eef2f8; --warn:#8a6d3b; --warn-soft:#f7f2e6;
+    --ok:#3f6b52; --ok-soft:#edf4ef; --shadow:0 1px 2px rgba(31,42,55,.06),0 4px 14px rgba(31,42,55,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 120px}
+  header.page{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:6px}
+  header.page h1{font-size:20px;margin:0;font-weight:650;letter-spacing:.2px}
+  header.page .sub{color:var(--muted);font-size:13px}
+  .banner{
+    margin:14px 0 20px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--accent);
+    background:var(--panel);border-radius:8px;color:var(--muted);font-size:13px;
+  }
+  .banner b{color:var(--ink);font-weight:600}
+  .sug-banner{
+    border-left-color:var(--warn);background:var(--warn-soft);color:#6b5527;
+    margin-top:-8px;
+  }
+  .sug-banner b{color:#5c4a20}
+  .sug-banner.all-clear{border-left-color:var(--ok);background:var(--ok-soft);color:#3f6b52}
+  .sug-banner.all-clear b{color:#2f5741}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:22px}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);
+  }
+  .card .k{font-size:12px;color:var(--muted);letter-spacing:.3px}
+  .card .v{font-size:26px;font-weight:650;margin-top:4px;color:var(--accent)}
+  .card.neutral .v{color:var(--ink)}
+  .card .u{font-size:12px;color:var(--muted);margin-left:4px;font-weight:400}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 12px;flex-wrap:wrap}
+  .section-head h2{font-size:15px;margin:0;font-weight:600}
+  .section-head .hint{font-size:12px;color:var(--muted)}
+  .bulk{display:flex;gap:8px;flex-wrap:wrap}
+  .bulk button{
+    font:inherit;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);cursor:pointer;
+  }
+  .bulk button:hover{border-color:var(--accent);color:var(--accent)}
+  .group{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;
+    box-shadow:var(--shadow);transition:border-color .15s ease;
+  }
+  .group.chosen-consolidated{border-color:#b9c9df;background:linear-gradient(0deg,var(--accent-soft),var(--panel) 60%)}
+  .group.chosen-parent{border-color:#cdc3a6;background:linear-gradient(0deg,var(--warn-soft),var(--panel) 60%)}
+  .g-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px}
+  .g-label{font-size:15px;font-weight:600}
+  .tag{
+    display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);
+    color:var(--muted);background:#fbfcfe;line-height:1.5;
+  }
+  .tag.acct{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .tag.sug{background:var(--accent-soft);color:var(--accent);border-color:#cfdaea;font-weight:600}
+  .g-meta{color:var(--muted);font-size:12px;margin-top:6px}
+  .reason{
+    margin:10px 0;padding:9px 12px;background:#fafbfd;border:1px dashed var(--line);border-radius:7px;
+    font-size:12.5px;color:#42505f;
+  }
+  .reason .rk{color:var(--warn);font-weight:600;margin-right:6px}
+  .hint{
+    margin:0 0 10px;padding:8px 12px;background:var(--accent-soft);border:1px solid #d3ddea;border-radius:7px;
+    font-size:12.5px;color:#3b5375;
+  }
+  .hint .hk{color:var(--accent);font-weight:600;margin-right:6px}
+  .choices{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .choice{
+    display:flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;
+    cursor:pointer;background:#fbfcfe;font-size:13px;user-select:none;transition:all .12s ease;
+  }
+  .choice:hover{border-color:#c3cedd}
+  .choice input{margin:0;accent-color:var(--accent)}
+  .choice.sel-consolidated{border-color:#8fabc9;background:#e9eff8;color:#274668}
+  .choice.sel-parent{border-color:#c9b483;background:#f6f0df;color:#6d5520}
+  .choice.sel-keep{border-color:#c3cedd;background:#eef1f5;color:#3a4856}
+  .footer-bar{
+    position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);
+    box-shadow:0 -2px 12px rgba(31,42,55,.06);backdrop-filter:blur(6px);
+  }
+  .footer-inner{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+  .tally{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+  .tally .item{color:var(--muted)}
+  .tally .item b{color:var(--ink);font-weight:650}
+  .tally .item.c b{color:#274668}
+  .tally .item.p b{color:#6d5520}
+  .spacer{flex:1}
+  .btn-primary{
+    font:inherit;font-size:13px;font-weight:600;padding:9px 18px;border-radius:8px;border:1px solid var(--accent);
+    background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap;
+  }
+  .btn-primary:hover{background:#32507c;border-color:#32507c}
+  .btn-primary:disabled{background:#c3cedd;border-color:#c3cedd;cursor:not-allowed}
+  .output{
+    margin:22px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;
+    box-shadow:var(--shadow);
+  }
+  .output h3{margin:0 0 10px;font-size:14px;font-weight:600}
+  .out-note{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  .out-note.warn{color:var(--warn)}
+  .gate{
+    margin:0 0 12px;padding:11px 13px;border:1px solid #e3d5b0;border-left:3px solid var(--warn);
+    background:var(--warn-soft);border-radius:8px;font-size:12.5px;color:#6b5527;
+  }
+  .gate.ok{border-left-color:var(--ok);border-color:#cfe0d5;background:var(--ok-soft);color:#3f6b52}
+  .gate-text{margin-bottom:8px;line-height:1.6}
+  .gate-check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:600;color:#5c4a20}
+  .gate.ok .gate-check{color:#2f5741}
+  .gate-check input{margin:2px 0 0;accent-color:var(--warn)}
+  pre.cmd{
+    margin:0;padding:12px 14px;background:#0f172a;color:#e6edf6;border-radius:8px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.55;
+    white-space:pre-wrap;word-break:break-all;
+  }
+  .cmd-bar{display:flex;justify-content:flex-end;margin-bottom:8px}
+  .cmd-bar button{
+    font:inherit;font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--line);
+    background:#fbfcfe;color:var(--muted);cursor:pointer;
+  }
+  .cmd-bar button:hover{border-color:var(--accent);color:var(--accent)}
+  details.help{margin:24px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+  details.help summary{cursor:pointer;padding:14px 16px;font-weight:600;font-size:14px;list-style:none}
+  details.help summary::-webkit-details-marker{display:none}
+  details.help summary::before{content:"▸ ";color:var(--accent)}
+  details.help[open] summary::before{content:"▾ "}
+  .help-body{padding:0 18px 18px;color:#42505f;font-size:13px}
+  .help-body h4{margin:14px 0 6px;font-size:13px;color:var(--ink)}
+  .help-body ul{margin:6px 0;padding-left:20px}
+  .help-body code{background:#f0f3f7;padding:1px 5px;border-radius:4px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .help-body .note{margin-top:12px;padding:10px 12px;background:var(--accent-soft);border-radius:7px;font-size:12.5px}
+  .toast{
+    position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(10px);opacity:0;
+    background:#1f2a37;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;pointer-events:none;
+    transition:opacity .18s ease,transform .18s ease;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  src-empty{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>明镜 · 报表口径澄清工具</h1>
+    <span class="sub">Source-caliber clarifier · 交互式口径澄清与重算命令生成</span>
+  </header>
+
+  <div class="banner">
+    <b>这些条目并非错误。</b>它们因研报原文<b>未声明报表口径（合并 / 母公司）</b>而理性弃权——
+    依据红线 <code>docs/FINANCIAL_SOURCE_POLICY.md</code>「口径不明时不得默认为合并口径」。
+    本工具让你<b>显式提供</b>口径，一键生成合规的重算命令。
+  </div>
+
+  <div class="banner sug-banner" id="originBanner"></div>
+
+  <div class="cards" id="summaryCards"></div>
+
+  <div class="section-head">
+    <h2>按组澄清（共 <span id="groupCount">0</span> 组）</h2>
+    <div class="bulk">
+      <button type="button" data-bulk="合并">全部按【合并】</button>
+      <button type="button" data-bulk="母公司">全部按【母公司】</button>
+      <button type="button" data-bulk="keep">全部保持弃权</button>
+    </div>
+  </div>
+  <div class="section-head" style="margin-top:-4px">
+    <span class="hint">
+      每组已按<b>原文线索</b>预选，并标注「<b>系统建议 · 待核对</b>」——这只是提示，<b>不是声明</b>。
+      请核对研报原文后逐组确认；<b>「保持弃权」始终可用</b>，不会被自动放开。
+    </span>
+  </div>
+
+  <div id="groupList"></div>
+
+  <div class="output" id="outputPanel" style="display:none">
+    <h3 id="outputTitle">重算命令</h3>
+    <div id="gateBlock" class="gate" style="display:none">
+      <div class="gate-text" id="gateText"></div>
+      <label class="gate-check">
+        <input type="checkbox" id="gateConfirm">
+        <span>我已核对研报原文，确认上述口径选择成立（非仅采纳系统建议）</span>
+      </label>
+    </div>
+    <div class="out-note" id="outputNote"></div>
+    <div class="cmd-bar"><button type="button" id="copyBtn">复制</button></div>
+    <pre class="cmd" id="outputCmd"></pre>
+  </div>
+
+  <details class="help">
+    <summary>如何使用（合规说明）</summary>
+    <div class="help-body">
+      <h4>这是什么</h4>
+      <p>
+        明镜在核查研报数值时会先确认数据口径（合并报表 / 母公司报表）。若原文通篇未声明口径，
+        明镜<b>不会猜测</b>，而是将这些条目列为「因口径弃权」并给出可澄清的分组。
+        本页把这些分组呈现在你面前，由你<b>显式</b>选择口径。
+      </p>
+      <h4>为什么必须由人提供口径</h4>
+      <ul>
+        <li>澄清创建的是一个<b>新的条件核查任务</b>，它从不「证明」原研报的口径。</li>
+        <li>系统绝不默认猜测口径，符合项目红线：口径不明时不得默认为合并口径。</li>
+        <li>生成的 provenance 会被记录在结果目录的 <code>clarifications.json</code>（全篇声明）
+            或 <code>scope_clarifications.json</code>（分组澄清）中，并附 SHA-256 校验。</li>
+      </ul>
+      <h4>两种澄清方式</h4>
+      <ul>
+        <li><b>全篇声明</b>：所有分组选择同一口径时，使用 <code>--scope-declaration 合并|母公司</code>。</li>
+        <li><b>分组澄清</b>：分组口径不一致时，使用 <code>--scope-clarifications-json</code>，
+            传入形如 <code>[{"scope":"合并","selector":{"claim_ids":["claim-00001", ...]}}]</code> 的 JSON 数组。</li>
+      </ul>
+      <h4>操作步骤</h4>
+      <ul>
+        <li>逐组选择「合并」「母公司」或「保持弃权」。</li>
+        <li>点击底部「生成重算命令」。</li>
+        <li>复制命令到终端执行（在项目根目录、使用 <code>py -3.12</code>）。</li>
+        <li>结果输出到 <code>runs/full-scope</code>，与 <code>runs/full-off</code> 对比弃权数量的变化。</li>
+      </ul>
+      <div class="note" id="helpSource"></div>
+    </div>
+  </details>
+
+  <details class="help">
+    <summary>数据来源与技术说明</summary>
+    <div class="help-body">
+      <p>本页数据为 <code id="srcPath">runs/full-off/results.json</code> 的静态快照（内联，无外部请求）。</p>
+      <ul>
+        <li>分组来源字段：<code>scope_clarification_groups</code>（共 <span id="srcGroups">0</span> 组）。</li>
+        <li>每组的 <code>selector.claim_ids</code> 即命令行 JSON 所需的精确选择器。</li>
+        <li>弃权原因（blockers）逐字取自结果文件，未改写。</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<div class="footer-bar">
+  <div class="footer-inner">
+    <div class="tally">
+      <span class="item c">合并 <b id="tallyConsolidated">0</b> 组</span>
+      <span class="item p">母公司 <b id="tallyParent">0</b> 组</span>
+      <span class="item">保持弃权 <b id="tallyKeep">0</b> 组</span>
+      <span class="item">· 补口径后预计可核实 ≈ <b id="tallyEstimate">0</b> 条</span>
+    </div>
+    <span class="spacer"></span>
+    <button type="button" class="btn-primary" id="generateBtn">生成重算命令</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script id="scopeData" type="application/json">
+{
+  "schema_version": "scope-clarifier-data.v1",
+  "source": {
+    "path": "runs/full-off/results.json",
+    "run_id": "run-6a292dce7c7b",
+    "draft": "samples\\real_broker_full_draft.md",
+    "corpus": "data\\corpus\\reports\\920493_并行科技",
+    "report_date": "2024-04-22",
+    "draft_sha256": "e5a50d753c8050de76a32e32dfe38f85fbbd5cbaa63886504355373b73b37de3",
+    "exported_at": "2024-04-22"
+  },
+  "summary": {
+    "verified": 3,
+    "violated": 0,
+    "abstained": 123
+  },
+  "totals": {
+    "claims_total": 126,
+    "scope_abstained": 70,
+    "groups": 25
+  },
+  "groups": [
+    {
+      "id": "scope-group-1",
+      "label": "正文 · REVENUE",
+      "account": "REVENUE",
+      "table_id": "",
+      "periods": [
+        "2023Y",
+        "2022Y"
+      ],
+      "claim_ids": [
+        "claim-00001",
+        "claim-00002",
+        "claim-00003",
+        "claim-00004",
+        "claim-00007",
+        "claim-00008",
+        "claim-00009",
+        "claim-00019",
+        "claim-00020",
+        "claim-00021",
+        "claim-00042",
+        "claim-00043",
+        "claim-00062",
+        "claim-00063"
+      ],
+      "occurrences": 14,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00001",
+          "claim-00002",
+          "claim-00003",
+          "claim-00004",
+          "claim-00007",
+          "claim-00008",
+          "claim-00009",
+          "claim-00019",
+          "claim-00020",
+          "claim-00021",
+          "claim-00042",
+          "claim-00043",
+          "claim-00062",
+          "claim-00063"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-2",
+      "label": "正文 · GROSS_MARGIN",
+      "account": "GROSS_MARGIN",
+      "table_id": "",
+      "periods": [
+        "2023Y",
+        "2022Y"
+      ],
+      "claim_ids": [
+        "claim-00010",
+        "claim-00011",
+        "claim-00066",
+        "claim-00067"
+      ],
+      "occurrences": 4,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00010",
+          "claim-00011",
+          "claim-00066",
+          "claim-00067"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-3",
+      "label": "正文 · EXP_PERIOD_RATIO_UNSPECIFIED",
+      "account": "EXP_PERIOD_RATIO_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2016Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00012",
+        "claim-00013"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "已有登记公式 FIN-period-expense-ratio，但登记公式不能证明原文采用该方法；原文尚未明确费用聚合范围及收入分母，不能假定采用登记的四费用定义；保留来源定义缺口，不按相近金额或双模型一致授权"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "已有登记公式 FIN-period-expense-ratio，但登记公式不能证明原文采用该方法；原文尚未明确费用聚合范围及收入分母，不能假定采用登记的四费用定义；保留来源定义缺口，不按相近金额或双模型一致授权"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "已有登记公式 FIN-period-expense-ratio，但登记公式不能证明原文采用该方法；原文尚未明确费用聚合范围及收入分母，不能假定采用登记的四费用定义；保留来源定义缺口，不按相近金额或双模型一致授权"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00012",
+          "claim-00013"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-4",
+      "label": "正文 · ADMIN_EXPENSE_RATIO",
+      "account": "ADMIN_EXPENSE_RATIO",
+      "table_id": "",
+      "periods": [
+        "2016Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00014",
+        "claim-00015"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00014",
+          "claim-00015"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-5",
+      "label": "正文 · NET_MARGIN_UNSPECIFIED",
+      "account": "NET_MARGIN_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2023Y",
+        "2022Y"
+      ],
+      "claim_ids": [
+        "claim-00016",
+        "claim-00068",
+        "claim-00069"
+      ],
+      "occurrences": 3,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文净利率/净利润率未明确分子与营业收入分母的完整定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文净利率/净利润率未明确分子与营业收入分母的完整定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文净利率/净利润率未明确分子与营业收入分母的完整定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00016",
+          "claim-00068",
+          "claim-00069"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-6",
+      "label": "正文 · REVENUE_SHARE",
+      "account": "REVENUE_SHARE",
+      "table_id": "",
+      "periods": [
+        "2023H1"
+      ],
+      "claim_ids": [
+        "claim-00022"
+      ],
+      "occurrences": 1,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00022"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-7",
+      "label": "正文 · UNKNOWN",
+      "account": "UNKNOWN",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023H1",
+        "",
+        "2021Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00023",
+        "claim-00024",
+        "claim-00025",
+        "claim-00027",
+        "claim-00036",
+        "claim-00038",
+        "claim-00090",
+        "claim-00091"
+      ],
+      "occurrences": 8,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "原文目标数值为占比；当前无匹配分子、分母定义与授权占比公式"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "source_semantics",
+          "reason": "原文目标数值为占比；当前无匹配分子、分母定义与授权占比公式"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "原文未唯一明确科目、期间或关系；需要补充源材料，不能从可用事实反推绑定"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "原文明示其他公司、并列公司或主体无法确定；不能将其归入当前任务公司的财务事实"
+        },
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文明示其他公司、并列公司或主体无法确定；不能将其归入当前任务公司的财务事实"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00023",
+          "claim-00024",
+          "claim-00025",
+          "claim-00027",
+          "claim-00036",
+          "claim-00038",
+          "claim-00090",
+          "claim-00091"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-8",
+      "label": "正文 · COST",
+      "account": "COST",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00044",
+        "claim-00045"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00044",
+          "claim-00045"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-9",
+      "label": "正文 · ASSETS",
+      "account": "ASSETS",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00046",
+        "claim-00047"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00046",
+          "claim-00047"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-10",
+      "label": "正文 · OPERATING_PROFIT",
+      "account": "OPERATING_PROFIT",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00048",
+        "claim-00049"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00048",
+          "claim-00049"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-11",
+      "label": "正文 · PROFIT_TOTAL",
+      "account": "PROFIT_TOTAL",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00050",
+        "claim-00051"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00050",
+          "claim-00051"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-12",
+      "label": "正文 · NP",
+      "account": "NP",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00052",
+        "claim-00053"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00052",
+          "claim-00053"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-13",
+      "label": "正文 · LIABILITIES",
+      "account": "LIABILITIES",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00056",
+        "claim-00057"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00056",
+          "claim-00057"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-14",
+      "label": "正文 · EBITDA_UNSPECIFIED",
+      "account": "EBITDA_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00058",
+        "claim-00059"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00058",
+          "claim-00059"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-15",
+      "label": "正文 · EQUITY_PARENT",
+      "account": "EQUITY_PARENT",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00060",
+        "claim-00061"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00060",
+          "claim-00061"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-16",
+      "label": "正文 · ROE_UNSPECIFIED",
+      "account": "ROE_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00070",
+        "claim-00071"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文仅称ROE/净资产收益率，未明确加权或其他净资产定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文仅称ROE/净资产收益率，未明确加权或其他净资产定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文仅称ROE/净资产收益率，未明确加权或其他净资产定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00070",
+          "claim-00071"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-17",
+      "label": "正文 · CFO",
+      "account": "CFO",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00072",
+        "claim-00073"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00072",
+          "claim-00073"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-18",
+      "label": "正文 · ROIC_UNSPECIFIED",
+      "account": "ROIC_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00074",
+        "claim-00075"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00074",
+          "claim-00075"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-19",
+      "label": "正文 · DEPRECIATION_AMORTIZATION_UNSPECIFIED",
+      "account": "DEPRECIATION_AMORTIZATION_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00076",
+        "claim-00077"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00076",
+          "claim-00077"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-20",
+      "label": "正文 · DEBT_RATIO",
+      "account": "DEBT_RATIO",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00078",
+        "claim-00079"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00078",
+          "claim-00079"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-21",
+      "label": "正文 · NET_DEBT_RATIO_UNSPECIFIED",
+      "account": "NET_DEBT_RATIO_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00080",
+        "claim-00081"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00080",
+          "claim-00081"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-22",
+      "label": "正文 · CAPEX_UNSPECIFIED",
+      "account": "CAPEX_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00082",
+        "claim-00083"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00082",
+          "claim-00083"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-23",
+      "label": "正文 · EPS_UNSPECIFIED",
+      "account": "EPS_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00084",
+        "claim-00085"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文每股收益/EPS未明确基本、法定稀释或其他股数口径；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文每股收益/EPS未明确基本、法定稀释或其他股数口径；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文每股收益/EPS未明确基本、法定稀释或其他股数口径；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00084",
+          "claim-00085"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-24",
+      "label": "正文 · CFO_PER_SHARE_BROKER_UNSPECIFIED",
+      "account": "CFO_PER_SHARE_BROKER_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00086",
+        "claim-00087"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00086",
+          "claim-00087"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-25",
+      "label": "正文 · EQUITY_PER_SHARE_BROKER_UNSPECIFIED",
+      "account": "EQUITY_PER_SHARE_BROKER_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00088",
+        "claim-00089"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00088",
+          "claim-00089"
+        ]
+      }
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- Command template constants (kept verbatim for reproducibility) ----
+  var DRAFT = "samples/real_broker_full_draft.md";
+  var CORPUS = "data/corpus/reports/920493_并行科技";
+  var REPORT_DATE = "2024-04-22";
+  var OUT = "runs/full-scope";
+  var MODE = "kernel";
+  var PY = "py -3.12";
+
+  var SCOPE_CONSOLIDATED = "合并";
+  var SCOPE_PARENT = "母公司";
+  var CHOICE_KEEP = "keep";
+
+  var data = {groups: [], summary: {}, totals: {}, source: {}};
+  try {
+    var raw = document.getElementById("scopeData").textContent.trim();
+    data = JSON.parse(raw);
+  } catch (err) {
+    console.error("数据解析失败", err);
+  }
+  var groups = Array.isArray(data.groups) ? data.groups : [];
+
+  // ---- Render summary cards ----
+  function renderSummary(){
+    var totals = data.totals || {};
+    var summary = data.summary || {};
+    var cards = [
+      {k:"总核查条目", v: totals.claims_total || 0, u:"条", cls:"neutral"},
+      {k:"因口径弃权", v: totals.scope_abstained || 0, u:"条", cls:"neutral"},
+      {k:"澄清分组", v: totals.groups || groups.length, u:"组", cls:""},
+      {k:"当前verified", v: summary.verified || 0, u:"条", cls:"neutral"}
+    ];
+    var host = document.getElementById("summaryCards");
+    host.innerHTML = "";
+    cards.forEach(function(c){
+      var div = document.createElement("div");
+      div.className = "card " + (c.cls || "");
+      var k = document.createElement("div"); k.className = "k"; k.textContent = c.k;
+      var v = document.createElement("div"); v.className = "v";
+      v.textContent = String(c.v);
+      var u = document.createElement("span"); u.className = "u"; u.textContent = c.u;
+      v.appendChild(u);
+      div.appendChild(k); div.appendChild(v);
+      host.appendChild(div);
+    });
+    document.getElementById("groupCount").textContent = String(groups.length);
+    document.getElementById("srcGroups").textContent = String(groups.length);
+    document.getElementById("srcPath").textContent = (data.source && data.source.path) || "runs/full-off/results.json";
+    var helpSrc = document.getElementById("helpSource");
+    if (helpSrc) {
+      helpSrc.textContent = "数据快照 → " + ((data.source && data.source.path) || "runs/full-off/results.json")
+        + " · run_id " + ((data.source && data.source.run_id) || "-")
+        + " · CLI 参数格式已实测跑通（见 scope-clarifier/README.md）。";
+    }
+  }
+
+  // ---- Selection state ----
+  var selection = {}; // id -> "合并" | "母公司" | "keep"
+  var suggested = {}; // id -> true 当该选择来自"原文线索"的系统建议（非用户原创）
+  // 依据原文线索预选，但一律标记为"建议"，用户须核对原文后自行确认。
+  // 口径线索只用于"预选+强提示"，绝不静默替用户声明（见 FINANCIAL_SOURCE_POLICY 第 13 条）。
+  function suggestFor(g){
+    var hints = (g && g.caliber_hint) || [];
+    for (var i = 0; i < hints.length; i++) {
+      if (hints[i] === SCOPE_CONSOLIDATED) return SCOPE_CONSOLIDATED;
+      if (hints[i] === SCOPE_PARENT) return SCOPE_PARENT;
+    }
+    return CHOICE_KEEP;
+  }
+  groups.forEach(function(g){
+    var pick = suggestFor(g);
+    selection[g.id] = pick;
+    suggested[g.id] = (pick !== CHOICE_KEEP);
+  });
+
+  var SCOPE_CLASS = {};
+  SCOPE_CLASS[SCOPE_CONSOLIDATED] = "sel-consolidated";
+  SCOPE_CLASS[SCOPE_PARENT] = "sel-parent";
+  SCOPE_CLASS[CHOICE_KEEP] = "sel-keep";
+  var GROUP_CLASS = {};
+  GROUP_CLASS[SCOPE_CONSOLIDATED] = "chosen-consolidated";
+  GROUP_CLASS[SCOPE_PARENT] = "chosen-parent";
+  GROUP_CLASS[CHOICE_KEEP] = "";
+
+  var CHOICES = [
+    {value: SCOPE_CONSOLIDATED, label: "按【合并】口径"},
+    {value: SCOPE_PARENT, label: "按【母公司】口径"},
+    {value: CHOICE_KEEP, label: "保持弃权（不猜测）"}
+  ];
+
+  // ---- Render group list ----
+  function renderGroups(){
+    var host = document.getElementById("groupList");
+    host.innerHTML = "";
+    groups.forEach(function(g){
+      var wrap = document.createElement("div");
+      wrap.className = "group";
+      wrap.id = "grp-" + g.id;
+
+      var head = document.createElement("div");
+      head.className = "g-head";
+      var label = document.createElement("span");
+      label.className = "g-label"; label.textContent = g.label;
+      var acct = document.createElement("span");
+      acct.className = "tag acct"; acct.textContent = g.account;
+      var occ = document.createElement("span");
+      occ.className = "tag"; occ.textContent = "涉及 " + (g.claim_ids ? g.claim_ids.length : 0) + " 条";
+      head.appendChild(label); head.appendChild(acct); head.appendChild(occ);
+      if (suggested[g.id]) {
+        var sug = document.createElement("span");
+        sug.className = "tag sug"; sug.textContent = "系统建议 · 待核对";
+        head.appendChild(sug);
+      }
+
+      var meta = document.createElement("div");
+      meta.className = "g-meta";
+      var periods = (g.periods || []).map(function(p){ return p || "未标期间"; }).join("、");
+      meta.textContent = "期间：" + (periods || "—") + "　·　条目：" + (g.claim_ids || []).join(", ");
+
+      var reason = document.createElement("div");
+      reason.className = "reason";
+      var rk = document.createElement("span"); rk.className = "rk"; rk.textContent = "弃权原因";
+      var rt = document.createElement("span"); rt.textContent = g.reason || "原文未声明报表口径";
+      reason.appendChild(rk); reason.appendChild(rt);
+
+      var hintList = (g.caliber_hint || []);
+      if (hintList.length > 0) {
+        var hint = document.createElement("div");
+        hint.className = "hint";
+        var hk = document.createElement("span"); hk.className = "hk"; hk.textContent = "原文线索";
+        var ht = document.createElement("span");
+        ht.textContent = hintList.join("、") + "　（仅供参考，不自动填入；请核对原文后自行声明）";
+        hint.appendChild(hk); hint.appendChild(ht);
+        wrap.appendChild(head); wrap.appendChild(meta); wrap.appendChild(reason); wrap.appendChild(hint);
+      } else {
+        wrap.appendChild(head); wrap.appendChild(meta); wrap.appendChild(reason);
+      }
+
+      var choices = document.createElement("div");
+      choices.className = "choices";
+      CHOICES.forEach(function(c){
+        var lab = document.createElement("label");
+        lab.className = "choice";
+        var input = document.createElement("input");
+        input.type = "radio";
+        input.name = "choice-" + g.id;
+        input.value = c.value;
+        input.checked = selection[g.id] === c.value;
+        input.addEventListener("change", function(){
+          selection[g.id] = c.value;
+          suggested[g.id] = (c.value === suggestFor(g));
+          paintGroup(g.id);
+          updateTallies();
+          updateOriginBanner();
+        });
+        var span = document.createElement("span");
+        span.textContent = c.label;
+        lab.appendChild(input); lab.appendChild(span);
+        choices.appendChild(lab);
+      });
+
+      wrap.appendChild(choices);
+      host.appendChild(wrap);
+      paintGroup(g.id);
+    });
+  }
+
+  function paintGroup(id){
+    var wrap = document.getElementById("grp-" + id);
+    if (!wrap) return;
+    var value = selection[id];
+    wrap.classList.remove("chosen-consolidated", "chosen-parent");
+    if (GROUP_CLASS[value]) wrap.classList.add(GROUP_CLASS[value]);
+    var labels = wrap.querySelectorAll(".choice");
+    for (var i = 0; i < labels.length; i++) {
+      var input = labels[i].querySelector("input");
+      labels[i].classList.remove("sel-consolidated", "sel-parent", "sel-keep");
+      if (input && input.checked) {
+        var cls = SCOPE_CLASS[input.value];
+        if (cls) labels[i].classList.add(cls);
+      }
+    }
+  }
+
+  function computeTallies(){
+    var out = {consolidated: 0, parent: 0, keep: 0, estimate: 0};
+    var counted = {};
+    groups.forEach(function(g){
+      var v = selection[g.id];
+      if (v === SCOPE_CONSOLIDATED) out.consolidated++;
+      else if (v === SCOPE_PARENT) out.parent++;
+      else out.keep++;
+      if (v === SCOPE_CONSOLIDATED || v === SCOPE_PARENT) {
+        (g.claim_ids || []).forEach(function(id){
+          if (!counted[id]) { counted[id] = true; out.estimate++; }
+        });
+      }
+    });
+    return out;
+  }
+
+  function updateTallies(){
+    var t = computeTallies();
+    document.getElementById("tallyConsolidated").textContent = String(t.consolidated);
+    document.getElementById("tallyParent").textContent = String(t.parent);
+    document.getElementById("tallyKeep").textContent = String(t.keep);
+    document.getElementById("tallyEstimate").textContent = String(t.estimate);
+  }
+
+  function countSuggested(){
+    var n = 0;
+    groups.forEach(function(g){ if (suggested[g.id]) n++; });
+    return n;
+  }
+
+  // 动态说明"当前有多少组仍是系统建议值"，提醒用户去核对原文。
+  function updateOriginBanner(){
+    var n = countSuggested();
+    var total = groups.length;
+    var el = document.getElementById("originBanner");
+    if (!el) return;
+    if (n === 0) {
+      el.className = "banner sug-banner all-clear";
+      el.innerHTML = "<b>已全部由你确认。</b>当前没有未核对的系统建议值——每组口径均为你的显式选择。";
+      return;
+    }
+    el.className = "banner sug-banner";
+    el.innerHTML = "以下 <b>" + n + " / " + total + " 组</b>的口径是按<b>原文线索自动预选</b>的，"
+      + "标有「<b>系统建议 · 待核对</b>」。<b>这是提示，不是声明</b>——请核对研报原文后逐组确认，"
+      + "或改为「保持弃权」。未核对即生成命令，等同于把线索当作声明使用。";
+  }
+
+  // ---- Command generation ----
+  function baseCommand(){
+    return PY + " -m mingjing.cli check"
+      + " --draft " + DRAFT
+      + " --corpus \"" + CORPUS + "\""
+      + " --report-date " + REPORT_DATE
+      + " --out " + OUT
+      + " --mode " + MODE;
+  }
+
+  function shellQuoteJson(jsonText){
+    // Wrap in single quotes for POSIX shells; JSON contains only double quotes.
+    return "'" + jsonText.replace(/'/g, "'\\''") + "'";
+  }
+
+  function buildSpecsFor(scope){
+    var specs = [];
+    groups.forEach(function(g){
+      if (selection[g.id] === scope) {
+        specs.push({scope: scope, selector: {claim_ids: (g.claim_ids || []).slice()}});
+      }
+    });
+    return specs;
+  }
+
+  function showOutput(title, note, cmd, noteIsWarn){
+    var panel = document.getElementById("outputPanel");
+    document.getElementById("outputTitle").textContent = title;
+    var noteEl = document.getElementById("outputNote");
+    noteEl.textContent = note || "";
+    noteEl.className = "out-note" + (noteIsWarn ? " warn" : "");
+    document.getElementById("outputCmd").textContent = cmd;
+    renderGate();
+    panel.style.display = "block";
+    panel.scrollIntoView({behavior: "smooth", block: "nearest"});
+  }
+
+  // 生成命令前的前置注释：记录口径来源，使审计可追溯。
+  // 若仍有未核对的系统建议值，注释中如实标明"部分声明源自系统建议"。
+  function originComment(){
+    var n = countSuggested();
+    var confirmed = isGateConfirmed();
+    var lines = [];
+    lines.push("# ── 报表口径声明 · 来源说明 ──────────────────────────");
+    lines.push("# 资源类型：user_supplied_scope（用户显式声明）");
+    if (n === 0) {
+      lines.push("# 来源：全部为人工核对后的显式选择（无未核对的系统建议值）");
+    } else if (confirmed) {
+      lines.push("# 来源：其中 " + n + " / " + groups.length + " 组初始为「原文线索」预选，"
+        + "用户已勾选确认已核对原文");
+    } else {
+      lines.push("# 来源：其中 " + n + " / " + groups.length + " 组为「原文线索」预选，"
+        + "尚未逐组人工核对（标『系统建议 · 待核对』）");
+      lines.push("# ⚠ 预选仅是提示，非原文声明；请核对研报原文后再执行本命令");
+    }
+    lines.push("# 依据：docs/FINANCIAL_SOURCE_POLICY.md「口径不明时不得默认为合并口径」");
+    lines.push("# ────────────────────────────────────────────────");
+    return lines.join("\n");
+  }
+
+  function isGateConfirmed(){
+    var box = document.getElementById("gateConfirm");
+    return !!(box && box.checked);
+  }
+
+  // 闸门：只要还有未核对的系统建议值，就在输出面板顶部要求用户显式确认。
+  // 这不是阻断（用户可能确已核对），而是让"把线索当声明用"无法无痕发生。
+  function renderGate(){
+    var block = document.getElementById("gateBlock");
+    var text = document.getElementById("gateText");
+    var box = document.getElementById("gateConfirm");
+    if (!block) return;
+    var n = countSuggested();
+    if (n === 0) {
+      block.style.display = "none";
+      return;
+    }
+    block.style.display = "block";
+    block.className = "gate" + (isGateConfirmed() ? " ok" : "");
+    text.innerHTML = "当前有 <b>" + n + " 组</b>口径来自「原文线索」预选，"
+      + "它们<b>不是研报原文的声明</b>，只是解析线索。<b>未核对即执行，等同于默认按合并口径</b>，"
+      + "可能触碰红线。请先核对原文，或把不确定的组改回「保持弃权」。";
+    if (box) box.checked = isGateConfirmed();
+  }
+
+  function generate(){
+    var t = computeTallies();
+    var total = groups.length;
+    if (t.consolidated === 0 && t.parent === 0) {
+      showOutput("无需重算",
+        "未选择任何口径（全部保持弃权）。这是合规的保守选择——系统不会替你猜测口径。",
+        "# 未选择任何口径，无需重算\n# 保持弃权符合红线：口径不明时不得默认为合并口径",
+        true);
+      return;
+    }
+    if (t.consolidated === total || t.parent === total) {
+      var scope = (t.consolidated === total) ? SCOPE_CONSOLIDATED : SCOPE_PARENT;
+      var cmd = originComment() + "\n\n"
+        + baseCommand() + " --scope-declaration " + scope;
+      showOutput("全篇声明命令（--scope-declaration）",
+        "全部 " + total + " 组均选择【" + scope + "】口径，使用全篇声明；预计补口径后可核实 ≈ "
+        + t.estimate + " 条。",
+        cmd, false);
+      return;
+    }
+    // Mixed: build grouped clarifications JSON.
+    var specs = buildSpecsFor(SCOPE_CONSOLIDATED).concat(buildSpecsFor(SCOPE_PARENT));
+    var jsonText = JSON.stringify(specs);
+    var cmd = originComment() + "\n\n"
+      + baseCommand() + " --scope-clarifications-json " + shellQuoteJson(jsonText);
+    showOutput("分组澄清命令（--scope-clarifications-json）",
+      "口径为混合选择（合并 " + t.consolidated + " 组 / 母公司 " + t.parent + " 组），"
+      + "使用分组澄清 JSON；预计补口径后可核实 ≈ " + t.estimate + " 条。",
+      cmd, false);
+  }
+
+  function copyOutput(){
+    var text = document.getElementById("outputCmd").textContent;
+    if (!text) { toast("暂无内容可复制"); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){ toast("已复制到剪贴板"); }, function(){ fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text){
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      toast(ok ? "已复制到剪贴板" : "复制失败，请手动选中");
+    } catch (e) {
+      toast("复制失败，请手动选中");
+    }
+  }
+
+  var toastTimer = null;
+  function toast(msg){
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  }
+
+  function applyBulk(value){
+    groups.forEach(function(g){
+      selection[g.id] = value;
+      suggested[g.id] = (value === suggestFor(g));
+    });
+    groups.forEach(function(g){
+      var inputs = document.getElementsByName("choice-" + g.id);
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].checked = (inputs[i].value === value);
+      }
+      paintGroup(g.id);
+    });
+    updateTallies();
+    updateOriginBanner();
+  }
+
+  // ---- Wire up ----
+  document.getElementById("generateBtn").addEventListener("click", generate);
+  document.getElementById("copyBtn").addEventListener("click", copyOutput);
+  var gateConfirm = document.getElementById("gateConfirm");
+  if (gateConfirm) {
+    gateConfirm.addEventListener("change", function(){
+      // 勾选/取消后重算命令注释与闸门样式，保持来源说明与事实一致。
+      generate();
+    });
+  }
+  var bulkButtons = document.querySelectorAll("[data-bulk]");
+  for (var i = 0; i < bulkButtons.length; i++) {
+    bulkButtons[i].addEventListener("click", function(){
+      applyBulk(this.getAttribute("data-bulk"));
+    });
+  }
+
+  renderSummary();
+  renderGroups();
+  updateTallies();
+  updateOriginBanner();
+})();
+</script>
+</body>
+</html>

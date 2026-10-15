@@ -1,0 +1,1321 @@
+{
+  "schema_version": "scope-clarifier-data.v1",
+  "source": {
+    "path": "runs/full-off/results.json",
+    "run_id": "run-6a292dce7c7b",
+    "draft": "samples\\real_broker_full_draft.md",
+    "corpus": "data\\corpus\\reports\\920493_并行科技",
+    "report_date": "2024-04-22",
+    "draft_sha256": "e5a50d753c8050de76a32e32dfe38f85fbbd5cbaa63886504355373b73b37de3",
+    "exported_at": "2024-04-22"
+  },
+  "summary": {
+    "verified": 3,
+    "violated": 0,
+    "abstained": 123
+  },
+  "totals": {
+    "claims_total": 126,
+    "scope_abstained": 70,
+    "groups": 25
+  },
+  "groups": [
+    {
+      "id": "scope-group-1",
+      "label": "正文 · REVENUE",
+      "account": "REVENUE",
+      "table_id": "",
+      "periods": [
+        "2023Y",
+        "2022Y"
+      ],
+      "claim_ids": [
+        "claim-00001",
+        "claim-00002",
+        "claim-00003",
+        "claim-00004",
+        "claim-00007",
+        "claim-00008",
+        "claim-00009",
+        "claim-00019",
+        "claim-00020",
+        "claim-00021",
+        "claim-00042",
+        "claim-00043",
+        "claim-00062",
+        "claim-00063"
+      ],
+      "occurrences": 14,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00001",
+          "claim-00002",
+          "claim-00003",
+          "claim-00004",
+          "claim-00007",
+          "claim-00008",
+          "claim-00009",
+          "claim-00019",
+          "claim-00020",
+          "claim-00021",
+          "claim-00042",
+          "claim-00043",
+          "claim-00062",
+          "claim-00063"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-2",
+      "label": "正文 · GROSS_MARGIN",
+      "account": "GROSS_MARGIN",
+      "table_id": "",
+      "periods": [
+        "2023Y",
+        "2022Y"
+      ],
+      "claim_ids": [
+        "claim-00010",
+        "claim-00011",
+        "claim-00066",
+        "claim-00067"
+      ],
+      "occurrences": 4,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00010",
+          "claim-00011",
+          "claim-00066",
+          "claim-00067"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-3",
+      "label": "正文 · EXP_PERIOD_RATIO_UNSPECIFIED",
+      "account": "EXP_PERIOD_RATIO_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2016Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00012",
+        "claim-00013"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "已有登记公式 FIN-period-expense-ratio，但登记公式不能证明原文采用该方法；原文尚未明确费用聚合范围及收入分母，不能假定采用登记的四费用定义；保留来源定义缺口，不按相近金额或双模型一致授权"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "已有登记公式 FIN-period-expense-ratio，但登记公式不能证明原文采用该方法；原文尚未明确费用聚合范围及收入分母，不能假定采用登记的四费用定义；保留来源定义缺口，不按相近金额或双模型一致授权"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "已有登记公式 FIN-period-expense-ratio，但登记公式不能证明原文采用该方法；原文尚未明确费用聚合范围及收入分母，不能假定采用登记的四费用定义；保留来源定义缺口，不按相近金额或双模型一致授权"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00012",
+          "claim-00013"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-4",
+      "label": "正文 · ADMIN_EXPENSE_RATIO",
+      "account": "ADMIN_EXPENSE_RATIO",
+      "table_id": "",
+      "periods": [
+        "2016Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00014",
+        "claim-00015"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00014",
+          "claim-00015"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-5",
+      "label": "正文 · NET_MARGIN_UNSPECIFIED",
+      "account": "NET_MARGIN_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2023Y",
+        "2022Y"
+      ],
+      "claim_ids": [
+        "claim-00016",
+        "claim-00068",
+        "claim-00069"
+      ],
+      "occurrences": 3,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文净利率/净利润率未明确分子与营业收入分母的完整定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文净利率/净利润率未明确分子与营业收入分母的完整定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文净利率/净利润率未明确分子与营业收入分母的完整定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00016",
+          "claim-00068",
+          "claim-00069"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-6",
+      "label": "正文 · REVENUE_SHARE",
+      "account": "REVENUE_SHARE",
+      "table_id": "",
+      "periods": [
+        "2023H1"
+      ],
+      "claim_ids": [
+        "claim-00022"
+      ],
+      "occurrences": 1,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00022"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-7",
+      "label": "正文 · UNKNOWN",
+      "account": "UNKNOWN",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023H1",
+        "",
+        "2021Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00023",
+        "claim-00024",
+        "claim-00025",
+        "claim-00027",
+        "claim-00036",
+        "claim-00038",
+        "claim-00090",
+        "claim-00091"
+      ],
+      "occurrences": 8,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "原文目标数值为占比；当前无匹配分子、分母定义与授权占比公式"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "source_semantics",
+          "reason": "原文目标数值为占比；当前无匹配分子、分母定义与授权占比公式"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "原文未唯一明确科目、期间或关系；需要补充源材料，不能从可用事实反推绑定"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "原文明示其他公司、并列公司或主体无法确定；不能将其归入当前任务公司的财务事实"
+        },
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文明示其他公司、并列公司或主体无法确定；不能将其归入当前任务公司的财务事实"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00023",
+          "claim-00024",
+          "claim-00025",
+          "claim-00027",
+          "claim-00036",
+          "claim-00038",
+          "claim-00090",
+          "claim-00091"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-8",
+      "label": "正文 · COST",
+      "account": "COST",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00044",
+        "claim-00045"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00044",
+          "claim-00045"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-9",
+      "label": "正文 · ASSETS",
+      "account": "ASSETS",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00046",
+        "claim-00047"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00046",
+          "claim-00047"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-10",
+      "label": "正文 · OPERATING_PROFIT",
+      "account": "OPERATING_PROFIT",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00048",
+        "claim-00049"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00048",
+          "claim-00049"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-11",
+      "label": "正文 · PROFIT_TOTAL",
+      "account": "PROFIT_TOTAL",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00050",
+        "claim-00051"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00050",
+          "claim-00051"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-12",
+      "label": "正文 · NP",
+      "account": "NP",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00052",
+        "claim-00053"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00052",
+          "claim-00053"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-13",
+      "label": "正文 · LIABILITIES",
+      "account": "LIABILITIES",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00056",
+        "claim-00057"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00056",
+          "claim-00057"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-14",
+      "label": "正文 · EBITDA_UNSPECIFIED",
+      "account": "EBITDA_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00058",
+        "claim-00059"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00058",
+          "claim-00059"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-15",
+      "label": "正文 · EQUITY_PARENT",
+      "account": "EQUITY_PARENT",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00060",
+        "claim-00061"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00060",
+          "claim-00061"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-16",
+      "label": "正文 · ROE_UNSPECIFIED",
+      "account": "ROE_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00070",
+        "claim-00071"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文仅称ROE/净资产收益率，未明确加权或其他净资产定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文仅称ROE/净资产收益率，未明确加权或其他净资产定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文仅称ROE/净资产收益率，未明确加权或其他净资产定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00070",
+          "claim-00071"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-17",
+      "label": "正文 · CFO",
+      "account": "CFO",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00072",
+        "claim-00073"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00072",
+          "claim-00073"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-18",
+      "label": "正文 · ROIC_UNSPECIFIED",
+      "account": "ROIC_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00074",
+        "claim-00075"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00074",
+          "claim-00075"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-19",
+      "label": "正文 · DEPRECIATION_AMORTIZATION_UNSPECIFIED",
+      "account": "DEPRECIATION_AMORTIZATION_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00076",
+        "claim-00077"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00076",
+          "claim-00077"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-20",
+      "label": "正文 · DEBT_RATIO",
+      "account": "DEBT_RATIO",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00078",
+        "claim-00079"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00078",
+          "claim-00079"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-21",
+      "label": "正文 · NET_DEBT_RATIO_UNSPECIFIED",
+      "account": "NET_DEBT_RATIO_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00080",
+        "claim-00081"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X2",
+          "kind": "primary",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X2",
+          "kind": "definition",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X2",
+          "kind": "source_binding",
+          "reason": "数值与源量纲已解析，但该原文指标尚无授权输入、金融定义与公式；不能借用其他科目、比率或相近金额核查"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00080",
+          "claim-00081"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-22",
+      "label": "正文 · CAPEX_UNSPECIFIED",
+      "account": "CAPEX_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00082",
+        "claim-00083"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文科目缺少可用的明确金融定义；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00082",
+          "claim-00083"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-23",
+      "label": "正文 · EPS_UNSPECIFIED",
+      "account": "EPS_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00084",
+        "claim-00085"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值、单位已解析，但语义定义未确定：原文每股收益/EPS未明确基本、法定稀释或其他股数口径；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值、单位已解析，但语义定义未确定：原文每股收益/EPS未明确基本、法定稀释或其他股数口径；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值、单位已解析，但语义定义未确定：原文每股收益/EPS未明确基本、法定稀释或其他股数口径；不能依相近事实金额或双模型一致授权映射"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00084",
+          "claim-00085"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-24",
+      "label": "正文 · CFO_PER_SHARE_BROKER_UNSPECIFIED",
+      "account": "CFO_PER_SHARE_BROKER_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00086",
+        "claim-00087"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00086",
+          "claim-00087"
+        ]
+      }
+    },
+    {
+      "id": "scope-group-25",
+      "label": "正文 · EQUITY_PER_SHARE_BROKER_UNSPECIFIED",
+      "account": "EQUITY_PER_SHARE_BROKER_UNSPECIFIED",
+      "table_id": "",
+      "periods": [
+        "2022Y",
+        "2023Y"
+      ],
+      "claim_ids": [
+        "claim-00088",
+        "claim-00089"
+      ],
+      "occurrences": 2,
+      "blockers": [
+        {
+          "code": "X3",
+          "kind": "primary",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_scope",
+          "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务"
+        },
+        {
+          "code": "X3",
+          "kind": "definition",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "source_binding",
+          "reason": "数值与每股元单位已解析，但原文每股现金流或净资产未明确股数、分子聚合与基本/摊薄定义；不能借用EPS或期末股本事实"
+        },
+        {
+          "code": "X3",
+          "kind": "fact_lookup",
+          "reason": "源维度或语义前置验证未通过，依赖事实查询未执行",
+          "lookup_status": "not_executed"
+        }
+      ],
+      "reason": "原文未唯一声明合并或母公司报表口径；请补充有来源的口径声明后新建核查任务",
+      "caliber_hint": [
+        "合并",
+        "未扣非"
+      ],
+      "conditional_verification": true,
+      "selector": {
+        "claim_ids": [
+          "claim-00088",
+          "claim-00089"
+        ]
+      }
+    }
+  ]
+}
