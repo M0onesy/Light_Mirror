@@ -9,7 +9,10 @@ const REL = { value: '', yoy: '同比', qoq: '环比', cagr: 'CAGR', pp: '百分
 const CAT = { core: '历史财务（法定/封闭定义）', open_metric: '历史财务（开放定义）', forecast: '预测与估值', template: '模板聚合项', market: '行情数据', external: '行业/第三方', other_fact: '其他事实' };
 const MODALITY = { fact: '事实', inference: '推论（预测与估算）', opinion: '观点（目标价等）' };
 const TYPE = { research_report: '研究报告', annual_report: '年度报告', semiannual_report: '半年度报告', quarterly_report: '季度报告', prospectus: '招股说明书', facts_json: '结构化事实', other: '其他材料', unknown: '未识别' };
+const TABLE_LABEL = { SUMMARY: '财务摘要', IS: '利润表', BS: '资产负债表', CF: '现金流量表', RATIO: '主要财务比率' };
 const state = { queue: [], run: null, poll: null, batch: null, item: null, results: null, kb: [], session: null, sessionPoll: null, provider: null };
+/** 口径待澄清视图的界面状态（仅影响展示，不参与任何判定）。 */
+const scopeView = { query: '', filter: 'all', collapsed: new Set(), reviewed: new Set(), groups: [], decision: '', gate: false };
 let token = sessionStorage.getItem('mingjing-token') || '';
 
 function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), ms); }
@@ -214,9 +217,183 @@ function subject(it) {
 function highlight(it) {
   const t = it.text || ''; const s = it.span || [0, 0];
   if (it.kind === 'prose' && s[1] > s[0] && s[1] <= t.length) return esc(t.slice(Math.max(0, s[0] - 90), s[0])) + '<mark>' + esc(t.slice(s[0], s[1])) + '</mark>' + esc(t.slice(s[1], s[1] + 70));
-  const TABLES = { SUMMARY: '财务摘要', IS: '利润表', BS: '资产负债表', CF: '现金流量表', RATIO: '主要财务比率' };
+  const TABLES = TABLE_LABEL;
   const cells = it.row_label && t.startsWith(it.row_label) ? t.slice(it.row_label.length).trim() : t;
   return esc((it.row_label ? `【${TABLES[it.table] || '表格'}】${it.row_label}：` : '') + cells.slice(0, 160));
+}
+/* —— 口径待澄清（B 类：分组检索、状态筛选、折叠、锚点定位）——
+   分组完全在前端由已有 items 派生，不改动任何判定结果与后端管线。
+   可澄清的判定口径：审慎模式下因原文未声明会计口径而弃权的条目（X3 + 事实 + 理由含“口径”）。
+   其余 X3（估值取价日差异、备选定义相容等）单独列出，不计入可澄清组。 */
+function isScopeCaliber(it) {
+  return it.status === 'unverifiable' && it.abstain_code === 'X3' && it.modality === 'fact'
+    && /口径/.test(String(it.reason || ''));
+}
+function buildScopeGroups(items) {
+  const groups = new Map();
+  items.forEach((it) => {
+    if (!isScopeCaliber(it)) return;
+    const table = it.table || '';
+    const metric = it.metric || it.metric_name || '';
+    const key = table + '|' + metric;
+    const group = groups.get(key) || { key, table, metric, metricName: it.metric_name || it.metric || '未绑定指标', label: '', periods: [], cids: [], reasons: [] };
+    group.cids.push(it.cid);
+    if (it.period && !group.periods.includes(it.period)) group.periods.push(it.period);
+    const reason = String(it.reason || '原文未声明会计口径');
+    if (!group.reasons.includes(reason)) group.reasons.push(reason);
+    groups.set(key, group);
+  });
+  return Array.from(groups.values()).map((g) => Object.assign(g, {
+    label: (TABLE_LABEL[g.table] || '正文') + ' · ' + g.metricName,
+    periodsText: g.periods.map(periodLabel).join('、') || '—',
+  }));
+}
+function scopeGroupShown(g) {
+  if (scopeView.filter === 'pending' && scopeView.reviewed.has(g.key)) return false;
+  if (scopeView.filter === 'reviewed' && !scopeView.reviewed.has(g.key)) return false;
+  const q = scopeView.query.trim().toLowerCase();
+  if (!q) return true;
+  return [g.label, g.metricName, g.metric, g.table, g.periodsText].join(' ').toLowerCase().includes(q);
+}
+function scopeTally() {
+  const total = scopeView.groups.length;
+  const done = scopeView.groups.filter((g) => scopeView.reviewed.has(g.key)).length;
+  return { total, done, pending: total - done };
+}
+function renderScopeTab(data) {
+  const items = data.items || [];
+  const groups = buildScopeGroups(items);
+  scopeView.groups = groups;
+  scopeView.reviewed = new Set(Array.from(scopeView.reviewed).filter((k) => groups.some((g) => g.key === k)));
+  scopeView.collapsed = new Set();
+  scopeView.query = ''; scopeView.filter = 'all'; scopeView.decision = ''; scopeView.gate = false;
+  const others = items.filter((it) => it.status === 'unverifiable' && it.abstain_code === 'X3' && !isScopeCaliber(it));
+  $('#cScope').textContent = groups.length || '';
+  const tabBtn = $('#rTabs button[data-tab="scope"]');
+  if (tabBtn) tabBtn.hidden = groups.length === 0;
+  if (!groups.length) { $('#tab-scope').innerHTML = ''; return; }
+  $('#tab-scope').innerHTML = `
+    <div class="scope-banner">
+      <b>口径待澄清</b>
+      <p>下列条目因<b>原文没有声明会计口径</b>而未能核实，并非数字有误。声明口径会新建一次条件核查，<b>不会把已有结果改成已核实</b>；系统不会默认采用合并口径，声明须由本人确认并写入审计留痕。</p>
+    </div>
+    <div class="scope-tools">
+      <input id="scopeSearch" placeholder="搜索科目、期间、指标…" aria-label="搜索口径分组">
+      <div class="chips" id="scopeChips" role="group" aria-label="按核对状态筛选">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="pending">待核对</button>
+        <button class="chip" data-filter="reviewed">已核对</button>
+      </div>
+      <button class="btn" id="scopeToggleAll">收起全部</button>
+      <button class="btn" id="scopeNext">下一个待核对</button>
+    </div>
+    <div class="small muted" id="scopeTally"></div>
+    <div id="scopeList"></div>
+    <div class="scope-declare">
+      <label>任务口径声明
+        <select id="scopeDecision">
+          <option value="">保持弃权（不作声明）</option>
+          <option value="合并">合并（用户声明）</option>
+          <option value="母公司">母公司（用户声明）</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button class="primary" id="scopeApply" disabled>声明口径并新建核查</button>
+        <span class="small muted" id="scopeApplyHint"></span>
+      </div>
+      <label class="check" id="scopeGateWrap" hidden><input type="checkbox" id="scopeGate"> 已逐组核对原文，确认上述口径为本人声明</label>
+    </div>
+    ${others.length ? `<div class="panel scope-others"><div class="panel-head"><h3>其他未能核实的条目</h3><span class="muted small">${others.length} 条</span></div>
+      <p class="muted small">这些条目不属口径问题（例如估值取价日差异、仅在备选定义下相容），声明口径不会改变它们。</p>
+      ${others.map((it) => `<div class="card unk" data-cid="${esc(it.cid)}"><div class="row1"><span class="tag unk">${esc(it.abstain_code)}</span><b>${esc(subject(it))} ${esc(it.num_text)}</b><span class="muted small">第${it.page}页</span></div><div class="muted small">${esc(it.reason)}</div></div>`).join('')}</div>` : ''}`;
+  bindScopeTools(data);
+  paintScopeList();
+}
+function paintScopeList() {
+  const shown = scopeView.groups.filter(scopeGroupShown);
+  const tally = scopeTally();
+  $('#scopeTally').innerHTML = `共 <b>${tally.total}</b> 组口径待澄清 · 已核对 <b>${tally.done}</b> · 待核对 <b>${tally.pending}</b>`
+    + (shown.length === tally.total ? '' : ` · 当前筛选显示 ${shown.length} 组`);
+  $('#scopeList').innerHTML = shown.length ? shown.map((g) => {
+    const collapsed = scopeView.collapsed.has(g.key);
+    const reviewed = scopeView.reviewed.has(g.key);
+    return `<div class="scope-card${reviewed ? ' reviewed' : ''}" id="scope-${esc(g.key)}" data-key="${esc(g.key)}">
+      <div class="scope-head">
+        <button class="scope-toggle" data-toggle="${esc(g.key)}" aria-expanded="${!collapsed}" title="${collapsed ? '展开' : '收起'}">${collapsed ? '▸' : '▾'}</button>
+        <b>${esc(g.label)}</b>
+        <span class="tag unk">${g.cids.length} 条</span>
+        <span class="small muted">期间 ${esc(g.periodsText)}</span>
+        <label class="check scope-review"><input type="checkbox" data-review="${esc(g.key)}" ${reviewed ? 'checked' : ''}> 已核对</label>
+      </div>
+      <div class="scope-body" ${collapsed ? 'hidden' : ''}>
+        ${g.reasons.map((r) => `<div class="muted small">${esc(r)}</div>`).join('')}
+        <div class="scope-cids">${g.cids.map((cid) => `<button class="link" data-cid="${esc(cid)}">${esc(cid)}</button>`).join(' ')}</div>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">当前筛选下没有分组。</div>';
+  $('#scopeToggleAll').textContent = shown.length && shown.every((g) => scopeView.collapsed.has(g.key)) ? '展开全部' : '收起全部';
+  paintScopeApply();
+}
+function paintScopeApply() {
+  const tally = scopeTally();
+  const decision = scopeView.decision;
+  const gateNeeded = tally.pending > 0;
+  $('#scopeGateWrap').hidden = !decision;
+  $('#scopeApply').disabled = !decision || (gateNeeded && !scopeView.gate);
+  const hint = !decision ? '未选择口径时保持弃权，不产生新任务'
+    : gateNeeded && !scopeView.gate ? `尚有 ${tally.pending} 组未核对，需勾选确认后才能提交`
+    : `将新建一次审慎核查，口径来源记为「用户声明」；原结果只读不变`;
+  $('#scopeApplyHint').textContent = hint;
+}
+function bindScopeTools(data) {
+  $('#scopeSearch').addEventListener('input', (e) => { scopeView.query = e.target.value; paintScopeList(); });
+  $('#scopeChips').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    scopeView.filter = b.dataset.filter;
+    $$('#scopeChips .chip').forEach((c) => c.classList.toggle('active', c === b));
+    paintScopeList();
+  });
+  $('#scopeToggleAll').addEventListener('click', () => {
+    const shown = scopeView.groups.filter(scopeGroupShown);
+    const allCollapsed = shown.length && shown.every((g) => scopeView.collapsed.has(g.key));
+    shown.forEach((g) => (allCollapsed ? scopeView.collapsed.delete(g.key) : scopeView.collapsed.add(g.key)));
+    paintScopeList();
+  });
+  $('#scopeNext').addEventListener('click', () => {
+    if (scopeView.filter === 'reviewed') { scopeView.filter = 'pending'; $('#scopeChips .chip[data-filter="pending"]').classList.add('active'); $('#scopeChips .chip[data-filter="reviewed"]').classList.remove('active'); }
+    const next = scopeView.groups.find((g) => !scopeView.reviewed.has(g.key) && scopeGroupShown(g))
+      || scopeView.groups.find((g) => !scopeView.reviewed.has(g.key));
+    if (!next) { toast('所有分组都已核对'); return; }
+    if (!scopeGroupShown(next)) { scopeView.filter = 'all'; scopeView.query = ''; $('#scopeSearch').value = ''; paintScopeList(); toast('已清除筛选以定位待核对分组'); }
+    scopeView.collapsed.delete(next.key); paintScopeList();
+    const el = document.getElementById('scope-' + next.key);
+    if (el) { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); }
+  });
+  $('#scopeDecision').addEventListener('change', (e) => { scopeView.decision = e.target.value; paintScopeApply(); });
+  $('#scopeGate').addEventListener('change', (e) => { scopeView.gate = e.target.checked; paintScopeApply(); });
+  $('#scopeApply').addEventListener('click', () => applyScopeDeclaration(data));
+  $('#scopeList').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-toggle]');
+    if (t) { const k = t.dataset.toggle; scopeView.collapsed.has(k) ? scopeView.collapsed.delete(k) : scopeView.collapsed.add(k); paintScopeList(); return; }
+    const review = e.target.closest('[data-review]');
+    if (review) { const k = review.dataset.review; review.checked ? scopeView.reviewed.add(k) : scopeView.reviewed.delete(k); paintScopeList(); }
+  });
+}
+async function applyScopeDeclaration(data) {
+  const scope = scopeView.decision;
+  const anchor = (state.item && state.item.anchor_doc_id) || '';
+  if (!scope || !anchor) { toast('缺少声明口径或研报标识，无法新建任务', 4000); return; }
+  const btn = $('#scopeApply'); btn.disabled = true; btn.textContent = '正在新建…';
+  try {
+    const run = await api('/api/smart/run', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doc_ids: [anchor], mode: 'check', options: { kb_lookup: true, strict: true, text_evidence: true, scope } }),
+    });
+    toast(`已按「${scope}」用户声明新建核查 ${run.run_id}；原结果保持只读`, 5000);
+    state.run = run.run_id; $('#progressPanel').hidden = false; show('work'); watch(run.run_id);
+  } catch (err) {
+    toast(err.message, 6000);
+  } finally { btn.textContent = '声明口径并新建核查'; paintScopeApply(); }
 }
 function renderCheck(data) {
   const s = data.summary, t = s.totals;
@@ -264,6 +441,7 @@ function renderCheck(data) {
     <p class="muted small">核实依据：${Object.entries(s.basis || {}).map(([k, v]) => `${BASIS[k] || k} ${v}`).join('，')}。错误类型：${Object.entries(s.error_types || {}).map(([k, v]) => `${k} ${v}`).join('，') || '无'}。弃权代码：${Object.entries(s.abstain_codes || {}).map(([k, v]) => `${k} ${v}`).join('，') || '无'}。</p>`;
   $('#tab-materials').innerHTML = materialsTable(data.materials) + (data.binder && data.binder.mode === 'llm' ? `<p class="muted small">模型语义绑定：${esc(data.binder.model || '')}，候选 ${data.binder.candidates}，改写 ${data.binder.refined}，请求 ${data.binder.requests}，缓存命中 ${data.binder.cache_hits}。</p>` : `<p class="muted small">语义绑定：确定性规则${data.binder && data.binder.error ? '（模型不可用，已回退：' + esc(data.binder.error) + '）' : ''}。</p>`)
     + `<p class="muted small">知识库本次：解析缓存命中 ${data.kb.parse_hits}、事实缓存命中 ${data.kb.fact_hits}、去重命中 ${data.kb.dedupe_hits}。</p>`;
+  renderScopeTab(data);
   $$('#rTabs button').forEach((b) => b.classList.toggle('active', b.dataset.tab === 'wrong')); $$('.tab').forEach((t) => (t.hidden = t.id !== 'tab-wrong'));
 }
 function materialsTable(materials) {
@@ -278,7 +456,7 @@ function renderAll() {
   const rows = state.results.items.filter((it) => (!st || it.status === st) && (!cat || it.category === cat) && (!basis || it.basis === basis)
     && (!q || [it.text, it.metric, it.metric_text, it.num_text, it.segment, it.row_label].join(' ').includes(q)));
   $('#allRows').innerHTML = rows.slice(0, 400).map((it) => `<tr class="click" data-cid="${it.cid}"><td class="small muted">${esc(it.cid)}</td><td>${it.page}</td>
-    <td><div class="stmt">${esc(subject(it))}</div><div class="sub">${esc((it.row_label ? `【${({ SUMMARY: '财务摘要', IS: '利润表', BS: '资产负债表', CF: '现金流量表', RATIO: '主要财务比率' })[it.table] || '表格'}】${it.row_label}` : (it.text || '')).slice(0, 80))}</div></td>
+    <td><div class="stmt">${esc(subject(it))}</div><div class="sub">${esc((it.row_label ? `【${TABLE_LABEL[it.table] || '表格'}】${it.row_label}` : (it.text || '')).slice(0, 80))}</div></td>
     <td>${esc(it.num_text)}</td><td>${esc(it.expected_display || '')}</td><td>${tag(it.status)}${it.advisories && it.advisories.length ? ` <span class="tag info">${esc(it.advisories.join('/'))}</span>` : ''}</td><td class="small">${esc(BASIS[it.basis] || '')}</td></tr>`).join('');
   $('#allMore').textContent = rows.length > 400 ? `共 ${rows.length} 条，仅显示前 400 条，请用筛选缩小范围。` : `共 ${rows.length} 条`;
 }

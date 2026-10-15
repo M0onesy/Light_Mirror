@@ -30,7 +30,7 @@ export interface AppFrameProps {
   useStore: <T>(selector: (state: {layoutInfo: FrameLayout}) => T) => T;
   usePanelInfo: <T>(selector: (info: {activePanelId: string | null}) => T) => T;
   useSessions?: unknown;
-  actions: {setViewportWidth: (width:number)=>void; setSidebar: (width:number)=>void; setRightbar: (width:number)=>void};
+  actions: {setViewportWidth: (width:number)=>void; setSidebar: (width:number)=>void; setRightbar: (width:number)=>void; setNarrowExpanded: (value:boolean)=>void};
   renderSlot: (slot:Slot, data:Record<string, unknown>, options?:{entryKey:string})=>ReactNode;
   t: (key:string)=>string;
 }
@@ -200,7 +200,8 @@ export function AppFrame({
   const sidebar = useMemo(() => renderSlot('sidebar', {
     collapsed: sidebarCollapsed,
     width: cols.sidebar,
-  }), [renderSlot, sidebarCollapsed, cols.sidebar])
+    narrow,
+  }), [renderSlot, sidebarCollapsed, cols.sidebar, narrow])
   const main = useMemo(() => (
     <MainPanel usePanelInfo={usePanelInfo} renderSlot={renderSlot} />
   ), [usePanelInfo, renderSlot])

@@ -53,7 +53,7 @@
     <div class="grid3">
       <label>公司（覆盖自动识别）<input id="optCompany" placeholder="如：并行科技"></label>
       <label>研报日期（取数截止日）<input id="optDate" type="date"></label>
-      <label>任务口径声明<select id="optScope"><option value="">按原文识别／标准模式注明推定</option><option value="合并">合并（用户声明）</option><option value="母公司">母公司（用户声明）</option></select></label>
+      <label>任务口径声明（用户声明；与原文冲突时任务终止）<select id="optScope"><option value="">按原文识别／标准模式注明推定</option><option value="合并">合并（用户声明）</option><option value="母公司">母公司（用户声明）</option></select></label>
       <label class="check"><input id="optKb" type="checkbox" checked> 从知识库补充同公司财报</label>
       <label class="check"><input id="optStrict" type="checkbox"> 审慎模式（不做口径推定）</label>
       <label class="check"><input id="optLlm" type="checkbox"> 启用模型语义绑定 <small id="llmState" class="muted"></small></label>
@@ -107,6 +107,7 @@
         <button data-tab="wrong" class="active">有误与修改建议 <em id="cWrong"></em></button>
         <button data-tab="all">全部陈述 <em id="cAll"></em></button>
         <button data-tab="gap">未能核实与补材 <em id="cGap"></em></button>
+        <button data-tab="scope" hidden>口径待澄清 <em id="cScope"></em></button>
         <button data-tab="assume">推定与假设 <em id="cAssume"></em></button>
         <button data-tab="groups">分级统计</button>
         <button data-tab="materials">参考材料</button>
@@ -123,6 +124,7 @@
         <div class="muted small" id="allMore"></div>
       </div>
       <div class="tab" id="tab-gap" hidden></div>
+      <div class="tab" id="tab-scope" hidden></div>
       <div class="tab" id="tab-assume" hidden></div>
       <div class="tab" id="tab-groups" hidden></div>
       <div class="tab" id="tab-materials" hidden></div>

@@ -1,8 +1,8 @@
-import {useEffect,useMemo,useState} from 'react'
+import {useEffect,useMemo,useRef,useState} from 'react'
 import {Button} from '../vendor/harness/packages/client/ui-primitives/src/Button'
 import {Tag} from '../vendor/harness/packages/client/ui-primitives/src/Tag'
 import {MarkdownText} from '../vendor/harness/packages/client/ui-primitives/src/markdown/MarkdownText'
-import type {Results,Verdict,AnalysisMetric,Json,CoverageStatistics,ScopeClarification} from './types'
+import type {Results,Verdict,AnalysisMetric,Json,CoverageStatistics,ScopeClarification,ScopeClarificationGroup} from './types'
 import {copy,label,markdownLabels} from './i18n'
 
 function visibleVerdicts(data:Results):Verdict[] {
@@ -17,7 +17,6 @@ function visibleVerdicts(data:Results):Verdict[] {
 export function ResultsView({data,onSelect,selected,onClarifyScope,onClarifyGroups}:{data:Results;onSelect:(result:Verdict)=>void;selected?:string;onClarifyScope?:(scope:string)=>void;onClarifyGroups?:(specs:ScopeClarification[])=>void}) {
   const [tab,setTab]=useState('task'),[filter,setFilter]=useState('all'),[query,setQuery]=useState(''),[page,setPage]=useState(0)
   const [scope,setScope]=useState('')
-  const [groupScopes,setGroupScopes]=useState<Record<string,string>>({})
   const [scopeFilter,setScopeFilter]=useState('issuer_historical_financial')
   const [analysisPeriod,setAnalysisPeriod]=useState('latest')
   useEffect(()=>{setTab(data.task_type==='analysis'?'analysis':'task');setAnalysisPeriod('latest');setPage(0);setFilter('all');setQuery('')},[data.run_id])
@@ -34,7 +33,7 @@ export function ResultsView({data,onSelect,selected,onClarifyScope,onClarifyGrou
     {data.knowledge?.enabled&&<details className="knowledge-summary"><summary>会计知识库 · {data.knowledge.documents} 份材料 · {data.knowledge.blocks} 个文本块</summary><p>材料及解析缓存已冻结，Agent 可通过只读工具检索原文。外部材料的来源、版本和有效日期声明尚未独立核验，不直接授权公式或判定。</p><p className="evidence-id">知识锁：{data.knowledge.knowledge_lock}</p></details>}
     {data.scope_declaration&&<div className="notice">本任务使用用户补充声明的{data.scope_declaration}口径；声明已归档并锁定，不能据此声称原文明示了该口径。</div>}
     {!!data.scope_clarifications?.length&&<div className="notice">本任务部分陈述使用用户补充的口径。对应结果为条件核查，不能替代原文口径证据；来源表转述继续按其原始来源独立核查。</div>}
-    {onClarifyGroups&&!!data.scope_clarification_groups?.length?<details className="scope-clarification"><summary>按表或指标补充口径 · {data.scope_clarification_groups.reduce((total,group)=>total+group.occurrences,0)} 个原文位置</summary><p>请先补充来源说明；若你已明确使用口径，可只声明下面选定的组。其他阻断原因仍保留，声明不保证能解除缺方法或缺材料。</p>{data.scope_clarification_groups.map(group=><div className="form-card" key={group.id}><label>{group.label} · {group.periods.join('、')} · {group.occurrences} 处<select aria-label={`补充口径 ${group.label}`} value={groupScopes[group.id]||''} onChange={event=>setGroupScopes(value=>({...value,[group.id]:event.target.value}))}><option value="">不补充声明</option><option value="合并">我明确声明该组为合并口径</option><option value="母公司">我明确声明该组为母公司口径</option></select></label><details><summary>查看全部阻断原因与原文位置</summary><p>{group.claim_ids.join('、')}</p>{group.blockers.map((blocker,index)=><p key={index}>{blocker.code} · {blocker.reason}</p>)}</details></div>)}<Button disabled={!data.scope_clarification_groups.some(group=>groupScopes[group.id])} onClick={()=>onClarifyGroups(data.scope_clarification_groups!.filter(group=>groupScopes[group.id]).map(group=>({scope:groupScopes[group.id],selector:group.selector})))}>归档选定组并新建条件核查</Button></details>:onClarifyScope&&data.results.some(row=>row.abstention_code==='X3'&&row.display_status!=='pending')&&<details className="scope-clarification"><summary>补充研报口径并建立新核查任务</summary><p>仅在你能明确研报使用的口径时补充。与原文明示口径冲突时拒绝覆盖。</p><select aria-label="补充研报口径" value={scope} onChange={e=>setScope(e.target.value)}><option value="">请选择明确声明的口径</option><option value="合并">我明确声明使用合并口径</option><option value="母公司">我明确声明使用母公司口径</option></select><Button disabled={!scope} onClick={()=>onClarifyScope(scope)}>归档声明并重新核查</Button></details>}
+    {onClarifyGroups&&!!data.scope_clarification_groups?.length?<ScopeClarificationGroups groups={data.scope_clarification_groups!} onClarifyGroups={onClarifyGroups}/>:onClarifyScope&&data.results.some(row=>row.abstention_code==='X3'&&row.display_status!=='pending')&&<details className="scope-clarification"><summary>补充研报口径并建立新核查任务</summary><p>仅在你能明确研报使用的口径时补充。与原文明示口径冲突时拒绝覆盖。</p><select aria-label="补充研报口径" value={scope} onChange={e=>setScope(e.target.value)}><option value="">请选择明确声明的口径</option><option value="合并">我明确声明使用合并口径</option><option value="母公司">我明确声明使用母公司口径</option></select><Button disabled={!scope} onClick={()=>onClarifyScope(scope)}>归档声明并重新核查</Button></details>}
     {data.model?.status==='fallback'&&<div role="status" className="notice">Agent 未完成，已降级到确定性内核。{String(data.model.error||'模型或运行时不可用。')}</div>}
     {data.model?.status==='partial'&&<div role="status" className="notice">原生 Agent 任务部分完成。{String(data.model.error||'还有未处理的材料提及。')}</div>}
     {data.mode==='harness'&&data.task_type!=='analysis'&&summary.verified===0&&summary.violated===0&&(summary.abstained||0)>0&&<div className="notice">本任务尚未获得可核实的数字结论。请查看各条弃权原因，补充口径、可解析原文或缺失财报；处理完账本不代表研报质量达标。</div>}
@@ -71,6 +70,71 @@ export function ResultsView({data,onSelect,selected,onClarifyScope,onClarifyGrou
       ))}{!data.analysis?.signals?.length&&!data.analysis?.events?.length&&<p className="muted">当前冻结材料未触发登记的分析信号或披露变更事件。</p>}</details>
     </>}
     </div></>
+}
+
+type ScopeStatusFilter='all'|'pending'|'declared'
+
+/**
+ * 口径澄清分组面板。
+ *
+ * 在“归档选定组并新建条件核查”之外，提供与默认首页一致的检索、状态筛选、
+ * 一键折叠、逐个定位待声明分组的能力。默认全部展开，用户可以逐组声明口径；
+ * 声明只会新建一次条件核查，不会把已有结果改成已核实，也不会默认采用合并口径。
+ */
+export function ScopeClarificationGroups({groups,onClarifyGroups}:{groups:ScopeClarificationGroup[];onClarifyGroups:(specs:ScopeClarification[])=>void}) {
+  const [groupScopes,setGroupScopes]=useState<Record<string,string>>({})
+  const [query,setQuery]=useState('')
+  const [statusFilter,setStatusFilter]=useState<ScopeStatusFilter>('all')
+  const [collapsed,setCollapsed]=useState<Record<string,boolean>>({})
+  const [flash,setFlash]=useState('')
+  const listRef=useRef<HTMLDivElement>(null)
+  const keyword=query.trim().toLowerCase()
+  const declaredCount=groups.filter(group=>groupScopes[group.id]).length
+  const pendingCount=groups.length-declaredCount
+  const shown=groups.filter(group=>(!keyword||[group.label,group.account,group.table_id||''].join(' ').toLowerCase().includes(keyword))&&(statusFilter==='all'||(statusFilter==='declared'?Boolean(groupScopes[group.id]):!groupScopes[group.id])))
+  const allCollapsed=shown.length>0&&shown.every(group=>Boolean(collapsed[group.id]))
+  const toggleGroup=(id:string)=>setCollapsed(value=>({...value,[id]:!value[id]}))
+  const toggleAll=()=>{const next=!allCollapsed;setCollapsed(Object.fromEntries(shown.map(group=>[group.id,next])))}
+  const locateNext=()=>{
+    const target=groups.find(group=>!groupScopes[group.id]&&shown.some(item=>item.id===group.id))||groups.find(group=>!groupScopes[group.id])
+    if(!target)return
+    if(!shown.some(item=>item.id===target.id)){setQuery('');setStatusFilter('all')}
+    setCollapsed(value=>({...value,[target.id]:false}))
+    setFlash(target.id)
+    window.setTimeout(()=>setFlash(current=>current===target.id?'':current),1400)
+    window.requestAnimationFrame(()=>{const element=listRef.current?.querySelector<HTMLElement>(`#scope-group-${target.id}`);element?.scrollIntoView?.({block:'center',behavior:'smooth'})})
+  }
+  const submitSpecs=()=>groups.filter(group=>groupScopes[group.id]).map(group=>({scope:groupScopes[group.id],selector:group.selector}))
+  return <details className="scope-clarification" open>
+    <summary>按表或指标补充口径 · {groups.reduce((total,group)=>total+group.occurrences,0)} 个原文位置</summary>
+    <div className="scope-banner"><b>口径待澄清</b><p>下列条目因原文没有声明会计口径而未能核实，并非数字有误。声明口径会新建一次条件核查，<b>不会把已有结果改成已核实</b>；系统<b>不会默认采用合并口径</b>，声明须由本人确认并写入审计留痕。</p></div>
+    <p>请先补充来源说明；若你已明确使用口径，可只声明下面选定的组。其他阻断原因仍保留，声明不保证能解除缺方法或缺材料。</p>
+    <div className="scope-tools">
+      <input aria-label="检索口径分组" placeholder="检索科目、口径、来源表…" value={query} onChange={event=>setQuery(event.target.value)}/>
+      <div className="scope-chips" role="group" aria-label="按声明状态筛选">
+        {([['all','全部'],['pending','待声明'],['declared','已声明']] as [ScopeStatusFilter,string][]).map(([value,text])=><button key={value} type="button" className={'scope-chip'+(statusFilter===value?' active':'')} aria-pressed={statusFilter===value} onClick={()=>setStatusFilter(value)}>{text}</button>)}
+      </div>
+      <button type="button" className="scope-tool-btn" onClick={toggleAll}>{allCollapsed?'展开全部':'收起全部'}</button>
+      <button type="button" className="scope-tool-btn" onClick={locateNext}>下一个待声明</button>
+    </div>
+    <p className="scope-tally">共 <b>{groups.length}</b> 组口径待澄清 · 已声明 <b>{declaredCount}</b> · 待声明 <b>{pendingCount}</b>{shown.length===groups.length?'':` · 当前筛选显示 ${shown.length} 组`}</p>
+    <div className="scope-group-list" ref={listRef}>
+      {shown.length===0?<p className="scope-empty muted">没有匹配当前检索或筛选条件的口径分组。请调整关键词或切换「全部／待声明／已声明」状态筛选。</p>:shown.map(group=>{const isCollapsed=Boolean(collapsed[group.id]);return <div key={group.id} id={`scope-group-${group.id}`} className={'scope-card'+(groupScopes[group.id]?' declared':'')+(flash===group.id?' flash':'')}>
+        <div className="scope-card-head">
+          <button type="button" className="scope-toggle" aria-label={`展开或收起 ${group.label}`} aria-expanded={!isCollapsed} onClick={()=>toggleGroup(group.id)}>{isCollapsed?'▸':'▾'}</button>
+          <b>{group.label}</b>
+          <span className="scope-card-meta muted">{group.account}{group.table_id?` · ${group.table_id}`:''}</span>
+          <span className="scope-card-periods muted">{group.periods.join('、')} · {group.occurrences} 处</span>
+        </div>
+        <div className="scope-card-body" hidden={isCollapsed}>
+          <label className="scope-card-declare">{group.label} · {group.periods.join('、')} · {group.occurrences} 处<select aria-label={`补充口径 ${group.label}`} value={groupScopes[group.id]||''} onChange={event=>setGroupScopes(value=>({...value,[group.id]:event.target.value}))}><option value="">不补充声明</option><option value="合并">我明确声明该组为合并口径</option><option value="母公司">我明确声明该组为母公司口径</option></select></label>
+          <p className="scope-cids muted">{group.claim_ids.join('、')}</p>
+          {group.blockers.map((blocker,index)=><p key={index} className="scope-blocker">{blocker.code} · {blocker.reason}</p>)}
+        </div>
+      </div>})}
+    </div>
+    <Button disabled={!groups.some(group=>groupScopes[group.id])} onClick={()=>onClarifyGroups(submitSpecs())}>归档选定组并新建条件核查</Button>
+  </details>
 }
 const metricNames:Record<string,string>={REVENUE:'营业收入',COST:'营业成本',NP:'净利润',NP_PARENT:'归母净利润',NP_PARENT_ADJ:'扣非归母净利润',CFO:'经营现金流',ASSETS:'总资产',LIABILITIES:'总负债',EQUITY_PARENT:'归母权益',EPS:'基本每股收益',EPS_DILUTED:'稀释每股收益',ROE:'加权平均净资产收益率',GROSS_MARGIN:'毛利率',NET_MARGIN:'净利率',DEBT_RATIO:'资产负债率',CASH_CONTENT:'经营现金流含金量',NP_PARENT_RECOMPUTED:'四项重算扣非归母净利润',NON_RECURRING_SHARE:'非经常性损益占比',REVENUE_YOY:'营业收入同比',NP_PARENT_YOY:'归母净利润同比',CFO_YOY:'经营现金流同比'}
 function metricUnit(metric:string) {return metric.endsWith('_YOY')||['ROE','GROSS_MARGIN','NET_MARGIN','DEBT_RATIO','CASH_CONTENT','NON_RECURRING_SHARE'].includes(metric)?'比例':metric==='EPS'||metric==='EPS_DILUTED'?'元/股':'元'}

@@ -59,7 +59,8 @@ export function App() {
   const actions=useMemo(()=>({
     setViewportWidth:(width:number)=>setLayout(value=>value.viewportWidth===width?value:{...value,viewportWidth:width}),
     setSidebar:(width:number)=>setLayout(value=>({...value,sidebar:Math.max(180,Math.min(380,width))})),
-    setRightbar:(width:number)=>setLayout(value=>({...value,rightbar:Math.max(300,Math.min(value.viewportWidth*.65,width))}))
+    setRightbar:(width:number)=>setLayout(value=>({...value,rightbar:Math.max(300,Math.min(value.viewportWidth*.65,width))})),
+    setNarrowExpanded:(value:boolean)=>setLayout(v=>({...v,narrowExpanded:value}))
   }),[])
 
   useEffect(()=>{
@@ -111,10 +112,10 @@ export function App() {
     catch(e){showError((e as Error).message)}
   }
 
-  const sidebar=(collapsed:boolean)=><aside className={'sidebar '+(collapsed?'collapsed':'')}>
-    <header><button className="brand" onClick={newTask}>{collapsed?'镜':'明镜'}{!collapsed&&<span>金融 Agent</span>}</button></header>
+  const sidebar=(collapsed:boolean,narrow=false)=><aside className={'sidebar '+(collapsed?'collapsed':'')}>
+    <header><button className="brand" onClick={newTask}>{collapsed?'镜':'明镜'}{!collapsed&&<span>金融 Agent</span>}</button>{narrow&&collapsed&&<Button size="sm" aria-label="展开边栏" onClick={()=>actions.setNarrowExpanded(true)}>›</Button>}</header>
     <Button variant="outline" onClick={newTask}>{collapsed?'＋':copy.newTask}</Button>
-    {!collapsed&&<><div className="sidebar-heading">{copy.history}<Button size="sm" aria-label="刷新历史" onClick={refresh}>↻</Button></div>
+    {!collapsed&&<><div className="sidebar-heading">{copy.history}{narrow&&<Button size="sm" aria-label="收起边栏" onClick={()=>actions.setNarrowExpanded(false)}>‹</Button>}<Button size="sm" aria-label="刷新历史" onClick={refresh}>↻</Button></div>
       <div className="history-list">{runs.map(run=><button key={run.id} className={'history-row '+(run.id===current?.id?'active':'')} onClick={()=>openRun(run)}>
         <span>{String(run.request?.company||run.id)}</span><small>{label(run.status)} · {run.id.slice(-8)}</small></button>)}
         {sessions.map(session=><button key={session.session_id} className="history-row" onClick={()=>{const run=runs.find(item=>item.id===session.run_id);if(run)openRun(run,session.session_id)}}>
@@ -130,7 +131,7 @@ export function App() {
   if(!config)return <div className="login"><h1>{copy.title}</h1><p>{error||'正在连接本地金融服务…'}</p><Button onClick={refresh}>重试连接</Button></div>
 
   return <><AppFrame useStore={selector=>selector({layoutInfo:layout})} usePanelInfo={selector=>selector({activePanelId:null})} actions={actions} t={()=>copy.title} renderSlot={(slot,props)=>{
-    if(slot==='sidebar')return sidebar(Boolean(props.collapsed))
+    if(slot==='sidebar')return sidebar(Boolean(props.collapsed),Boolean(props.narrow))
     if(slot==='rightbar')return layout.rightbarShown?<Inspector width={Number(props.width)||Math.min(layout.viewportWidth,400)} verdict={selected} runId={current?.id} events={events} onNewRun={run=>{openRun(run);setSelected(undefined);setLayout(value=>({...value,rightbarShown:false,rightbarTrack:false}));void refresh()}} onClose={()=>setLayout(value=>({...value,rightbarShown:false,rightbarTrack:false}))}/>:null
     if(slot==='shell.overlay')return null
     return <main className="main"><header className="main-header">
