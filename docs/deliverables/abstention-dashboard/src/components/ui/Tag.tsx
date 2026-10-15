@@ -26,7 +26,7 @@ export interface TagProps {
 }
 
 const TONE_CLASS: Record<TagTone, string> = {
-  neutral: 'text-text-secondary bg-white/5',
+  neutral: 'text-text-secondary bg-abstain/10',
   abstain: 'text-abstain bg-abstain/10',
   improve: 'text-improve bg-improve/10',
   improveAlt: 'text-improve-alt bg-improve-alt/10',

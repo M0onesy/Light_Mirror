@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html,
@@ -25,14 +25,14 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #0b0e13;
+    background: #f5f7fa;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1f2937;
+    background: #c9d2dc;
     border-radius: 0;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #374151;
+    background: #aebac8;
   }
 }
 

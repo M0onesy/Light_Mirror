@@ -1,6 +1,7 @@
 /**
  * 分段控件 —— 顶栏五视图切换（替代路由）。
  * 终端气质：方角、细分隔、选中态用一条强调底线。
+ * 窄屏（DASH-5）：容器可横向滚动、不换行，避免 375px 下崩坏。
  */
 
 export interface SegmentedOption<T extends string> {
@@ -27,7 +28,7 @@ export function SegmentedControl<T extends string>({
   return (
     <div
       role="tablist"
-      className={['inline-flex items-stretch gap-0', className]
+      className={['inline-flex items-stretch gap-0 overflow-x-auto whitespace-nowrap max-w-full', className]
         .filter(Boolean)
         .join(' ')}
     >

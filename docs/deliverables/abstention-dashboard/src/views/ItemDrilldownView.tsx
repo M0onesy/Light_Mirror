@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, ExternalLink } from 'lucide-react';
 import { useDiagnosis, X_CODE_ORDER } from '@/hooks/useDiagnosis';
 import AmendmentBadge from '@/components/AmendmentBadge';
 import Tag from '@/components/ui/Tag';
-import type { XCode } from '@/types/diagnosis';
+import { clarifierHref } from '@/utils/clarifierLink';
+import type { DiagnosisItem, XCode } from '@/types/diagnosis';
 
 /**
  * 逐条归因下钻视图 —— 143 条表（按 activeXCode / cause 筛选，分页）。
  *
  * 逐条展示 page/seq/raw_label/x_code/gap_kind/cause/amendability/evidence_ref/关联需求。
  * 点击某行可关联需求 → dispatch SET_REQUIREMENT。
+ * 口径类行（x_code=X3 且 requirement_ref=P0-3）新增「→ 去澄清」（DASH-4），非口径行不渲染。
  */
 
 export interface ItemDrilldownViewProps {
@@ -17,6 +19,11 @@ export interface ItemDrilldownViewProps {
 }
 
 const PAGE_SIZE = 25;
+
+/** 口径类条目判定（DASH-4）：X3 口径且关联 P0-3 需求。 */
+function isClarifiableItem(item: DiagnosisItem): boolean {
+  return item.x_code === 'X3' && item.requirement_ref === 'P0-3';
+}
 
 /** 逐条下钻视图组件。 */
 export function ItemDrilldownView({ onGoToSimulator }: ItemDrilldownViewProps) {
@@ -132,10 +139,10 @@ export function ItemDrilldownView({ onGoToSimulator }: ItemDrilldownViewProps) {
       {/* —— 下钻表 —— */}
       <section className="mj-panel overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-xs">
+          <table className="w-full min-w-[1040px] border-collapse text-xs">
             <thead>
               <tr className="border-b border-border text-text-muted">
-                <th className="px-3 py-2 text-left font-medium">ID</th>
+                <th className="sticky left-0 z-10 bg-panel px-3 py-2 text-left font-medium">ID</th>
                 <th className="px-3 py-2 text-right font-medium">页码</th>
                 <th className="px-3 py-2 text-right font-medium">序号</th>
                 <th className="px-3 py-2 text-left font-medium">原始标签</th>
@@ -145,6 +152,7 @@ export function ItemDrilldownView({ onGoToSimulator }: ItemDrilldownViewProps) {
                 <th className="px-3 py-2 text-left font-medium">可改善性</th>
                 <th className="px-3 py-2 text-left font-medium">证据</th>
                 <th className="px-3 py-2 text-left font-medium">关联需求</th>
+                <th className="px-3 py-2 text-left font-medium">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -153,9 +161,11 @@ export function ItemDrilldownView({ onGoToSimulator }: ItemDrilldownViewProps) {
                 return (
                   <tr
                     key={item.id}
-                    className="border-b border-border/50 hover:bg-white/[0.02]"
+                    className="border-b border-border/50 hover:bg-ink/5"
                   >
-                    <td className="mj-num px-3 py-1.5 text-text-muted">{item.id}</td>
+                    <td className="sticky left-0 z-10 bg-panel mj-num px-3 py-1.5 text-text-muted">
+                      {item.id}
+                    </td>
                     <td className="mj-num px-3 py-1.5 text-right text-text-secondary">
                       {item.page}
                     </td>
@@ -191,12 +201,27 @@ export function ItemDrilldownView({ onGoToSimulator }: ItemDrilldownViewProps) {
                         <span className="text-text-muted">—</span>
                       )}
                     </td>
+                    <td className="px-3 py-1.5">
+                      {isClarifiableItem(item) ? (
+                        <a
+                          href={clarifierHref({ filter: 'X3', cause: 'scope' })}
+                          target="_blank"
+                          rel="noopener"
+                          className="inline-flex items-center gap-1 whitespace-nowrap text-improve hover:underline"
+                        >
+                          <ExternalLink size={11} />
+                          去澄清
+                        </a>
+                      ) : (
+                        <span className="text-text-muted">—</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
               {pageRows.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-8 text-center text-text-muted">
+                  <td colSpan={11} className="px-3 py-8 text-center text-text-muted">
                     无匹配条目，请调整筛选条件。
                   </td>
                 </tr>

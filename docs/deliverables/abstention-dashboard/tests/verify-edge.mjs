@@ -47,8 +47,16 @@ async function findAssets() {
 
 /** 补丁：把 items 数组替换为空。 */
 function patchEmptyItems(jsText) {
-  const start = jsText.indexOf('am=[{id:"i0001"');
-  if (start === -1) throw new Error('未找到 items 数组起点 am=[{id:"i0001"');
+  // 不依赖压缩器生成的变量名（如 am/fm 会随源码变化而漂移）：
+  // 以 items 首个元素的稳定数据签名定位数组起点，向前回退到 "标识符=[" 之前。
+  const SIGNATURE = '[{id:"i0001"';
+  const sig = jsText.indexOf(SIGNATURE);
+  if (sig === -1) throw new Error('未找到 items 数组起点（签名 ' + SIGNATURE + '）');
+  // 从签名的 '[' 往前找到紧邻的 "名字=" 形式，使替换保持 "名字=[]" 结构。
+  let p = sig - 1;
+  while (p >= 0 && /[A-Za-z0-9_$]/.test(jsText[p])) p--;
+  if (p < 0 || jsText[p] !== '=') throw new Error('items 数组起点前未找到赋值运算符');
+  const start = p + 1;
   // 从 start 往后找到匹配的顶层 ']'（简单括号计数，跳过字符串内括号）
   let i = jsText.indexOf('[', start);
   let depth = 0;
@@ -70,7 +78,7 @@ function patchEmptyItems(jsText) {
     }
   }
   if (end === -1) throw new Error('未找到 items 数组结束位置');
-  return jsText.slice(0, start) + 'am=[]' + jsText.slice(end + 1);
+  return jsText.slice(0, start) + '[]' + jsText.slice(end + 1);
 }
 
 /** 补丁：denominator_scope all_candidates → main_scope。 */

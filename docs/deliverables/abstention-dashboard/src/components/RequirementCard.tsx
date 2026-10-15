@@ -61,7 +61,7 @@ export function RequirementCard({
               selected ? 'border-improve bg-improve' : 'border-border',
             ].join(' ')}
           >
-            {selected && <Check size={11} className="text-base" strokeWidth={3} />}
+            {selected && <Check size={11} className="text-white" strokeWidth={3} />}
           </span>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">

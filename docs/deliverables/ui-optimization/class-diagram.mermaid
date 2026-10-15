@@ -1,0 +1,94 @@
+classDiagram
+    class DesignTokens {
+        <<module src/theme/tokens.ts>>
+        +string bg
+        +string panel
+        +string ink
+        +string muted
+        +string line
+        +string accent
+        +string abstain
+        +string improve
+        +string improveAlt
+        +string declare
+        +string alert
+        +string ok
+        +string cmdBg
+    }
+
+    class ClarifierLink {
+        <<module src/utils/clarifierLink.ts>>
+        +string CLARIFIER_URL
+        +clarifierHref(params) string
+    }
+
+    class ClarifierApp {
+        <<scope-clarifier/index.html inline>>
+        -groups : Group[]
+        -selection : Map
+        -suggested : Map
+        -filterState : FilterState
+        -collapsed : Set
+        +renderGroups() void
+        +applyFilter() void
+        +toggleGroup(id) void
+        +setAllCollapsed(b) void
+        +gotoNextPending() void
+        +readUrlParams() void
+        +renderNextSteps() void
+        +generate() void
+        +renderGate() void
+        +originComment() string
+    }
+
+    class FilterState {
+        +string query
+        +string status
+        +string cause
+    }
+
+    class AbstentionBar {
+        +AbstentionSegment[] segments
+        +number total
+        +onSegmentClick(id) void
+    }
+    class MigrationChart {
+        +VersionSnapshot from
+        +VersionSnapshot to
+    }
+    class RootCauseTree {
+        +RootCauseNode node
+        +accentColor(node) string
+    }
+    class CompositionView {
+        +onDrillIntoXCode() void
+        +renderClarifierAction(entry) boolean
+    }
+    class ItemDrilldownView {
+        +onGoToSimulator() void
+        +renderClarifierAction(item) boolean
+    }
+    class Layout {
+        +ViewKey view
+        +renderFooter() void
+        +renderClarifierLink() void
+    }
+    class Tag {
+        +TagTone tone
+    }
+    class AmendmentBadge {
+        +Amendability amendability
+    }
+
+    AbstentionBar ..> DesignTokens : uses FILL
+    MigrationChart ..> DesignTokens : uses COLOR/delta
+    RootCauseTree ..> DesignTokens : uses accentColor
+    Tag ..> DesignTokens : token classes
+    AmendmentBadge ..> DesignTokens : token classes
+    CompositionView ..> ClarifierLink : clarifierHref()
+    ItemDrilldownView ..> ClarifierLink : clarifierHref()
+    Layout ..> ClarifierLink : clarifierHref()
+    CompositionView *-- AbstentionBar
+    CompositionView *-- MigrationChart
+    ClarifierApp *-- FilterState
+    ClarifierApp ..> ClarifierLink : DASHBOARD_URL

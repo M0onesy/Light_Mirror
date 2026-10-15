@@ -1,12 +1,15 @@
 import { scaleLinear } from 'd3-scale';
 import { ArrowRight } from 'lucide-react';
 import type { VersionSnapshot, XCode } from '@/types/diagnosis';
+import { tokens } from '@/theme/tokens';
 
 /**
  * X 码迁移图（stable-04 → stable-08）。
  *
  * 手写 SVG 双环/箭头：左侧为 from 版本、右侧为 to 版本，
  * 用带宽与箭头展示各 X 码的迁移（叙事：X6 ↓ / X3 ↑，根因重心位移而非消失）。
+ *
+ * 取色全部来自 `@/theme/tokens`（浅色专底下可读），禁止字面量。
  */
 
 export interface MigrationChartProps {
@@ -14,12 +17,12 @@ export interface MigrationChartProps {
   to: VersionSnapshot;
 }
 
-/** 展示顺序与配色（X3 定义=青，X6 解析=琥珀，X2 前提=中性灰）。 */
+/** 展示顺序与配色（X3 定义=深青，X6 解析=深琥珀，X2 前提=中性冷灰）。 */
 const CODES: XCode[] = ['X3', 'X6', 'X2'];
 const COLOR: Record<string, string> = {
-  X3: '#38BDF8',
-  X6: '#F59E0B',
-  X2: '#6B7280',
+  X3: tokens.improve,
+  X6: tokens.improveAlt,
+  X2: tokens.abstain,
 };
 const NAME: Record<string, string> = {
   X3: '定义缺口',
@@ -66,7 +69,7 @@ export function MigrationChart({ from, to }: MigrationChartProps) {
           const tw = scale(tv);
           const color = COLOR[code];
           const delta = tv - fv;
-          const deltaColor = delta > 0 ? '#38BDF8' : delta < 0 ? '#F59E0B' : '#6B7280';
+          const deltaColor = delta > 0 ? tokens.improve : delta < 0 ? tokens.improveAlt : tokens.abstain;
           return (
             <g key={code}>
               {/* 行分隔线 */}
@@ -75,14 +78,14 @@ export function MigrationChart({ from, to }: MigrationChartProps) {
                 y1={idx * rowH}
                 x2={width}
                 y2={idx * rowH}
-                stroke="#1F2937"
+                stroke={tokens.line}
                 strokeWidth={1}
               />
               {/* 左侧标签 */}
-              <text x={0} y={cy - 4} fill="#9CA3AF" fontSize={11}>
+              <text x={0} y={cy - 4} fill={tokens.muted} fontSize={11}>
                 {code}
               </text>
-              <text x={0} y={cy + 9} fill="#6B7280" fontSize={9}>
+              <text x={0} y={cy + 9} fill={tokens.mutedDim} fontSize={9}>
                 {NAME[code]}
               </text>
               {/* from 条 */}
@@ -97,7 +100,7 @@ export function MigrationChart({ from, to }: MigrationChartProps) {
               <text
                 x={labelW + fw + 6}
                 y={cy + 3}
-                fill="#9CA3AF"
+                fill={tokens.muted}
                 fontSize={10}
                 style={{ fontVariantNumeric: 'tabular-nums' }}
               >
@@ -123,7 +126,7 @@ export function MigrationChart({ from, to }: MigrationChartProps) {
               <text
                 x={labelW + barMaxW + 60 + tw + 6}
                 y={cy + 3}
-                fill="#E5E7EB"
+                fill={tokens.ink}
                 fontSize={10}
                 style={{ fontVariantNumeric: 'tabular-nums' }}
               >
@@ -144,7 +147,7 @@ export function MigrationChart({ from, to }: MigrationChartProps) {
             </g>
           );
         })}
-        <line x1={0} y1={height} x2={width} y2={height} stroke="#1F2937" strokeWidth={1} />
+        <line x1={0} y1={height} x2={width} y2={height} stroke={tokens.line} strokeWidth={1} />
       </svg>
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-2xs text-text-muted">
         <span>

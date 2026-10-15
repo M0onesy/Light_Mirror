@@ -1,13 +1,16 @@
 import { scaleLinear } from 'd3-scale';
 import type { Amendability } from '@/types/diagnosis';
+import { tokens, ON_FILL_TEXT } from '@/theme/tokens';
 
 /**
  * 弃权构成水平堆叠条（手写 SVG）。
  *
  * 着色语义（核心叙事红线）：
- * - amendable / amendable_partial → 青 / 琥珀（可改善空间）
- * - needs_user_declaration → 紫
+ * - amendable / amendable_partial → 深青 / 深琥珀（可改善空间）
+ * - needs_user_declaration → 深紫
  * - intentional → 中性冷灰（合法弃权，被尊重，绝不用红）
+ *
+ * 取色全部来自 `@/theme/tokens`（浅色专底下可读），禁止字面量。
  */
 
 export interface AbstentionSegment {
@@ -24,12 +27,12 @@ export interface AbstentionBarProps {
   activeId?: string | null;
 }
 
-/** amendability → 填充色。 */
+/** amendability → 填充色（浅底可读，取自 tokens）。 */
 const FILL: Record<Amendability, string> = {
-  amendable: '#38BDF8',
-  amendable_partial: '#F59E0B',
-  needs_user_declaration: '#A78BFA',
-  intentional: '#6B7280',
+  amendable: tokens.improve,
+  amendable_partial: tokens.improveAlt,
+  needs_user_declaration: tokens.declare,
+  intentional: tokens.abstain,
 };
 
 /** 条高（px）。 */
@@ -85,7 +88,7 @@ export function AbstentionBar({
                 <text
                   x={x0 + 8}
                   y={BAR_H / 2 + 4}
-                  fill="#0B0E13"
+                  fill={ON_FILL_TEXT}
                   fontSize={13}
                   fontWeight={600}
                   style={{ fontVariantNumeric: 'tabular-nums' }}

@@ -44,6 +44,15 @@ function check(name, fn) {
     results.push({ name, ok: false, detail: err.message });
   }
 }
+/** 异步断言（用于 page.evaluate 等返回 Promise 的检查）。 */
+async function acheck(name, fn) {
+  try {
+    const detail = await fn();
+    results.push({ name, ok: true, detail: detail ?? '' });
+  } catch (err) {
+    results.push({ name, ok: false, detail: err.message });
+  }
+}
 function assert(cond, msg) {
   if (!cond) throw new Error(msg);
 }
@@ -199,6 +208,113 @@ async function main() {
       assert(drillHasTable > 0, '下钻视图未渲染表格');
       return `table 数量=${drillHasTable}`;
     });
+
+    // —— DASH-3/4 构成分解与逐条下钻的「→ 去澄清」动线 ——
+    await page.getByRole('tab', { name: '构成分解' }).click();
+    await page.waitForTimeout(350);
+    await acheck('DASH-3. 构成分解存在「去澄清」且 href 含 filter=X3&cause=scope', () => {
+      return page.evaluate(() => {
+        const as = Array.from(document.querySelectorAll('a'));
+        const hits = as.filter((a) => a.textContent && a.textContent.includes('去澄清'));
+        if (hits.length === 0) throw new Error('构成分解未找到「去澄清」链接');
+        const hrefs = hits.map((a) => a.getAttribute('href') || '');
+        const okHref = hrefs.some((h) => h.includes('filter=X3') && h.includes('cause=scope'));
+        if (!okHref) throw new Error('「去澄清」href 未含 filter=X3&cause=scope：' + hrefs.join(', '));
+        return '去澄清链接 ' + hits.length + ' 个，href 契约正确';
+      });
+    });
+
+    await page.getByRole('tab', { name: '逐条下钻' }).click();
+    await page.waitForTimeout(350);
+    await acheck('DASH-4. 逐条下钻：口径类行有「去澄清」、非口径行无', () => {
+      return page.evaluate(() => {
+        const rows = Array.from(document.querySelectorAll('table tbody tr'));
+        let clarifiable = 0;
+        let nonClarifiable = 0;
+        for (const tr of rows) {
+          const tds = tr.querySelectorAll('td');
+          if (tds.length === 0) continue;
+          const idCell = (tds[0].textContent || '').trim();
+          // 关联需求列（倒数第二列）与 操作列（最后一列）
+          const reqCell = (tds[tds.length - 2]?.textContent || '').trim();
+          const lastCell = tds[tds.length - 1];
+          const hasLink = !!(lastCell && lastCell.querySelector('a') && lastCell.textContent.includes('去澄清'));
+          const isCaliber = idCell.length > 0 && reqCell === 'P0-3';
+          if (isCaliber) {
+            if (hasLink) clarifiable++;
+            else throw new Error('口径类行（' + idCell + ' P0-3）缺少「去澄清」');
+          } else {
+            if (!hasLink) nonClarifiable++;
+            else throw new Error('非口径行（' + idCell + '）不应出现「去澄清」');
+          }
+        }
+        if (clarifiable === 0) throw new Error('本页未出现口径类行，无法验证（请确认首页含 i0016-i0022）');
+        return '口径类行 ' + clarifiable + ' 个均有链接；非口径行 ' + nonClarifiable + ' 个均无';
+      });
+    });
+
+    // —— DASH-1③ 深底残留：html/#root/body 计算底色须为浅色（防白闪内联样式回归）——
+    await acheck('DASH-1c. 全站无深色底残留（html/#root/body 计算色为浅色）', () => {
+      return page.evaluate(() => {
+        const bg = (el) => getComputedStyle(el).backgroundColor;
+        const rgb = [document.documentElement, document.getElementById('root'), document.body]
+          .map((el) => (el ? bg(el) : 'n/a'));
+        const luminance = (s) => {
+          const m = s.match(/rgba?\(([^)]+)\)/);
+          if (!m) return 1;
+          const [r, g, b] = m[1].split(',').map((x) => parseFloat(x) / 255);
+          const lin = (c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+          return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+        };
+        for (const s of rgb) {
+          const L = luminance(s);
+          if (L < 0.9) throw new Error('发现深色底残留（明度 ' + L.toFixed(3) + '）：' + s);
+        }
+        return 'html/#root/body 底色均浅色：' + rgb.join(' | ');
+      });
+    });
+
+    // —— DASH-5① 视口级横向溢出：375px / 360px 无横向滚动 ——
+    for (const w of [375, 360]) {
+      await page.setViewportSize({ width: w, height: 800 });
+      await page.getByRole('tab', { name: '结论总览' }).click();
+      await page.waitForTimeout(300);
+      await acheck(`DASH-5a. ${w}px 无横向溢出`, () => {
+        return page.evaluate(() => {
+          const sw = document.documentElement.scrollWidth;
+          const cw = document.documentElement.clientWidth;
+          if (sw > cw) throw new Error(`横向溢出 +${sw - cw}px（scroll=${sw} client=${cw}）`);
+          return `scrollWidth=${sw} clientWidth=${cw}，无溢出`;
+        });
+      });
+    }
+
+    // —— DASH-5③ 切换控件在窄屏可操作（内部横滚、不换行崩坏）——
+    {
+      await page.setViewportSize({ width: 375, height: 800 });
+      await page.getByRole('tab', { name: '构成分解' }).click();
+      await page.waitForTimeout(350);
+      await acheck('DASH-5b. 375px SegmentedControl 内部可横滚', () => {
+        return page.evaluate(() => {
+          const t = document.querySelector('[role=tablist]');
+          if (!t) throw new Error('未找到 SegmentedControl');
+          const tabs = t.querySelectorAll('[role=tab]');
+          if (tabs.length !== 5) throw new Error('视图 tab 数不为 5：' + tabs.length);
+          return 'tablist scrollWidth=' + t.scrollWidth + ' clientWidth=' + t.clientWidth + '（' + (t.scrollWidth > t.clientWidth ? '可横滚' : '未溢出') + '）';
+        });
+      });
+      // 点击最末 tab（需求模拟器）验证可达
+      await page.getByRole('tab', { name: '需求模拟器' }).click();
+      await page.waitForTimeout(350);
+      const simText375 = await page.textContent('body');
+      check('DASH-5c. 375px 末 tab「需求模拟器」可点击并渲染', () => {
+        assert(/不做清单|需求池|模拟结果/.test(simText375), '375px 下未能切换到需求模拟器视图');
+        return '末 tab 可点击，视图渲染 OK';
+      });
+      // 恢复桌面视口，避免影响后续截图
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.waitForTimeout(200);
+    }
 
     // —— pageerror 汇总 ——
     check('D12-d. 全流程 console 零 error / 零 pageerror', () => {

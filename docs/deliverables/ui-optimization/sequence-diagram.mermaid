@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    actor U as 评审者
+    participant CV as CompositionView / ItemDrilldownView
+    participant CL as clarifierLink.ts
+    participant CLR as scope-clarifier/index.html
+    participant DOM as 澄清工具 DOM
+
+    U->>CV: 点击 c02 / i0016 行「→ 去澄清」
+    CV->>CL: clarifierHref({filter:'X3', cause:'scope'})
+    CL-->>CV: "../scope-clarifier/index.html?filter=X3&cause=scope"
+    CV-->>U: 新标签打开（<a target=_blank>）
+    Note over CV,U: 若 file:// 下打不开 → 页脚绝对路径提示降级
+
+    CLR->>CLR: readUrlParams() 解析 search
+    alt filter 合法(X1..X6) 且 cause=scope
+        CLR->>DOM: filterState={status:'pending', cause:'scope'}
+        CLR->>DOM: 显示 #originCrumb「来自：弃权诊断看板 · 口径类」
+    else 非法值(如 filter=ZZ)
+        CLR->>DOM: 忽略该字段，status='all', cause=null（显示全部）
+    end
+    CLR->>DOM: renderGroups() + applyFilter() 应用可见集合
+    U->>DOM: 输入搜索 / 点击筛选片 / 折叠 / 下一个待核对
+    DOM->>CLR: applyFilter()/toggleGroup()/gotoNextPending()
+    U->>DOM: 逐组选择口径（radio change → paintGroup+updateTallies+updateOriginBanner）
+    U->>DOM: 点击「生成重算命令」
+    DOM->>CLR: generate()（分支逻辑原样）
+    CLR->>CLR: renderGate() + originComment()（逐字不改）
+    CLR->>DOM: showOutput() + renderNextSteps()（3 步引导）
+    U->>DOM: 复制命令 → 终端执行（结果 runs/full-scope）

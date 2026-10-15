@@ -47,6 +47,19 @@ r.checkedAfterBulkConsolidated = await page.evaluate(() => {
 });
 r.sugBadgesAfterBulk = await page.locator('.tag.sug').count();
 
+// 5) 响应式：≤640px 断点无横向溢出（CLR-5①，覆盖 320px 极窄屏）
+r.responsive = {};
+for (const w of [320, 340, 375]) {
+  await page.setViewportSize({ width: w, height: 900 });
+  await page.waitForTimeout(250);
+  r.responsive[w] = await page.evaluate(() => {
+    const sw = document.documentElement.scrollWidth;
+    const cw = document.documentElement.clientWidth;
+    return { scrollWidth: sw, clientWidth: cw, overflow: sw - cw };
+  });
+}
+await page.setViewportSize({ width: 1320, height: 1300 });
+
 r.errors = errors;
 console.log(JSON.stringify(r, null, 2));
 await browser.close();

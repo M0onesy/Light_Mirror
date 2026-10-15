@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { useDiagnosis } from '@/hooks/useDiagnosis';
 import AbstentionBar, { type AbstentionSegment } from '@/components/AbstentionBar';
 import MigrationChart from '@/components/MigrationChart';
 import GapKindLegend from '@/components/GapKindLegend';
 import AmendmentBadge from '@/components/AmendmentBadge';
 import Tag from '@/components/ui/Tag';
+import { clarifierHref } from '@/utils/clarifierLink';
 import type { Amendability } from '@/types/diagnosis';
 
 /**
@@ -12,6 +14,7 @@ import type { Amendability } from '@/types/diagnosis';
  *
  * 内容：堆叠条 + 10 条 cause 明细表 + 迁移图 + GAP_KIND 图例。
  * 点击构成段 → dispatch SET_XCODE（供逐条下钻联动）。
+ * 明细表新增「操作」列：口径类（definition + needs_user_declaration）行提供「→ 去澄清」（DASH-3）。
  */
 
 export interface CompositionViewProps {
@@ -58,6 +61,10 @@ export function CompositionView({ onDrillIntoXCode }: CompositionViewProps) {
     dispatch({ type: 'SET_XCODE', code: activeXCode === top.x_code ? null : top.x_code });
   };
 
+  /** 口径类构成条目（definition + needs_user_declaration）→ 是否渲染「→ 去澄清」（DASH-3）。 */
+  const isClarifiable = (c: (typeof data.composition)[number]): boolean =>
+    c.gap_kind === 'definition' && c.amendability === 'needs_user_declaration';
+
   return (
     <div className="flex flex-col gap-4">
       {/* —— 构成堆叠条 —— */}
@@ -92,25 +99,28 @@ export function CompositionView({ onDrillIntoXCode }: CompositionViewProps) {
           <span className="text-2xs text-text-muted">来源 ABSTENTION_SMALL_SAMPLE.md</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-xs">
+          <table className="w-full min-w-[860px] border-collapse text-xs">
             <thead>
               <tr className="border-b border-border text-text-muted">
-                <th className="px-3 py-2 text-left font-medium">ID</th>
+                <th className="sticky left-0 z-10 bg-panel px-3 py-2 text-left font-medium">ID</th>
                 <th className="px-3 py-2 text-left font-medium">首要问题</th>
                 <th className="px-3 py-2 text-right font-medium">条数</th>
                 <th className="px-3 py-2 text-left font-medium">X 码</th>
                 <th className="px-3 py-2 text-left font-medium">GAP_KIND</th>
                 <th className="px-3 py-2 text-left font-medium">可改善性</th>
                 <th className="px-3 py-2 text-left font-medium">证据</th>
+                <th className="px-3 py-2 text-left font-medium">操作</th>
               </tr>
             </thead>
             <tbody>
               {sortedComposition.map((c) => (
                 <tr
                   key={c.id}
-                  className="border-b border-border/50 hover:bg-white/[0.02]"
+                  className="border-b border-border/50 hover:bg-ink/5"
                 >
-                  <td className="mj-num px-3 py-1.5 text-text-muted">{c.id}</td>
+                  <td className="sticky left-0 z-10 bg-panel mj-num px-3 py-1.5 text-text-muted">
+                    {c.id}
+                  </td>
                   <td className="px-3 py-1.5 text-text-primary">{c.cause}</td>
                   <td className="mj-num px-3 py-1.5 text-right text-text-primary">
                     {c.count}
@@ -130,6 +140,21 @@ export function CompositionView({ onDrillIntoXCode }: CompositionViewProps) {
                     <AmendmentBadge amendability={c.amendability} compact />
                   </td>
                   <td className="px-3 py-1.5 text-text-muted">{c.evidence_ref}</td>
+                  <td className="px-3 py-1.5">
+                    {isClarifiable(c) ? (
+                      <a
+                        href={clarifierHref({ filter: 'X3', cause: 'scope' })}
+                        target="_blank"
+                        rel="noopener"
+                        className="inline-flex items-center gap-1 whitespace-nowrap text-improve hover:underline"
+                      >
+                        <ExternalLink size={11} />
+                        去澄清
+                      </a>
+                    ) : (
+                      <span className="text-text-muted">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -140,7 +165,7 @@ export function CompositionView({ onDrillIntoXCode }: CompositionViewProps) {
                 <td className="mj-num px-3 py-2 text-right font-semibold text-text-primary">
                   {sortedComposition.reduce((acc, c) => acc + c.count, 0)}
                 </td>
-                <td className="px-3 py-2" colSpan={4} />
+                <td className="px-3 py-2" colSpan={5} />
               </tr>
             </tfoot>
           </table>

@@ -1,5 +1,6 @@
 import { ChevronRight, ChevronDown, CircleDot, ShieldCheck } from 'lucide-react';
 import type { RootCauseNode } from '@/types/diagnosis';
+import { tokens } from '@/theme/tokens';
 
 /**
  * 根因树递归组件 —— 可折叠 + 叶子联动 activeRequirement 高亮。
@@ -16,23 +17,23 @@ export interface RootCauseTreeProps {
   onSelectLeaf?: (node: RootCauseNode) => void;
 }
 
-/** X 码 → 左侧色条颜色（neutral 冷灰=保守，高亮=可改善）。 */
+/** X 码 → 左侧色条颜色（neutral 冷灰=保守，高亮=可改善；取自 tokens）。 */
 function accentColor(node: RootCauseNode): string {
   if (node.redline === true) {
-    return '#6B7280';
+    return tokens.abstain;
   }
   switch (node.x_code) {
     case 'X3':
-      return '#38BDF8';
+      return tokens.improve;
     case 'X6':
-      return '#F59E0B';
+      return tokens.improveAlt;
     case 'X2':
-      return '#6B7280';
+      return tokens.abstain;
     case 'X1':
     case 'X5':
-      return '#38BDF8';
+      return tokens.improve;
     default:
-      return '#4B5563';
+      return tokens.abstainMuted;
   }
 }
 
@@ -57,7 +58,7 @@ export function RootCauseTree({
       <div
         className={[
           'group flex items-center gap-2 py-1 pr-2 rounded-sm transition-colors',
-          linked ? 'bg-improve/10' : selected ? 'bg-white/5' : '',
+          linked ? 'bg-improve/10' : selected ? 'bg-ink/5' : '',
         ]
           .filter(Boolean)
           .join(' ')}

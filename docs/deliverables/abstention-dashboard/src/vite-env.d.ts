@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly DEV: boolean;
   readonly PROD: boolean;
   readonly MODE: string;
+  /** 口径澄清工具 URL 覆盖（用于看板单独部署到其它根路径时）。 */
+  readonly VITE_CLARIFIER_URL?: string;
 }
 
 interface ImportMeta {
