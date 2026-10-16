@@ -41,7 +41,10 @@
     <div class="drop-sub">支持 PDF、Word(.docx)、Markdown、TXT；可一次放入一批。文件自动存入知识库，重复文件按内容去重。</div>
   </div>
 
-  <div class="drop-alt">已经上传过？<button class="link" id="addFromKb">从知识库选择已有材料</button> · 只传研报也可以：系统会自动调取库中同公司的财报。 · <button class="link" id="runDemo">一键演示（虚构样例，含预埋错误）</button></div>
+  <div class="drop-alt">
+    <div class="drop-alt-row">已经上传过？<button class="link" id="addFromKb">从知识库选择已有材料</button><button class="link" id="runDemo" title="载入内置样例并直接跑一遍核查（样例含故意埋下的错误），结果会出现在「核查结果」页">试用示例</button></div>
+    <div class="drop-alt-note">只传研报也可以：系统会自动调取库中同公司的财报</div>
+  </div>
 
   <div class="panel" id="queuePanel" hidden>
     <div class="panel-head"><h3>本次材料</h3><div><button class="link" id="clearQueue">清空</button></div></div>
@@ -49,10 +52,10 @@
   </div>
 
   <details class="panel options">
-    <summary>可选项（不填写也能运行）</summary>
+    <summary>可选项</summary>
     <div class="grid3">
       <label>公司（覆盖自动识别）<input id="optCompany" placeholder="如：并行科技"></label>
-      <label>研报日期（取数截止日）<input id="optDate" type="date"></label>
+      <label>研报日期（取数截止日）<span class="date-field"><input id="optDate" type="text" placeholder="YYYY-MM-DD" inputmode="numeric" autocomplete="off" aria-label="研报日期"><button type="button" class="date-btn" id="optDatePick" aria-label="打开日历选择日期">📅</button><input id="optDateNative" type="date" tabindex="-1" aria-hidden="true" class="date-native"></span></label>
       <label>任务口径声明（用户声明；与原文冲突时任务终止）<select id="optScope"><option value="">按原文识别／标准模式注明推定</option><option value="合并">合并（用户声明）</option><option value="母公司">母公司（用户声明）</option></select></label>
       <label class="check"><input id="optKb" type="checkbox" checked> 从知识库补充同公司财报</label>
       <label class="check"><input id="optStrict" type="checkbox"> 审慎模式（不做口径推定）</label>
@@ -83,15 +86,7 @@
         <a id="rHtml" class="btn" target="_blank">报告（HTML）</a>
         <a id="rCsv" class="btn">修改清单（CSV）</a>
         <a id="rZip" class="btn">导出全部</a>
-        <button id="rReplay" class="btn" title="用知识库中按哈希登记的同一批输入离线重算，逐条比较结论">重放验证</button>
       </div>
-    </div>
-    <div class="panel" id="sessionPanel" hidden>
-      <div class="panel-head"><h3>材料会话与补证</h3><span id="sessionState" class="small muted"></span><button class="link" id="sessionRefresh">刷新</button></div>
-      <p id="nativeState" class="muted small"></p>
-      <div id="sessionMessages" class="session-messages" aria-live="polite"></div>
-      <div class="actions"><input id="sessionQuestion" placeholder="追问同一材料，例如：这个同比的分母和证据是什么？" aria-label="材料追问"><button class="primary" id="sessionSend">发送追问</button><button class="btn" id="sessionCancel">取消会话</button><button class="btn" id="sessionResume">恢复会话</button><button class="btn" id="sessionSupplement">添加补证并重查</button></div>
-      <div id="sessionActivities" class="small muted"></div>
     </div>
     <div id="checkView">
       <div class="kpis">
@@ -108,12 +103,11 @@
         <button data-tab="all">全部陈述 <em id="cAll"></em></button>
         <button data-tab="gap">未能核实与补材 <em id="cGap"></em></button>
         <button data-tab="scope" hidden>口径待澄清 <em id="cScope"></em></button>
-        <button data-tab="assume">推定与假设 <em id="cAssume"></em></button>
-        <button data-tab="groups">分级统计</button>
         <button data-tab="materials">参考材料</button>
       </div>
       <div class="tab" id="tab-wrong"></div>
       <div class="tab" id="tab-all" hidden>
+        <p class="muted small" id="allAssumptions"></p>
         <div class="filters">
           <input id="fText" placeholder="搜索原文、指标、数值…">
           <select id="fStatus"><option value="">全部状态</option><option value="verified">已核实</option><option value="violated">有误</option><option value="unverifiable">未能核实</option><option value="skipped">不判定</option></select>
@@ -125,8 +119,6 @@
       </div>
       <div class="tab" id="tab-gap" hidden></div>
       <div class="tab" id="tab-scope" hidden></div>
-      <div class="tab" id="tab-assume" hidden></div>
-      <div class="tab" id="tab-groups" hidden></div>
       <div class="tab" id="tab-materials" hidden></div>
     </div>
     <div id="analysisView" hidden>
@@ -146,7 +138,7 @@
     <div class="panel-head"><h3>文档</h3><div class="filters inline"><input id="kbSearch" placeholder="搜索文件名、公司、代码"><select id="kbType"><option value="">全部类型</option></select><button class="btn" id="kbUpload">上传到知识库</button></div></div>
     <table class="table" id="kbTable"><thead><tr><th>文件</th><th>类型</th><th>公司</th><th>报告期</th><th>日期</th><th>事实</th><th>上传/引用</th><th></th></tr></thead><tbody></tbody></table>
   </div>
-  <div class="panel"><div class="panel-head"><h3>留痕日志</h3><span class="muted small">入库、去重命中、解析、被任务引用均写入哈希链日志</span><span><span id="journalState" class="small"></span> <button class="link" id="verifyJournal">校验哈希链</button></span></div><ol class="journal" id="journal"></ol></div>
+  <div class="panel"><div class="panel-head"><h3>留痕日志</h3><span class="muted small">谁在什么时候用过这份材料</span><span><span id="journalState" class="small"></span> <button class="link" id="verifyJournal">校验留痕完整性</button></span></div><ol class="journal" id="journal"></ol></div>
 </section>
 
 <section id="view-history" class="view">
@@ -167,11 +159,10 @@
       <label><span id="sKeyLabel">API Key</span><input id="sKey" type="password" autocomplete="new-password" placeholder="留空则不修改"></label>
     </div>
     <div class="actions"><button class="primary" id="sSave">保存设置</button><span class="muted small" id="sEffective"></span></div>
-    <div class="actions"><button class="btn" id="sTest">测试连接</button><button class="btn" id="sTestAgent">测试 Agent 工具闭环</button><button class="btn" id="sDiscover">发现模型</button><a href="/classic#settings">角色路由与预算</a></div>
+    <div class="actions"><button class="btn" id="sTest">测试连接</button><button class="btn" id="sDiscover">发现模型</button><a href="/classic#settings">角色路由与预算</a></div>
     <pre id="sTestResult" class="test-result" hidden></pre>
   </div>
   <div class="panel"><div class="panel-head"><h3>运行环境</h3></div><div class="kv" id="sStatus"></div></div>
-  <div class="panel"><div class="panel-head"><h3>高级界面</h3></div><p>原生 Agent 会话、补证包、供应商路由等高级配置在 <a href="/classic">高级界面</a> 中。</p></div>
 </section>
 
 <section id="view-about" class="view">

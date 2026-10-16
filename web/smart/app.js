@@ -10,7 +10,7 @@ const CAT = { core: '历史财务（法定/封闭定义）', open_metric: '历�
 const MODALITY = { fact: '事实', inference: '推论（预测与估算）', opinion: '观点（目标价等）' };
 const TYPE = { research_report: '研究报告', annual_report: '年度报告', semiannual_report: '半年度报告', quarterly_report: '季度报告', prospectus: '招股说明书', facts_json: '结构化事实', other: '其他材料', unknown: '未识别' };
 const TABLE_LABEL = { SUMMARY: '财务摘要', IS: '利润表', BS: '资产负债表', CF: '现金流量表', RATIO: '主要财务比率' };
-const state = { queue: [], run: null, poll: null, batch: null, item: null, results: null, kb: [], session: null, sessionPoll: null, provider: null };
+const state = { queue: [], run: null, poll: null, batch: null, item: null, results: null, kb: [], provider: null };
 /** 口径待澄清视图的界面状态（仅影响展示，不参与任何判定）。 */
 const scopeView = { query: '', filter: 'all', collapsed: new Set(), reviewed: new Set(), groups: [], decision: '', gate: false };
 let token = sessionStorage.getItem('mingjing-token') || '';
@@ -85,6 +85,7 @@ function addRecords(records) {
   }
   renderQueue();
 }
+const MODE_LABEL = { auto: '自动识别', check: '研报核查', analysis: '财报分析' };
 function renderQueue() {
   $('#queuePanel').hidden = state.queue.length === 0;
   const body = $('#queue tbody');
@@ -102,19 +103,31 @@ function renderQueue() {
   $('#start').disabled = ready.length === 0;
   const reports = ready.filter((q) => q.record.doc_type === 'research_report').length;
   const filings = ready.length - reports;
-  $('#startHint').textContent = ready.length ? `将处理 ${ready.length} 份材料：研报 ${reports} 份、财报/其他 ${filings} 份。${reports ? '每份研报单独出具核查结果。' : '同一公司的财报合并分析。'}` : '请先放入文件';
+  const checkedMode = $('input[name=mode]:checked');
+  const modeLabel = MODE_LABEL[checkedMode ? checkedMode.value : 'auto'] || '自动识别';
+  $('#startHint').textContent = ready.length
+    ? `已选「${modeLabel}」 · 将处理 ${ready.length} 份材料：研报 ${reports} 份、财报/其他 ${filings} 份。${reports ? '每份研报单独出具核查结果。' : '同一公司的财报合并分析。'}`
+    : `已选「${modeLabel}」 · 请先放入文件`;
 }
+$$('input[name=mode]').forEach((r) => r.addEventListener('change', renderQueue));
 $('#queue').addEventListener('click', (e) => {
   const rm = e.target.closest('[data-remove]'); if (rm) { state.queue.splice(+rm.dataset.remove, 1); renderQueue(); return; }
   const ed = e.target.closest('[data-edit]'); if (ed) editDoc(ed.dataset.edit);
 });
 $('#clearQueue').addEventListener('click', () => { state.queue = []; renderQueue(); });
 $('#addFromKb').addEventListener('click', async () => {
-  const data = await api('/api/kb');
-  const rows = data.docs.map((d) => `<label class="check" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="${d.doc_id}"> ${esc(d.name)} <span class="muted small">${esc(d.type_label || '')} ${esc(d.company || '')} ${esc(d.period || '')}</span></label>`).join('') || '<p class="muted">知识库为空</p>';
-  openModal(`<h3>从知识库选择</h3><div style="max-height:50vh;overflow:auto">${rows}</div><div class="actions"><button class="primary" id="mOk">添加</button><button class="link" id="mCancel">取消</button></div>`);
-  $('#mOk').onclick = () => { const ids = $$('#modalCard input:checked').map((i) => i.value); addRecords(data.docs.filter((d) => ids.includes(d.doc_id))); closeModal(); };
-  $('#mCancel').onclick = closeModal;
+  try {
+    const data = await api('/api/kb');
+    if (!data.docs.length) { toast('知识库还没有材料，请先在工作台拖入研报或财报文件', 4000); return; }
+    const rows = data.docs.map((d) => `<label class="check" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="${d.doc_id}"> ${esc(d.name)} <span class="muted small">${esc(d.type_label || '')} ${esc(d.company || '')} ${esc(d.period || '')}</span></label>`).join('');
+    openModal(`<h3>从知识库选择</h3><div style="max-height:50vh;overflow:auto">${rows}</div><div class="actions"><button class="primary" id="mOk">添加</button><button class="link" id="mCancel">取消</button></div>`);
+    $('#mOk').onclick = () => {
+      const ids = $$('#modalCard input:checked').map((i) => i.value);
+      if (!ids.length) { toast('还没有勾选任何材料', 3000); return; }
+      addRecords(data.docs.filter((d) => ids.includes(d.doc_id))); closeModal(); toast('已加入本次材料，点「开始」运行');
+    };
+    $('#mCancel').onclick = closeModal;
+  } catch (err) { toast('服务未连接，请先启动明镜本地服务；' + (err && err.message ? err.message : ''), 5000); }
 });
 
 $('#runDemo').addEventListener('click', async () => {
@@ -141,6 +154,38 @@ async function editDoc(id) {
     renderQueue(); closeModal(); toast('已保存，相关事实缓存将按新信息重建'); if ($('#view-kb').classList.contains('active')) loadKb();
   };
 }
+
+/* —— 研报日期：文本输入 + 独立日历按钮（原生 type=date 会强制显示中文“年/月/日”，故改用 text + showPicker）—— */
+function normalizeDate(v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s) return '';
+  const m = s.match(/^(\d{4})[-/]?(\d{1,2})[-/]?(\d{1,2})$/);
+  if (!m) return null;
+  const year = +m[1], month = +m[2], day = +m[3];
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const d = new Date(Date.UTC(year, month - 1, day));
+  if (d.getUTCFullYear() !== year || d.getUTCMonth() !== month - 1 || d.getUTCDate() !== day) return null;
+  return `${m[1]}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+function commitDate(text, native) {
+  const raw = text.value.trim();
+  if (!raw) { native.value = ''; return ''; }
+  const n = normalizeDate(raw);
+  if (n) { text.value = n; native.value = n; return n; }
+  toast('日期格式应为 YYYY-MM-DD', 4000); text.value = ''; native.value = ''; return '';
+}
+(function bindDateField() {
+  const text = $('#optDate'), native = $('#optDateNative'), picker = $('#optDatePick');
+  if (!text || !native || !picker) return;
+  text.addEventListener('change', () => commitDate(text, native));
+  text.addEventListener('blur', () => commitDate(text, native));
+  picker.addEventListener('click', () => {
+    native.value = text.value.trim() || '';
+    if (typeof native.showPicker === 'function') { try { native.showPicker(); } catch (e) { native.click(); } }
+    else native.click();
+  });
+  native.addEventListener('change', () => { if (native.value) { text.value = native.value; text.focus(); } });
+})();
 
 /* —— 启动与进度 —— */
 $('#start').addEventListener('click', async () => {
@@ -189,15 +234,6 @@ async function openItem(index) {
   $('#rCsv').onclick = (e) => { e.preventDefault(); download(base + '/corrections.csv?download=1', `明镜修改清单-${item.company || 'report'}.csv`); };
   $('#rZip').onclick = (e) => { e.preventDefault(); download(`/api/smart/runs/${run.run_id}/export`, `MingJing-${run.run_id}.zip`); };
   $('#rCsv').hidden = data.task !== 'check';
-  $('#rReplay').onclick = async () => {
-    const btn = $('#rReplay'); btn.disabled = true; btn.textContent = '重放中…';
-    try {
-      const r = await api(base + '/replay', { method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' } });
-      if (r.status === 'identical') toast(`离线重放一致：逐条比较 ${r.compared} 项，差异 0`, 4000);
-      else if (r.status === 'missing_inputs') toast('知识库缺少原始输入：' + (r.missing || []).join('、'), 5000);
-      else toast(`重放未通过：${r.reason || r.status} ${r.differences ?? ''} ${r.issues ? JSON.stringify(r.issues).slice(0, 240) : ''}`, 5000);
-    } catch (err) { toast(err.message, 4000); } finally { btn.disabled = false; btn.textContent = '重放验证'; }
-  };
   const rep = data.report || {};
   $('#rTitle').textContent = `${rep.company || '未识别公司'} · ${data.task === 'check' ? '研报核查' : '财报分析'}`;
   $('#rMeta').textContent = data.task === 'check'
@@ -208,7 +244,6 @@ async function openItem(index) {
   $('#rNarrative').hidden = !narrative.text;
   $('#checkView').hidden = data.task !== 'check'; $('#analysisView').hidden = data.task !== 'analysis';
   if (data.task === 'check') renderCheck(data); else renderAnalysis(data);
-  openMaterialSession(data).catch((err) => { $('#sessionState').textContent = err.message; });
 }
 function subject(it) {
   const name = it.metric ? (it.metric_name || it.metric_text || it.metric) : (it.metric_text || '未绑定指标');
@@ -431,14 +466,11 @@ function renderCheck(data) {
   $('#tab-gap').innerHTML = grouped + (s.gaps && s.gaps.length ? `<div class="panel"><div class="panel-head"><h3>缺口清单</h3><span class="muted small">按缺失的期间与科目汇总，补充对应报告后重跑即可</span></div><table class="table"><thead><tr><th>期间</th><th>科目/维度</th><th>涉及陈述</th></tr></thead><tbody>${s.gaps.map((g) => `<tr><td>${esc(periodLabel(g.period))}</td><td>${esc(g.item)}${g.dimension ? ' · ' + esc(g.dimension) : ''}</td><td>${g.claims}</td></tr>`).join('')}</tbody></table></div>` : '')
     + Object.entries(byReason).map(([k, list]) => `<h4>${esc(k)}（${list.length}）</h4>` + list.slice(0, 120).map((it) => `<div class="card unk" data-cid="${it.cid}"><div class="row1"><span class="tag unk">${esc(it.abstain_code)}</span><b>${esc(subject(it))} ${esc(it.num_text)}</b><span class="muted small">第${it.page}页 · ${esc(CAT[it.category] || it.category)}</span></div><div class="muted">${esc(it.reason)}${it.internal_check ? '（' + esc(it.internal_check) + '）' : ''}</div></div>`).join('')).join('');
   const assumptions = s.assumptions || [];
-  $('#cAssume').textContent = s.presumed_results || '';
-  $('#tab-assume').innerHTML = `<div class="panel"><div class="panel-head"><h3>推定与假设</h3><span class="muted small">${s.presumed_results || 0} 条结论用到推定；点开任一条可看它用了哪几项</span></div>`
-    + (assumptions.length ? `<table class="table"><thead><tr><th>推定</th><th>涉及结论</th></tr></thead><tbody>${assumptions.map((a) => `<tr><td>${esc(a.label)}</td><td>${a.count}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">本次结论没有用到推定。</div>')
-    + `<p class="muted small">${data.mode === 'strict' ? '审慎模式：不做口径推定，仅备选定义相容的陈述记为“未能核实”。' : '标准模式：按通行惯例推定并逐条披露；勾选“审慎模式”可关闭口径推定。'}`
-    + `${data.market_check && data.market_check.status ? ' 首页行情校验：' + esc(data.market_check.detail || data.market_check.status) + '。' : ''}</p></div>`;
-  $('#tab-groups').innerHTML = `<table class="table"><thead><tr><th>分级</th><th>断言</th><th>已核实</th><th>有误</th><th>未能核实</th><th>不判定</th><th>原文出现</th></tr></thead><tbody>${Object.values(s.groups).map((g) => `<tr><td>${esc(g.label)}</td><td>${g.total}</td><td>${g.verified}</td><td>${g.violated}</td><td>${g.unverifiable}</td><td>${g.skipped}</td><td>${g.occurrences}</td></tr>`).join('')}</tbody></table>
-    ${s.modality ? `<h4>事实、推论与观点</h4><table class="table"><thead><tr><th>性质</th><th>断言</th><th>已核实</th><th>有误</th><th>未能核实</th><th>不判定</th></tr></thead><tbody>${Object.entries(s.modality).map(([k, v]) => `<tr><td>${esc(MODALITY[k] || k)}</td><td>${v.total}</td><td>${v.verified}</td><td>${v.violated}</td><td>${v.unverifiable}</td><td>${v.skipped}</td></tr>`).join('')}</tbody></table>` : ''}
-    <p class="muted small">核实依据：${Object.entries(s.basis || {}).map(([k, v]) => `${BASIS[k] || k} ${v}`).join('，')}。错误类型：${Object.entries(s.error_types || {}).map(([k, v]) => `${k} ${v}`).join('，') || '无'}。弃权代码：${Object.entries(s.abstain_codes || {}).map(([k, v]) => `${k} ${v}`).join('，') || '无'}。</p>`;
+  const assumedText = assumptions.length
+    ? `本次核查采用推定：${assumptions.map((a) => a.label).join('、')}。共 ${s.presumed_results || assumptions.reduce((n, a) => n + (a.count || 0), 0)} 项结论用到推定。`
+    : '';
+  const assumptionsLine = $('#allAssumptions');
+  if (assumptionsLine) { assumptionsLine.textContent = assumedText; assumptionsLine.hidden = !assumedText; }
   $('#tab-materials').innerHTML = materialsTable(data.materials) + (data.binder && data.binder.mode === 'llm' ? `<p class="muted small">模型语义绑定：${esc(data.binder.model || '')}，候选 ${data.binder.candidates}，改写 ${data.binder.refined}，请求 ${data.binder.requests}，缓存命中 ${data.binder.cache_hits}。</p>` : `<p class="muted small">语义绑定：确定性规则${data.binder && data.binder.error ? '（模型不可用，已回退：' + esc(data.binder.error) + '）' : ''}。</p>`)
     + `<p class="muted small">知识库本次：解析缓存命中 ${data.kb.parse_hits}、事实缓存命中 ${data.kb.fact_hits}、去重命中 ${data.kb.dedupe_hits}。</p>`;
   renderScopeTab(data);
@@ -577,7 +609,7 @@ async function refreshLlm() {
 /* —— 知识库 —— */
 async function loadKb() {
   const data = await api('/api/kb'); state.kb = data.docs; const s = data.stats;
-  $('#kbStats').innerHTML = [['文档', s.documents], ['公司', s.companies.length], ['去重节省上传', s.duplicate_uploads_saved], ['任务引用次数', s.reuse_hits], ['缓存条目', s.cache_entries]].map(([k, v]) => `<div class="kpi"><b>${v}</b><span>${k}</span></div>`).join('');
+  $('#kbStats').innerHTML = [['文档', s.documents], ['公司', s.companies.length]].map(([k, v]) => `<div class="kpi"><b>${v}</b><span>${k}</span></div>`).join('');
   const types = [...new Set(data.docs.map((d) => d.type_label).filter(Boolean))];
   const current = $('#kbType').value; $('#kbType').innerHTML = '<option value="">全部类型</option>' + types.map((t) => `<option ${t === current ? 'selected' : ''}>${esc(t)}</option>`).join('');
   renderKb(); verifyJournal(); const j = await api('/api/kb/journal?limit=80');
@@ -625,68 +657,9 @@ async function loadHistory() {
 }
 $('#refreshHistory').addEventListener('click', loadHistory);
 
-/* 同一冻结材料的原生会话。结论与引用来自宿主工具，不在浏览器计算。 */
-async function openMaterialSession(data) {
-  clearTimeout(state.sessionPoll); state.session = null;
-  $('#sessionPanel').hidden = !data.native_run_id;
-  if (!data.native_run_id) return;
-  const model = data.model || {};
-  $('#nativeState').textContent = `原生任务 ${data.native_run_id} · 模型执行 ${model.status || '未记录'}${model.error ? '（' + model.error + '）' : ''} · ${data.mode === 'strict' ? '审慎策略' : '标准策略'} · 追问使用任务冻结配置；补证创建新版本。`;
-  const session = data.session_id ? await api('/api/sessions/' + data.session_id)
-    : await api('/api/sessions', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({run_id: data.native_run_id})});
-  state.session = session.session_id; renderSession(session);
-}
-function renderSession(s) {
-  const labels = {ready:'可追问',running:'原生工具执行中',cancelled:'已取消',failed:'未完成',interrupted:'待恢复'};
-  $('#sessionState').textContent = `${labels[s.status] || s.status} · ${s.session_id}`;
-  $('#sessionSend').disabled = s.status === 'running';
-  $('#sessionResume').hidden = !['interrupted','cancelled','failed'].includes(s.status);
-  $('#sessionMessages').innerHTML = (s.messages || []).map((m) => `<div class="message ${esc(m.role)}"><b>${{user:'问题',assistant:'答复',system:'状态'}[m.role] || m.role}</b><p>${esc(m.text)}</p>${m.message_id ? `<button class="link" data-message-replay="${esc(m.message_id)}">离线重放此答复</button>` : ''}${(m.source_references || []).map((r) => `<div class="small muted">${esc(r.document_name || r.source || '')} · 页 ${esc(r.page || '')} · ${esc(r.evidence_id || '')}</div>`).join('')}</div>`).join('') || '<p class="muted">可继续询问依据、指标定义或缺少的材料。</p>';
-  const activities = s.activities || s.events || [];
-  $('#sessionActivities').textContent = activities.slice(-6).map((e) => `${e.role || ''} ${e.tool || e.event || e.type || ''} ${e.status || ''}`).join(' → ');
-  if (s.status === 'running') state.sessionPoll = setTimeout(refreshSession, 1800);
-}
-async function refreshSession() {
-  clearTimeout(state.sessionPoll);
-  if (!state.session) return;
-  try { const s = await api('/api/sessions/' + state.session); if (s.session_id === state.session) renderSession(s); }
-  catch (err) { $('#sessionState').textContent = err.message; }
-}
-$('#sessionRefresh').addEventListener('click', refreshSession);
-$('#sessionSend').addEventListener('click', async () => {
-  if (!state.session) return; const question = $('#sessionQuestion').value.trim(); if (!question) return;
-  $('#sessionSend').disabled = true;
-  try { const s = await api(`/api/sessions/${state.session}/messages`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})}); $('#sessionQuestion').value=''; renderSession(s); }
-  catch (err) { toast(err.message,5000); $('#sessionSend').disabled=false; }
-});
-for (const action of ['cancel','resume']) $('#session' + (action === 'cancel' ? 'Cancel' : 'Resume')).addEventListener('click', async () => {
-  if (!state.session) return;
-  try { renderSession(await api(`/api/sessions/${state.session}/${action}`, {method:'POST',body:'{}'})); }
-  catch (err) { toast(err.message,5000); }
-});
-$('#sessionMessages').addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-message-replay]'); if (!b || !state.session) return; b.disabled=true;
-  try { const r=await api(`/api/sessions/${state.session}/messages/${b.dataset.messageReplay}/replay`,{method:'POST',body:'{}'}); toast(r.status === 'passed' ? '消息离线重放通过' : `消息重放：${r.status} ${r.reason || ''}`,5000); }
-  catch (err) { toast(err.message,5000); } finally { b.disabled=false; }
-});
-$('#sessionSupplement').addEventListener('click', async () => {
-  if (!state.item || !state.batch) return;
-  try {
-    const k=await api('/api/kb');
-    $('#modalCard').innerHTML='<h3>选择补证材料</h3><p class="muted">先在知识库上传缺少的财报或附注。补证将创建新任务，不修改已冻结结果。</p><div class="supplement-list">'+k.docs.filter(d=>d.doc_type!=='research_report').map(d=>`<label class="check"><input type="checkbox" data-supplement-id="${esc(d.doc_id)}">${esc(d.name)} · ${esc(d.company || '')} · ${esc(d.report_date || '日期未知')}</label>`).join('')+'</div><div class="actions"><button class="primary" id="confirmSupplement">补证并重查</button><button class="btn" id="closeSupplement">关闭</button></div>';
-    $('#modal').hidden=false; $('#closeSupplement').onclick=()=>$('#modal').hidden=true;
-    $('#confirmSupplement').onclick=async()=>{
-      const doc_ids=$$('[data-supplement-id]:checked').map(e=>e.dataset.supplementId); if(!doc_ids.length){toast('请选择材料');return;}
-      try { const r=await api(`/api/smart/runs/${state.batch.run_id}/items/${encodeURIComponent(state.item.item_id)}/materials`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({doc_ids})}); $('#modal').hidden=true;
-        if(r.batch_id){ state.run=r.batch_id; show('work'); $('#progressPanel').hidden=false; pollRun(); }
-        else toast('补证版本已创建：'+r.run_id+'，可在高级界面的任务历史中查看',6000);
-      }catch(err){toast(err.message,5000);}
-    };
-  }catch(err){toast(err.message,5000);}
-});
 async function providerDiagnostic(action) {
-  const button={test:$('#sTest'),'test-agent':$('#sTestAgent'),discover:$('#sDiscover')}[action]; button.disabled=true;
-  $('#sTestResult').hidden=false; $('#sTestResult').textContent='正在执行 '+(action==='test-agent'?'真实原生工具往返（虚构数据）':'供应商检查')+'…';
+  const button={test:$('#sTest'),discover:$('#sDiscover')}[action]; button.disabled=true;
+  $('#sTestResult').hidden=false; $('#sTestResult').textContent='正在执行 供应商检查…';
   try {
     if(!state.provider){ const cfg=await api('/api/config'); state.provider=cfg.config.agent.routing.default.provider; }
     if(!state.provider) throw new Error('请先保存供应商设置');
@@ -695,7 +668,6 @@ async function providerDiagnostic(action) {
   }catch(err){$('#sTestResult').textContent=err.message;}finally{button.disabled=false;}
 }
 $('#sTest').addEventListener('click',()=>providerDiagnostic('test'));
-$('#sTestAgent').addEventListener('click',()=>providerDiagnostic('test-agent'));
 $('#sDiscover').addEventListener('click',()=>providerDiagnostic('discover'));
 
 /* —— 启动 —— */

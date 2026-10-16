@@ -4,13 +4,13 @@
   "files": [
     {
       "path": "web/smart/app.css",
-      "bytes": 15865,
-      "sha256": "4a50806d246ebe47a6600c191722448cb61684c1479171618aa775fa89335321"
+      "bytes": 16550,
+      "sha256": "b8e6e06040eb2dbcdeae7451a5b5afdc11d3f68b9fc431518ca3fc96d2f6d5d9"
     },
     {
       "path": "web/smart/app.js",
-      "bytes": 67193,
-      "sha256": "6a4fa1aed3136ca10de7067bba28d337a5391006e4d2887ccaa7a29c02c631c0"
+      "bytes": 61072,
+      "sha256": "ad2aa60ebb90a9ca8494cecda164a54967460f33f058da72667975e9e7f445ce"
     },
     {
       "path": "web/smart/decimal.js",
@@ -19,10 +19,10 @@
     },
     {
       "path": "web/smart/index.html",
-      "bytes": 17176,
-      "sha256": "7f27f55ac45c483c2cfa4cea463b729fd4743f6c036bc822b6d55407e8fbddd3"
+      "bytes": 16133,
+      "sha256": "c1cfcce4dad69e4240275a4f409c4ff692aec54fb152e42051840561ed71a0be"
     }
   ],
-  "sha256": "4cba5206574e363caaebc2774834200f12f9cf9ddbb7b20b7dfba1b1b730bba4",
-  "recorded_at": "2026-10-15T10:24:28.128026+00:00"
+  "sha256": "8fe4991d6f934e4bb15c88e94ec774a7f5f0796b5415c3a94ee3af7b25f70a6d",
+  "recorded_at": "2026-10-16T02:35:30.829525+00:00"
 }
