@@ -26,6 +26,7 @@ temp-*.txt
 /.tmp_sample_render/
 /.pytest_cache/
 /.pytest_tmp/
+/.workbuddy/
 /.ptmp_*/
 /.mypy_cache/
 /.ruff_cache/
