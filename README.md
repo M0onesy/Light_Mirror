@@ -2,6 +2,19 @@
 
 明镜面向研究报告事实核查、财报分析和材料追问。首页上传研报/财报并存入本地知识库，在线任务复用锁定的 DeepSeek Harness 原生 Agent Loop，通过受控金融工具调用统一的 MetricSpec、规则和 Decimal 内核。模型负责语义、检索与报告组织；金额事实、计算、判定和替换数字由宿主产生。
 
+## 项目速览
+
+明镜做的事很窄：给它一份研报草稿和对应的原始财报，它逐条核对草稿里的数字——收入、利润、估值倍数、单位、统计口径、同比环比——指出哪些与原始披露不符，哪些因为口径不明而无法判定。
+
+它不追求"给出结论"，而是保证每个结论都站得住：
+
+- **数字不由模型生成。** 金额事实、计算、判定和替换文本都由宿主的确定性内核产生；模型只负责语义理解、检索和组织语言。模型说错话，不会因此变成一个错数字。
+- **口径不明就弃权。** 缺少合并/母公司口径、缺少原始披露、两路来源冲突时，系统输出弃权并写明原因，而不是挑一个看起来合理的数值。
+- **每个结论都回得到原文。** 证据定位到 PDF 的页码与坐标，取数、口径判定与弃权理由全部写入运行记录，可重放、可重算。
+- **不配模型也能跑。** 没有配置任何大模型时，纯确定性内核仍能完成完整核查流程，功能不因缺模型而缺失。
+
+技术栈：Python 3.12 · PyMuPDF（PDF 解析与坐标定位）· 标准库 HTTP 服务（不依赖 Web 框架）· React + TypeScript（高级界面）· 原生 JavaScript（默认界面）· DeepSeek Harness 原生 Agent Loop
+
 唯一当前工程是本目录 **Light_Mirror**，版本为 **1.0.0.dev3 阶段候选**。计划书与任务手册只在 `docs/project/` 维护；实际验收说明在 `docs/acceptance/`，成品在 `artifacts/`，本地原始证据在 `evidence/`，外置材料在 `data/`。旧工程集中在工作区的 `存档/历史版本/`，不能作为另一个开发入口。
 
 普通用户下载 [当前 GitHub Release](https://github.com/M0onesy/Light_Mirror/releases/tag/mingjing-1.0.0.dev3)，解压后双击 `MingJing.exe`。本地对应入口为 `artifacts/program/MingJing.exe`。该程序保留原已冻结构建字节；本轮目录整理和辅助说明不构成新的金融验收或重打包。
@@ -22,7 +35,8 @@ Light_Mirror/
 ## 使用与任务
 
 ```powershell
-Set-Location -LiteralPath D:\Competition\金融人工智能竞赛\Light_Mirror
+git clone https://github.com/M0onesy/Light_Mirror.git
+Set-Location Light_Mirror
 python -m pip install -r requirements-build.lock
 python -m mingjing.launcher
 ```
