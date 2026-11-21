@@ -232,7 +232,7 @@ async function openItem(index) {
   $('#resultEmpty').hidden = true; $('#resultBody').hidden = false;
   $('#rHtml').href = base + '/report.html'; $('#rHtml').onclick = null;
   $('#rCsv').onclick = (e) => { e.preventDefault(); download(base + '/corrections.csv?download=1', `明镜修改清单-${item.company || 'report'}.csv`); };
-  $('#rZip').onclick = (e) => { e.preventDefault(); download(`/api/smart/runs/${run.run_id}/export`, `MingJing-${run.run_id}.zip`); };
+  $('#rZip').onclick = (e) => { e.preventDefault(); download(`/api/smart/runs/${run.run_id}/export`, `明镜-${run.run_id}.zip`); };
   $('#rCsv').hidden = data.task !== 'check';
   const rep = data.report || {};
   $('#rTitle').textContent = `${rep.company || '未识别公司'} · ${data.task === 'check' ? '研报核查' : '财报分析'}`;

@@ -8,8 +8,8 @@ import streamlit as st
 
 path = Path(os.environ.get("MINGJING_RESULTS", "results.json"))
 data = json.loads(path.read_text(encoding="utf-8"))
-st.set_page_config(page_title="明镜 MingJing", layout="wide")
-st.title("明镜 MingJing")
+st.set_page_config(page_title="明镜", layout="wide")
+st.title("明镜")
 st.caption(f"运行 ID：{data.get('run_id', '')}")
 summary = data.get("summary", {})
 cols = st.columns(3)

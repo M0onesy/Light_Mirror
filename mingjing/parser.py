@@ -907,7 +907,7 @@ def _extract_table_facts(pages, *, path, company, effective_period, doc_sha,
                     key = (page['page'], table_label, currency['currency'])
                     if not strict and key not in warned_currency:
                         import warnings
-                        warnings.warn('MingJing：币种未知或冲突的财报表段未进入事实库（页'
+                        warnings.warn('明镜：币种未知或冲突的财报表段未进入事实库（页'
                                       +str(page['page'])+'，币种'+currency['currency']+'）。', RuntimeWarning)
                         warned_currency.add(key)
             if '附注' in text and not _row_account(text) and len(text) < 150:

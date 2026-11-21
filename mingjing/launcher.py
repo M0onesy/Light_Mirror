@@ -154,10 +154,10 @@ def _startup_failure(paths: RuntimePaths, message: str) -> int:
     # Do not start a placeholder server that might be mistaken for a healthy
     # financial agent. A failed backend is a failed application startup.
     (paths.logs / "launcher.log").write_text(message + "\n", encoding="utf-8")
-    print("MingJing 启动失败：" + message, file=sys.stderr, flush=True)
+    print("明镜 启动失败：" + message, file=sys.stderr, flush=True)
     if os.name == "nt" and getattr(sys, "frozen", False) and os.environ.get("MINGJING_NO_BROWSER", "").lower() not in {"1", "true", "yes"}:
         import ctypes
-        ctypes.windll.user32.MessageBoxW(None, "明镜启动失败。\n" + message + "\n日志：" + str(paths.logs / "launcher.log"), "明镜 MingJing", 0x10)
+        ctypes.windll.user32.MessageBoxW(None, "明镜启动失败。\n" + message + "\n日志：" + str(paths.logs / "launcher.log"), "明镜", 0x10)
     return 1
 
 
@@ -195,7 +195,7 @@ def run(*, host: str | None = None, port: int | None = None, home: str | None = 
                 if record.get("url"):
                     if open_browser is not False and os.environ.get("MINGJING_NO_BROWSER", "").lower() not in {"1", "true", "yes"}:
                         webbrowser.open(str(record["url"]))
-                    print("MingJing 已在运行：" + str(record["url"]), flush=True)
+                    print("明镜 已在运行：" + str(record["url"]), flush=True)
                     return 0
             except (OSError, ValueError):
                 pass
@@ -225,7 +225,7 @@ def run(*, host: str | None = None, port: int | None = None, home: str | None = 
                                           "instance_id": instance_id, "version": __import__(__package__, fromlist=['__version__']).__version__})
         if selected_browser and os.environ.get("MINGJING_NO_BROWSER", "").lower() not in {"1", "true", "yes"}:
             webbrowser.open(url)
-        print(f"MingJing {__import__(__package__, fromlist=['__version__']).__version__} is running at {url}", flush=True)
+        print(f"明镜 {__import__(__package__, fromlist=['__version__']).__version__} is running at {url}", flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
@@ -259,7 +259,7 @@ def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         if stream is not None and hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")
-    parser = argparse.ArgumentParser(description="Start the MingJing local Web application")
+    parser = argparse.ArgumentParser(description="Start the MingJing local Web application (明镜)")
     parser.add_argument("--host", default=os.environ.get("MINGJING_HOST"))
     parser.add_argument("--port", type=int, default=int(os.environ["MINGJING_PORT"]) if os.environ.get("MINGJING_PORT") else None)
     parser.add_argument("--home", default=os.environ.get("MINGJING_HOME"))

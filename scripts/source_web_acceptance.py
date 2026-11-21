@@ -237,7 +237,7 @@ def execute(args):
                 'Actual smart workbench is missing its static security headers')
         checks['root_serves_smart_workbench'] = True
         smart_assets = []
-        for name in ('app.js', 'app.css', 'decimal.js'):
+        for name in ('app.js', 'app.css', 'decimal.js', 'logo.png'):
             raw = http.request('GET', '/smart/'+name)
             expected_raw = (ROOT/'web'/'smart'/name).read_bytes()
             require(raw == expected_raw, 'Served smart asset differs from source: '+name)

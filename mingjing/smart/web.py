@@ -36,7 +36,7 @@ import traceback
 import uuid
 import zipfile
 from pathlib import Path
-from urllib.parse import parse_qs, unquote
+from urllib.parse import parse_qs, quote, unquote
 
 from . import PIPELINE_VERSION
 from .docio import available_backends
@@ -459,7 +459,6 @@ class SmartService:
                     return _json(handler, 200, record)
                 if len(parts) == 4 and parts[3] == 'file' and method == 'GET':
                     raw = self.kb.validated_blob(doc_id).read_bytes()
-                    from urllib.parse import quote
                     return _send(handler, 200, raw, mimetypes.guess_type(record['name'])[0] or 'application/octet-stream',
                                  {'Content-Disposition': "attachment; filename*=UTF-8''" + quote(record['name'])})
                 if len(parts) == 5 and parts[3] == 'page' and method == 'GET':
@@ -549,7 +548,7 @@ class SmartService:
                                     for file in sorted(task.out.rglob('*')):
                                         if file.is_file() and not file.is_symlink():
                                             archive.write(file, f'{run_id}/native/{task.id}/{file.relative_to(task.out).as_posix()}')
-                    return _send(handler, 200, buffer.getvalue(), 'application/zip', {'Content-Disposition': f'attachment; filename="MingJing-{run_id}.zip"'})
+                    return _send(handler, 200, buffer.getvalue(), 'application/zip', {'Content-Disposition': 'attachment; filename="mingjing-' + run_id + '.zip"; filename*=UTF-8\'\'' + quote('明镜-' + run_id + '.zip')})
                 if len(parts) == 7 and parts[4] == 'items' and parts[6] == 'replay' and method == 'POST':
                     if not re.fullmatch(r'\d{2}-[\w\u4e00-\u9fff-]{1,40}', parts[5]):
                         raise ValueError('结果条目编号无效')

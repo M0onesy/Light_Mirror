@@ -1,7 +1,7 @@
 @echo off
 chcp 936 >nul
 rem ============================================================
-rem  明镜 MingJing 本地服务启动器
+rem  明镜 本地服务启动器
 rem  放置位置：Light_Mirror 仓库根目录（与本文件同级应有 mingjing 文件夹）
 rem  双击本文件即可启动；关闭本窗口即停止明镜服务。
 rem  脚本会自动查找 Python 并检查运行依赖，无需手工修改路径。
@@ -35,7 +35,7 @@ echo.
 
 rem 3) 确认当前目录是仓库根
 if not exist "mingjing\launcher.py" (
-    echo [错误] 当前目录不是 MingJing 仓库根目录：%CD%
+    echo [错误] 当前目录不是明镜仓库根目录：%CD%
     echo        请把本脚本放在 Light_Mirror 仓库根目录后再双击。
     echo.
     pause
@@ -57,7 +57,7 @@ if errorlevel 1 (
 
 echo.
 echo ============================================================
-echo   明镜 MingJing 正在启动...
+echo   明镜 正在启动...
 echo   工作目录 : %CD%
 echo   数据目录 : %LOCALAPPDATA%\MingJing   （平台默认，未改动）
 echo   ------------------------------------------------------------

@@ -4,13 +4,13 @@
   "files": [
     {
       "path": "web/smart/app.css",
-      "bytes": 16550,
-      "sha256": "b8e6e06040eb2dbcdeae7451a5b5afdc11d3f68b9fc431518ca3fc96d2f6d5d9"
+      "bytes": 16552,
+      "sha256": "a011e44f0ccc7d46d7531d45466c064ba67185c042ffd611e0bfcbe76df762e4"
     },
     {
       "path": "web/smart/app.js",
-      "bytes": 63513,
-      "sha256": "57ec17b62c54231ab2b9b9e1eeb8e0ad2cbc1680b3a551914e2b9af514e76f81"
+      "bytes": 63511,
+      "sha256": "ab4b9d0d584744e1979bd2af980147cc12014b62b24fb50c5b6bd3fd6404b0b4"
     },
     {
       "path": "web/smart/decimal.js",
@@ -19,10 +19,15 @@
     },
     {
       "path": "web/smart/index.html",
-      "bytes": 15983,
-      "sha256": "b1526aa80b35197c9b07e07e01ae68200f64a35353625ced14baabacd60ea6f4"
+      "bytes": 16083,
+      "sha256": "51bd1f6572b1cbf31ed3faa78a2a37e4f03c0443523fe4afec2728037f427fd7"
+    },
+    {
+      "path": "web/smart/logo.png",
+      "bytes": 26596,
+      "sha256": "e8bf0ee9ffc5dd988caf3ee0af263b741fc431f31d579ae18665027c660d9b74"
     }
   ],
-  "sha256": "b91e3f06f2e1f6c9f87160c3c02a0001407b0b9a213d5c812efb588bc49e1733",
-  "recorded_at": "2026-11-21T05:28:28.288148+00:00"
+  "sha256": "9884f586ded2ff2c3352007ed8e9a0fcf5d5157d04e50e582cb8ffdbf31f0321",
+  "recorded_at": "2026-11-21T06:05:19.080154+00:00"
 }
