@@ -1,6 +1,8 @@
 """Frozen Python source addresses must select the same text in both readers."""
+import pytest
+
 from mingjing.report import html_report
-from test_harness_web_ui import browser_page, ui_host
+from test_harness_web_ui import RETIRED_REASON, browser_page, ui_host
 
 
 def source_payload():
@@ -11,6 +13,7 @@ def source_payload():
             'source_span': {'start': 5, 'end': 11}, 'evidence': [], 'basis': []}]}
 
 
+@pytest.mark.skip(reason=RETIRED_REASON)  # 经典界面交互用例；本文件第二个用例只做纯渲染，仍需运行
 def test_harness_source_reader_preserves_supplementary_characters(ui_host, browser_page):
     _, base = ui_host
     page, errors, external = browser_page

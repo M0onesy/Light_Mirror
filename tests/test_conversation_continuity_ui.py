@@ -1,5 +1,9 @@
 """Real browser view continuity; controlled replies make no API-quality claim."""
-from test_harness_web_ui import browser_page, ui_host
+import pytest
+
+from test_harness_web_ui import RETIRED_REASON, browser_page, ui_host
+
+pytestmark = pytest.mark.skip(RETIRED_REASON)  # 经典界面已下线：收集期跳过，不再起服务
 
 
 def _host_routes(page):

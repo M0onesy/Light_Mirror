@@ -13,7 +13,7 @@
 - **每个结论都回得到原文。** 证据定位到 PDF 的页码与坐标，取数、口径判定与弃权理由全部写入运行记录，可重放、可重算。
 - **不配模型也能跑。** 没有配置任何大模型时，纯确定性内核仍能完成完整核查流程，功能不因缺模型而缺失。
 
-技术栈：Python 3.12 · PyMuPDF（PDF 解析与坐标定位）· 标准库 HTTP 服务（不依赖 Web 框架）· React + TypeScript（高级界面）· 原生 JavaScript（默认界面）· DeepSeek Harness 原生 Agent Loop
+技术栈：Python 3.12 · PyMuPDF（PDF 解析与坐标定位）· 标准库 HTTP 服务（不依赖 Web 框架）· React + TypeScript（高级界面已下线，源码保留在 `frontend/src/`，不再随产品提供入口）· 原生 JavaScript（唯一界面：工作台）· DeepSeek Harness 原生 Agent Loop
 
 唯一当前工程是本目录 **Light_Mirror**，版本为 **1.0.0.dev3 阶段候选**。计划书与任务手册只在 `docs/project/` 维护；实际验收说明在 `docs/acceptance/`，成品在 `artifacts/`，本地原始证据在 `evidence/`，外置材料在 `data/`。旧工程集中在工作区的 `存档/历史版本/`，不能作为另一个开发入口。
 

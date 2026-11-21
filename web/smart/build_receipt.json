@@ -9,8 +9,8 @@
     },
     {
       "path": "web/smart/app.js",
-      "bytes": 61072,
-      "sha256": "ad2aa60ebb90a9ca8494cecda164a54967460f33f058da72667975e9e7f445ce"
+      "bytes": 63513,
+      "sha256": "57ec17b62c54231ab2b9b9e1eeb8e0ad2cbc1680b3a551914e2b9af514e76f81"
     },
     {
       "path": "web/smart/decimal.js",
@@ -19,10 +19,10 @@
     },
     {
       "path": "web/smart/index.html",
-      "bytes": 16133,
-      "sha256": "c1cfcce4dad69e4240275a4f409c4ff692aec54fb152e42051840561ed71a0be"
+      "bytes": 15983,
+      "sha256": "b1526aa80b35197c9b07e07e01ae68200f64a35353625ced14baabacd60ea6f4"
     }
   ],
-  "sha256": "8fe4991d6f934e4bb15c88e94ec774a7f5f0796b5415c3a94ee3af7b25f70a6d",
-  "recorded_at": "2026-10-16T02:35:30.829525+00:00"
+  "sha256": "b91e3f06f2e1f6c9f87160c3c02a0001407b0b9a213d5c812efb588bc49e1733",
+  "recorded_at": "2026-11-21T05:28:28.288148+00:00"
 }

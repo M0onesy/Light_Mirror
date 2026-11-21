@@ -9,12 +9,13 @@ import os
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
 import pytest
 
-from test_harness_web_ui import browser_page, ui_host  # shared real-host/browser fixtures
+from test_harness_web_ui import NoRedirect, RETIRED_REASON, browser_page, ui_host  # shared real-host/browser fixtures
 
 
 def save_settings(page, title):
@@ -25,38 +26,57 @@ def save_settings(page, title):
     expect(page.get_by_role('button', name=title, exact=True)).to_be_enabled()
 
 
-def test_browser_launcher_settings_export_and_shutdown(tmp_path, browser_page):
+def test_launcher_home_isolation_config_export_and_shutdown(tmp_path):
+    """真实启动器：--home 隔离、导出脱敏、正常退出；已下线的界面只保留 302。
+
+    这是一个纯 HTTP 用例，不依赖浏览器：经典界面退役后它仍然每次都执行。
+    """
     home = tmp_path / 'profile'
     env = os.environ.copy()
     env.update(MINGJING_HOME=str(home), MINGJING_NO_BROWSER='1', PYTHONIOENCODING='utf-8')
-    child = subprocess.Popen([sys.executable, '-m', 'mingjing.launcher', '--home', str(home), '--no-browser'],
-                             cwd=Path(__file__).resolve().parents[1], env=env,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                             text=True, encoding='utf-8', errors='replace')
+    log = tmp_path / 'launcher.log'
+    with log.open('wb') as stream:
+        child = subprocess.Popen([sys.executable, '-m', 'mingjing.launcher', '--home', str(home), '--no-browser'],
+                                 cwd=Path(__file__).resolve().parents[1], env=env,
+                                 stdout=stream, stderr=subprocess.STDOUT)
     try:
         record = home / 'workspace' / 'server.json'
         deadline = time.monotonic() + 10
         while not record.exists() and child.poll() is None and time.monotonic() < deadline:
             time.sleep(.05)
-        assert record.exists(), child.communicate(timeout=1)[0]
-        base = json.loads(record.read_text(encoding='utf-8'))['url']
-        page, errors, external = browser_page
-        page.goto(base.rstrip('/') + '/classic')
-        page.get_by_role('button', name='新建金融任务', exact=True).wait_for()
-        page.get_by_role('button', name='设置', exact=True).click()
-        page.get_by_role('button', name='服务与安全', exact=True).click()
-        with page.expect_download() as downloaded:
-            page.get_by_role('button', name='导出配置', exact=True).click()
-        assert downloaded.value.suggested_filename == 'MingJing-config.json'
-        exported = json.loads(Path(downloaded.value.path()).read_text(encoding='utf-8'))
+        assert record.exists(), log.read_text(encoding='utf-8', errors='replace')
+        base = json.loads(record.read_text(encoding='utf-8'))['url'].rstrip('/')
+        # 回环直连：不走系统代理，302 保留给断言而不自动跟随
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+
+        def fetch(path, body=None):
+            request = urllib.request.Request(base + path, method='POST' if body is not None else 'GET', data=body,
+                                             headers={'Content-Type': 'application/json'} if body is not None else {})
+            try:
+                with opener.open(request, timeout=20) as response:
+                    return response.status, response.headers, response.read()
+            except urllib.error.HTTPError as error:
+                return error.code, error.headers, error.read()
+
+        # --home 隔离：服务记录与知识库根目录都落在本次临时目录内
+        assert record.parent == home / 'workspace'
+        status, _, raw = fetch('/api/smart/status')
+        assert status == 200, raw[:200]
+        assert Path(json.loads(raw)['kb']['root']).is_relative_to(home)
+        # 导出脱敏：配置可导出，密钥只报 omitted
+        status, _, raw = fetch('/api/config/export')
+        assert status == 200, raw[:200]
+        exported = json.loads(raw)
         assert exported['config']['version'] == 2
         assert exported['secrets'] == 'omitted'
-        assert not errors, errors
-        assert not external, external
-        req = urllib.request.Request(base.rstrip('/') + '/api/shutdown', method='POST', data=b'{}',
-                                     headers={'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=3) as response:
-            assert response.status == 202
+        # 高级界面已下线：首页、子路径与构建产物一律 302 到工作台，不再投递旧界面字节
+        for retired in ('/classic', '/harness', '/classic/index.html', '/harness/index.html',
+                        '/harness/assets/index-BZnw0XYu.js', '/harness/build_receipt.json',
+                        '/HARNESS/index.html', '/Harness/assets/index-BZnw0XYu.js', '/HARNESS/build_receipt.json'):
+            status, headers, body = fetch(retired)
+            assert (status, headers.get('Location'), body) == (302, '/smart/#work', b''), retired
+        status, _, raw = fetch('/api/shutdown', b'{}')
+        assert status == 202, raw
         assert child.wait(timeout=5) == 0
     finally:
         if child.poll() is None:
@@ -64,6 +84,7 @@ def test_browser_launcher_settings_export_and_shutdown(tmp_path, browser_page):
             child.wait(timeout=5)
 
 
+@pytest.mark.skip(reason=RETIRED_REASON)  # 经典界面交互用例，收集期即跳过
 def test_browser_provider_routes_partial_ledger_and_followup_controls(ui_host, browser_page):
     state, base = ui_host
     page, errors, external = browser_page

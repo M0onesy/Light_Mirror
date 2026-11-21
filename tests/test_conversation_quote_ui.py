@@ -2,7 +2,11 @@
 import base64
 from urllib.parse import parse_qs, unquote, urlparse
 
-from test_harness_web_ui import browser_page, ui_host
+import pytest
+
+from test_harness_web_ui import RETIRED_REASON, browser_page, ui_host
+
+pytestmark = pytest.mark.skip(RETIRED_REASON)  # 经典界面已下线：收集期跳过，不再起服务
 
 
 def test_long_source_reader_preserves_all_quotes_and_numeric_sections(ui_host, browser_page):

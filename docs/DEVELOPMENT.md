@@ -9,7 +9,7 @@ $env:MINGJING_HOME = 'D:\MingJingDevProfile'
 python -X utf8 -m mingjing.server --host 127.0.0.1 --port 8765 --no-browser
 ```
 
-首页为上传工作台；原生Harness高级界面为 `/harness`，`/classic` 保留兼容。使用隔离profile，避免改动真实用户DPAPI、配置和运行历史。模型与金融工具按真实保存路由执行，不加载上游任意Shell的完整profile。
+首页为上传工作台；高级界面已下线，`/harness` 与 `/classic` 均重定向到工作台。使用隔离profile，避免改动真实用户DPAPI、配置和运行历史。模型与金融工具按真实保存路由执行，不加载上游任意Shell的完整profile。
 
 源码、规则、UI与运行时来源放在原有英文目录。项目文档只维护 `docs/project/` 的原件，当前使用说明在 `docs/`；原始验收留在 `evidence/`，新构建与交付写入 `artifacts/`，私有原件及本地工作区放在 `data/`。不把缓存、依赖树、个人配置或模型响应推送到GitHub。
 

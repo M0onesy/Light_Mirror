@@ -3,9 +3,11 @@ import json
 
 import pytest
 
-from test_harness_web_ui import browser_page, ui_host
+from test_harness_web_ui import RETIRED_REASON, browser_page, ui_host
 from test_reparse_packets import source
 from test_reparse_web import frozen_parent
+
+pytestmark = pytest.mark.skip(RETIRED_REASON)  # 经典界面已下线：收集期跳过，不再起服务
 
 
 @pytest.mark.parametrize('status,title', [

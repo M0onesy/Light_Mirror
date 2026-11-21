@@ -1645,8 +1645,8 @@ class Handler(BaseHTTPRequestHandler):
                 _json(self, 200, {"config": self.state.config.public(), "exported_at": time.time(), "secrets": "omitted"}); return
             if path == "/" or path == "/index.html":
                 self.state.smart.static(self, "index.html"); return
-            if path in {"/classic", "/harness"}:
-                self._static("index.html"); return
+            if {"classic", "harness"} & {part.casefold() for part in PurePosixPath(path).parts[1:]}:  # 高级界面已下线：/classic、/harness 及其任何子路径（含大小写与 ../ 变体）一律回工作台
+                self.send_response(302); self.send_header("Location", "/smart/#work"); self.send_header("Content-Length", "0"); self.end_headers(); return
             self._static(path.removeprefix("/"))
         except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
             # Cancelling a fetch/closing a tab is normal. The socket cannot

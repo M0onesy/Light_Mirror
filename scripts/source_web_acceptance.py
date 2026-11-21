@@ -106,7 +106,7 @@ class HTTPProof:
                   'response_sha256': hashlib.sha256(raw).hexdigest(), 'response_bytes': len(raw),
                   'response_file': body_path.relative_to(self.out).as_posix(), 'content_type': content_type,
                   'response_headers': {key: value for key, value in response_headers.items()
-                                       if key.lower() in {'content-security-policy', 'x-content-type-options', 'cache-control', 'content-disposition'}}}
+                                       if key.lower() in {'content-security-policy', 'x-content-type-options', 'cache-control', 'content-disposition', 'location'}}}
         self.records.append(record)
         with (self.out/'http.jsonl').open('a', encoding='utf-8') as stream:
             stream.write(json.dumps(record, ensure_ascii=False)+'\n')
@@ -246,24 +246,22 @@ def execute(args):
             {'path': 'web/smart/index.html', 'sha256': hashlib.sha256(index).hexdigest(), 'bytes': len(index)},
             *smart_assets,
         ]
-        harness_index = http.request('GET', '/harness')
-        require(harness_index == (ROOT/'web'/'harness'/'index.html').read_bytes(), 'Served /harness HTML is not the actual Harness UI build')
-        require("script-src 'self'" in http.records[-1]['response_headers'].get('Content-Security-Policy', '')
-                and http.records[-1]['response_headers'].get('X-Content-Type-Options') == 'nosniff',
-                'Actual Harness UI is missing its static security headers')
-        checks['harness_serves_locked_ui'] = True
-        web_receipt = http.request('GET', '/build_receipt.json')
-        require(web_receipt == json.loads((ROOT/'web'/'harness'/'build_receipt.json').read_text(encoding='utf-8')),
-                'HTTP frontend receipt differs from the source build receipt')
-        for entry in web_receipt['outputs']:
-            path = entry['path'].removeprefix('web/harness/')
-            endpoint = '/harness' if path == 'index.html' else '/'+urllib.parse.quote(path, safe='/')
-            raw = http.request('GET', endpoint)
-            if isinstance(raw, dict):
-                raise ValueError('A frontend asset was unexpectedly returned as JSON')
-            require(hashlib.sha256(raw).hexdigest() == entry['sha256'] and len(raw) == entry['bytes'],
-                    'Served frontend asset differs from its build lock')
-        checks['all_served_frontend_assets_locked'] = len(web_receipt['outputs'])
+        for retired in ('/classic', '/harness'):
+            http.request('GET', retired, expected=302)
+            location = next((value for key, value in http.records[-1]['response_headers'].items()
+                             if key.lower() == 'location'), '')
+            require(location.startswith('/smart/'), f'{retired} did not redirect to the workbench: {location!r}')
+        checks['classic_ui_redirects_to_workbench'] = True
+        harness_receipt_path = ROOT/'web'/'harness'/'build_receipt.json'
+        require(harness_receipt_path.is_file(), 'Retired Harness UI build receipt is missing from disk')
+        harness_receipt = json.loads(harness_receipt_path.read_text(encoding='utf-8'))
+        require(harness_receipt.get('kind') == 'mingjing-harness-ui-build.v1' and harness_receipt.get('status') == 'built',
+                'Retired Harness UI build receipt is not a successful build record')
+        for entry in harness_receipt['outputs']:
+            asset = ROOT/entry['path']
+            require(asset.is_file() and asset.stat().st_size == entry['bytes'] and sha256_file(asset) == entry['sha256'],
+                    'Retired Harness UI asset differs from its build lock: '+entry['path'])
+        checks['harness_assets_locked_on_disk'] = True
         http.request('GET', '/api/health', headers={'Origin': 'https://untrusted.example'}, expected=401)
         http.request('GET', '/api/health', headers={'Host': 'untrusted.example'}, expected=401)
         config = http.request('GET', '/api/config')

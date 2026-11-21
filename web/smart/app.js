@@ -521,10 +521,43 @@ function openDrawer(cid) {
     ${(it.notes || []).length ? `<h4>提示</h4><ul class="small">${it.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
     ${(it.missing || []).length ? `<h4>缺少的材料</h4><ul class="small">${it.missing.map((m) => `<li>${esc(periodLabel(m.period))} ${esc(m.name || m.account)} ${esc(m.dimension || '')}</li>`).join('')}</ul>` : ''}
     ${reportPage(it)}
-    ${evidence.length ? `<h4>原文证据（财报）</h4><div class="evidence">${evidence.map((e) => `<div class="small muted">${esc(e)}</div>${canRenderEvidenceImage(e) ? `<img loading="lazy" alt="证据页" src="/api/kb/evidence/${encodeURIComponent(e)}.png">` : ''}`).join('')}</div>` : ''}`;
+    ${evidence.length ? `<h4>原文证据（财报）</h4><div class="evidence">${evidence.map((e) => `<div class="small muted">${esc(e)}</div>${canRenderEvidenceImage(e) ? `<img loading="lazy" alt="证据页" src="/api/kb/evidence/${encodeURIComponent(e)}.png">` : ''}`).join('')}</div>` : ''}
+    <h4>重放校验</h4><div class="small muted">用知识库登记的同一批冻结输入离线重算这条结果，只读原文件、不联网。</div>
+    <button class="btn" id="replayItem">重放这条</button><div class="small muted" id="replayResult"></div>`;
   $('#drawer').hidden = false;
   const copy = $('#copyFix'); if (copy) copy.onclick = () => navigator.clipboard.writeText(it.correction.replacement_text).then(() => toast('已复制'));
+  const replayButton = $('#replayItem'); if (replayButton) replayButton.onclick = () => replayItemResult(replayButton);
   $$('#dBody img').forEach((img) => img.addEventListener('error', () => { img.replaceWith(Object.assign(document.createElement('div'), { className: 'small muted', textContent: '当前环境无法渲染该页（需要 PyMuPDF 或 poppler）' })); }));
+}
+/* —— 条目级重放：沿用 openItem 选中的 run_id 与 item_id，后端只读原目录并逐条比较结论 —— */
+const REPLAY_STATUS = { different: '重算结果与原始不一致', failed: '重算结果与原始不一致', integrity_mismatch: '输入文件或产出与登记哈希不符',
+  incompatible_version: '金融代码或规则已变更', missing_inputs: '知识库缺少本次的原始输入' };
+function replayPath() {
+  const runId = (state.batch && state.batch.run_id) || state.run;
+  const itemId = (state.item && state.item.item_id) || '';
+  return runId && itemId ? `/api/smart/runs/${encodeURIComponent(runId)}/items/${encodeURIComponent(itemId)}/replay` : '';
+}
+function replaySentence(r) {
+  const diffs = Array.isArray(r.differences) ? r.differences.length : (r.differences ?? (r.diffs || []).length);
+  if (diffs > 0) return `重放发现 ${diffs} 处差异`;
+  // 差异为 0 但仍不通过时，先看完整性：replay.py 的收据在审计文件被追加/替换时会给出 integrity_issues，
+  // 这时报「重算不一致」会把人引到错误方向。
+  if (r.status === 'integrity_mismatch' || (r.integrity_issues || []).length) return '重放未通过：输入或产出与登记哈希不符';
+  if (['passed', 'identical'].includes(r.status)) return '重放通过：与原始结果一致，未联网';
+  return `重放未通过：${REPLAY_STATUS[r.status] || r.status || '状态未知'}`;
+}
+async function replayItemResult(button) {
+  const path = replayPath();
+  if (!path) { toast('缺少任务或结果条目编号，无法重放', 4000); return; }
+  const out = $('#replayResult');
+  button.disabled = true; button.textContent = '重放中…'; if (out) out.textContent = '';
+  try {
+    const r = await api(path, { method: 'POST' });
+    if (out) out.textContent = replaySentence(r);
+  } catch (err) {
+    if (out) out.textContent = '';
+    toast('重放失败：' + (err && err.message ? err.message : ''), 5000);
+  } finally { button.disabled = false; button.textContent = '重放这条'; }
 }
 $('#dClose').addEventListener('click', () => ($('#drawer').hidden = true));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('#drawer').hidden = true; closeModal(); } });
@@ -586,7 +619,7 @@ async function loadSettings() {
     state.provider = s.llm.provider_id || s.effective.provider || null;
     $('#sKeyLabel').textContent = s.llm.has_key ? 'API Key（已保存，留空则不修改）' : 'API Key';
     $('#sPersist').textContent = s.persistent ? '保存到本机配置，密钥进入系统安全存储' : '轻量模式：设置只在本次运行期间有效，不写盘';
-    $('#sEffective').textContent = s.effective.configured ? `当前生效：${s.effective.model}（来源：${s.effective.source === 'agent.routing' ? '高级界面的供应商路由' : '本页设置'}）` : '当前未启用模型：以纯确定性内核运行';
+    $('#sEffective').textContent = s.effective.configured ? `当前生效：${s.effective.model}（来源：${s.effective.source === 'agent.routing' ? '配置文件中的供应商路由' : '本页设置'}）` : '当前未启用模型：以纯确定性内核运行';
     $('#sSave').disabled = !s.writable;
     $('#sStatus').innerHTML = `<div>管线版本</div><div>${esc(st.pipeline)}</div><div>PDF 读取</div><div>${esc((st.pdf_backends || []).join('、') || '不可用')}</div>`
       + `<div>原页渲染</div><div>${esc(st.page_renderer || '不可用')}</div><div>知识库</div><div>${st.kb.documents} 份文件 · <span class="small muted">${esc(st.kb.root)}</span></div><div>任务</div><div>${st.runs} 个</div>`;

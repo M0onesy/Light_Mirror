@@ -686,7 +686,8 @@ class WebServiceTests(unittest.TestCase):
 
 
 class MainServerIntegrationTests(unittest.TestCase):
-    def test_new_home_page_classic_ui_and_smart_routes_on_main_server(self):
+    def test_new_home_page_and_smart_routes_on_main_server(self):
+        """主服务只提供工作台：首页与 /smart/ 直出，/classic 与 /harness 一律 302 回工作台。"""
         from mingjing import server
         tmp = Path(tempfile.mkdtemp(prefix='mj-main-'))
         old = os.environ.get('MINGJING_HOME')
@@ -701,9 +702,21 @@ class MainServerIntegrationTests(unittest.TestCase):
             def get(path):
                 with urllib.request.urlopen(base + path, timeout=20) as response:
                     return response.status, response.read().decode('utf-8', errors='replace')
+
+            def get_redirect(path):
+                """高级界面已下线：不跟随跳转，取原始状态码与 Location 头。"""
+                class NoRedirect(urllib.request.HTTPRedirectHandler):
+                    def redirect_request(self, req, fp, code, msg, headers, newurl):
+                        return None
+                try:
+                    urllib.request.build_opener(NoRedirect).open(base + path, timeout=20).close()
+                    return None, None
+                except urllib.error.HTTPError as exc:
+                    return exc.code, exc.headers.get('Location')
             self.assertIn('上传即核查', get('/')[1])
-            if (server.STATIC_ROOT / 'harness' / 'index.html').is_file():
-                self.assertIn('<div id="root">', get('/classic')[1])
+            for classic in ('/classic', '/harness'):
+                self.assertEqual(get_redirect(classic), (302, '/smart/#work'))
+                self.assertIn('上传即核查', get(classic)[1])
             self.assertEqual(json.loads(get('/api/kb')[1])['stats']['documents'], 0)
             self.assertEqual(json.loads(get('/api/health')[1])['status'], 'ok')
             self.assertEqual(json.loads(get('/api/runs')[1]).get('runs', []), [])

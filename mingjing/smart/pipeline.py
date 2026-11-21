@@ -522,7 +522,7 @@ def replay(item_dir: str | Path, kb: KnowledgeBase) -> dict:
                 'diffs': receipt.get('differences', []), 'network_calls': 0}
     missing = [row for row in manifest.get('inputs', []) if not kb.record(row['sha256'])]
     if missing:
-        return {'status': 'missing_inputs', 'missing': [row['name'] for row in missing]}
+        return {'status': 'missing_inputs', 'missing': [row['name'] for row in missing], 'network_calls': 0}
     for row in manifest.get('inputs', []):
         try:
             kb.validated_blob(row['sha256'])
@@ -580,6 +580,7 @@ def replay(item_dir: str | Path, kb: KnowledgeBase) -> dict:
     receipt = {'schema': 'mingjing-smart-replay.v1', 'run_id': payload['run_id'], 'task': payload['task'],
                'status': 'identical' if not diffs and same_summary else 'different', 'compared': compared, 'differences': len(diffs),
                'diffs': diffs[:50], 'inputs': [row['sha256'][:12] for row in manifest.get('inputs', [])],
-               'versions': {'recorded': payload.get('versions'), 'current': fresh.get('versions')}, 'replayed_at': time.strftime('%Y-%m-%d %H:%M:%S')}
+               'versions': {'recorded': payload.get('versions'), 'current': fresh.get('versions')}, 'replayed_at': time.strftime('%Y-%m-%d %H:%M:%S'),
+               'network_calls': 0}
     kb._journal('replayed', '', run_id=payload['run_id'], status=receipt['status'], differences=len(diffs))
     return receipt

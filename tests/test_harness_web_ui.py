@@ -3,16 +3,40 @@
 These are product flow checks, not mocked assertions about JSX. They never
 contact a model provider and use the built-in redistributable financial corpus.
 """
+import importlib.util
 import json
 import os
 import sys
 import threading
+import urllib.error
+import urllib.request
 from pathlib import Path
 from urllib.parse import urlparse
 
 import pytest
 
 from mingjing import server
+
+# 高级界面已下线（/classic 与 /harness 均 302 回工作台），这批浏览器用例永久不再适用：
+# 收集期直接跳过，不再为每条用例起一次服务。原因同时披露本机能否运行浏览器。
+RETIRED_REASON = ('经典界面已下线；浏览器用例本轮未执行（本机未安装 playwright）'
+                  if importlib.util.find_spec('playwright') is None
+                  else '经典界面已下线；浏览器用例不再适用（/classic 与 /harness 已重定向到工作台）')
+pytestmark = pytest.mark.skip(RETIRED_REASON)
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, message, headers, newurl):
+        return None
+
+
+def classic_ui_retired(base):
+    """高级界面已下线时 /classic 返回 302 跳转到工作台；此时浏览器用例不再适用。"""
+    try:
+        with urllib.request.build_opener(NoRedirect()).open(base.rstrip('/') + '/classic', timeout=5) as response:
+            return response.status == 302
+    except urllib.error.HTTPError as error:
+        return error.code == 302
 
 
 @pytest.fixture
@@ -24,14 +48,19 @@ def ui_host(tmp_path, monkeypatch):
     httpd = server.MingJingServer(('127.0.0.1', 0), state)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
-    yield state, f'http://127.0.0.1:{httpd.server_port}'
-    for task in state.tasks.values():
-        task.cancelled.set()
-        if task.thread:
-            task.thread.join(5)
-    httpd.shutdown()
-    httpd.server_close()
-    thread.join(2)
+    base = f'http://127.0.0.1:{httpd.server_port}'
+    try:
+        if classic_ui_retired(base):
+            pytest.skip(RETIRED_REASON)  # 模块级 pytestmark 已先跳过；这里保证 fixture 单独使用时口径一致
+        yield state, base
+    finally:
+        for task in state.tasks.values():
+            task.cancelled.set()
+            if task.thread:
+                task.thread.join(5)
+        httpd.shutdown()
+        httpd.server_close()
+        thread.join(2)
 
 
 @pytest.fixture
