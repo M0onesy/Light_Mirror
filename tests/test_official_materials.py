@@ -12,6 +12,8 @@ from mingjing.issuer_identity import same_issuer
     ('关于第一轮问询的回复', '问询回复'), ('关于第二轮问询的回复', '问询回复'),
     ('2022年年报更正公告', '更正公告'), ('招股说明书（注册稿）', '招股书'),
     ('2023年度审计报告及财务报表', '审计报告'), ('2023年年度报告摘要', None),
+    # 标题含“年度报告”但正文不是报告本身：业绩说明会/预告/提示性公告
+    ('2025年年度报告业绩说明会预告公告', None), ('2024年年度报告披露提示性公告', None),
 ])
 def test_collection_keeps_full_financial_disclosures(title, kind):
     assert material_type(title) == kind

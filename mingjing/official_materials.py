@@ -35,7 +35,9 @@ _MATERIAL_TYPES = (
 
 def material_type(title: str) -> str | None:
     clean = html.unescape(re.sub(r"<[^>]+>", "", title))
-    if re.search(r"摘要|英文版|取消|预约|提示性", clean):
+    # 排除“正文以外”的伴随公告：摘要/英文版是副本，取消/预约/提示性/说明会/预告
+    # 只是关于报告的会议或提示，标题里含“年度报告”但不是报告本身。
+    if re.search(r"摘要|英文版|取消|预约|提示性|说明会|预告", clean):
         return None
     return next((kind for kind, pattern in _MATERIAL_TYPES if re.search(pattern, clean)), None)
 

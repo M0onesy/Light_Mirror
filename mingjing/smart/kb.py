@@ -73,7 +73,16 @@ class KnowledgeBase:
     def _save(self, index: dict) -> None:
         temp = self.index_path.with_suffix('.tmp')
         temp.write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding='utf-8')
-        os.replace(temp, self.index_path)
+        # Windows 上杀毒/索引服务可能短暂持有刚写出的临时文件，os.replace 会抛
+        # PermissionError(WinError 5)。这里做短重试，避免一次瞬时占用打断整次核查。
+        for attempt in range(6):
+            try:
+                os.replace(temp, self.index_path)
+                return
+            except PermissionError:
+                if attempt == 5:
+                    raise
+                time.sleep(0.05 * (attempt + 1))
 
     def _journal(self, event: str, doc_id: str = '', **detail) -> None:
         with _LOCK:
