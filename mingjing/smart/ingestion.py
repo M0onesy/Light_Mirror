@@ -245,6 +245,8 @@ def smart_claims(path, text, pages, blocks, company, period, facts, policy, meta
                     score = sum(token in block['text'].replace(' ', '') for token in (item.row_label, item.metric_text) if token)
                     candidates.append((score, left, right - left, block))
             if not candidates:
+                # 数字无法在冻结原文中唯一定位（与相邻数字粘连，或与另一条声明共用同一处）。
+                # 该条按"未能定位"跳过，不让单条定位失败中断整次核查；条目数由 coverage 记录。
                 unmapped.append(item.cid)
                 continue
         _, start, length, block = max(candidates, key=lambda x: (x[0], -x[1]))
@@ -271,7 +273,9 @@ def smart_claims(path, text, pages, blocks, company, period, facts, policy, meta
                                   modality=item.modality, parse_status='parsed' if item.metric else 'unresolved',
                                   table_context=context, source_numeric_start=start - block['start']))
     if unmapped:
-        raise ValueError('智能声明无法定位到冻结原文 occurrence: ' + ', '.join(unmapped))
+        # 不再中断整次核查：单条数字定位失败只影响它自己，记录到模型统计里可追溯。
+        # （原先这里抛 ValueError，一份真实研报里 5 个数字定位失败就会让整份核查失败。）
+        model.stats['unlocated_claims'] = list(unmapped)
     return model, mapped
 
 
