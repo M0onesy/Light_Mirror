@@ -675,13 +675,16 @@ class WebServiceTests(unittest.TestCase):
         if has_pdf_backend() and (SAMPLES / 'seeded_errors.json').is_file():
             status, demo = self.call('POST', '/api/smart/demo', b'{}')
             self.assertEqual(status, 202)
-            deadline = time.time() + 120
+            # 一键演示要跑三份研报的原生任务，实测入库 13.6s + 三份 33/52/53s ≈ 163s（本机）。
+            # 原来的 120s 墙比它短，轮到机器慢一点就会在 state['batch'] 上 KeyError 假失败；
+            # 这里只放宽等待窗口，断言（三份、[6,8,9]）不动。
+            deadline = time.time() + 300
             while time.time() < deadline:
                 _, state = self.call('GET', '/api/smart/runs/' + demo['run_id'])
                 if state['status'] in ('completed', 'failed', 'cancelled'):
                     break
                 time.sleep(0.3)
-            self.assertEqual((state['status'], len(state['batch']['items'])), ('completed', 3))      # 一键演示：三份研报
+            self.assertEqual((state['status'], len(state.get('batch', {}).get('items', []))), ('completed', 3))      # 一键演示：三份研报
             self.assertEqual(sorted(i['totals']['violated'] for i in state['batch']['items']), [6, 8, 9])      # 23处预埋错误逐份检出
 
 

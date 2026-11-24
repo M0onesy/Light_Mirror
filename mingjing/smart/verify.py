@@ -41,6 +41,10 @@ ASSUMPTION_LABELS = {'scope': '默认合并口径', 'period': '期间按上下�
                      'drift': '估值取价日差异', 'text': '原文佐证（未经重算）', 'identity': '模板项按表内勾稽', 'version': '早期披露版本'}
 ABSTAIN_LABELS = {'X1': '缺少可用事实', 'X2': '公式前提不成立', 'X3': '指标/口径定义缺口', 'X4': '来源冲突或置信不足',
                   'X5': '缺回溯日期', 'X6': '主体或维度待确认'}
+# 图轴刻度被聚进正文版面行时留下的痕迹：数值后面紧跟成串的“年/月/日”刻度
+# （“…同比  -48% 2025/11/3  2026/3/3  2026/7/1  2026/10/29增长1,007.69%”）。
+# 正文陈述不会连续出现两个以上完整日期，据此可把那串数字归位到图上。
+_TICK_RUN = re.compile(r'[^\d\u4e00-\u9fff]*(?:20\d{2}\s*[/／-]\s*\d{1,2}\s*[/／-]\s*\d{1,2}[^\d\u4e00-\u9fff]*){2,}')
 SIBLINGS = {
     'NP': ['NP_PARENT', 'NP_PARENT_ADJ', 'PROFIT_TOTAL', 'OPERATING_PROFIT'], 'NP_PARENT': ['NP', 'NP_PARENT_ADJ', 'PROFIT_TOTAL'],
     'NP_PARENT_ADJ': ['NP_PARENT', 'NP'], 'REVENUE': ['TOTAL_REVENUE', 'MAIN_REVENUE', 'COST'], 'COST': ['TOTAL_COST', 'REVENUE'],
@@ -48,6 +52,13 @@ SIBLINGS = {
     'LIABILITIES': ['CURRENT_LIABILITIES', 'ASSETS'], 'CFO': ['CFI', 'CFF', 'CASH_EQUIVALENTS_CHANGE', 'NP'],
     'EPS': ['EPS_DILUTED', 'EPS_ADJ'], 'OPERATING_PROFIT': ['PROFIT_TOTAL', 'NP'], 'PROFIT_TOTAL': ['OPERATING_PROFIT', 'NP'],
     'CASH_FUNDS': ['CASH_EQUIVALENTS'], 'ROE': ['ROE_ADJ'], 'EXP_RD': ['RD_INVESTMENT'],
+}
+# 三表的层级勾稽：上级合计 = 下级小计之和。残差项是按「小计 − 已知明细」反推的，
+# 前提是本块没有漏列明细行；小计若在上一级勾稽中自洽，说明该前提不成立。
+PARENT_IDENTITIES = {
+    'BS': [(('负债合计',), ('流动负债', '非流动负债')),
+           (('资产总计',), ('流动资产', '非流动资产'))],
+    'CF': [(('现金净增加额',), ('经营活动现金流', '投资活动现金流', '筹资活动现金流'))],
 }
 
 
@@ -561,6 +572,25 @@ def _display(value: Decimal, claim: Claim) -> str:
     return fmt_amount(value, unit, claim.decimals if claim.decimals else (2 if unit in ('元', '倍', 'x', '') and abs(value) < 100 else 0))
 
 
+def figure_tick_run(claim: Claim) -> str:
+    """原文数值后面紧跟的那串图表刻度；没有则返回空串。
+
+    坐标后端按纵向重叠把文本聚成版面行，图内刻度会插进正文句子中间，使刻画标的
+    数字看上去像紧随其后。正文不会连续写出两个以上完整日期，据此把这种数值判为
+    图内标注：它的主语无从确定，应弃权而不是判错。
+    """
+    text, number = claim.text or '', (claim.num_text or '').strip()
+    if not text or not number or claim.kind != 'prose':
+        return ''
+    at = text.find(number)
+    if at < 0:
+        return ''
+    found = _TICK_RUN.match(text[at + len(number):])
+    if not found:
+        return ''
+    return re.sub(r'\s+', ' ', found[0]).strip(' ,，、;；:：')
+
+
 class Verifier:
     def __init__(self, facts: list[Fact], model: ReportModel, *, strict: bool = False, texts: list | None = None, hedge: str = '0.02',
                  drift: str = '0.03', doc_index: dict | None = None):
@@ -816,6 +846,13 @@ class Verifier:
             return result
         if not claim.period:
             result.abstain_code, result.reason = 'X6', '未能确定陈述对应的期间'
+            return result
+        ticks = figure_tick_run(claim)
+        if ticks:
+            result.abstain_code = 'X6'
+            result.reason = (f'原文“{claim.num_text}”后面紧跟图表刻度（{ticks}），数值与图内标注混排，'
+                             f'无法确认它属于{claim.metric_text or claim.metric or "该指标"}，不判定')
+            result.diagnosis = {'type': 'X6', 'detail': f'图轴刻度混入正文行：{ticks}'}
             return result
         if claim.relation == 'pp' and claim.metric not in RATIO_METRICS and claim.unit in ('百分点', 'pct', 'pp', 'bp'):
             result.abstain_code, result.reason = 'X6', '百分点变化未绑定到比率指标'
@@ -1270,6 +1307,29 @@ class Verifier:
         return ''
 
     # —— 表内勾稽：小计 = 明细之和；残差项随之确认 ——
+    def _parent_identity(self, table: str, total_label: str, period: str, index) -> str:
+        """同期间上一级勾稽是否自洽：自洽时返回该勾稽的算式，否则返回空串。
+
+        残差项按「小计 − 已列明细」反推，前提是本块没有漏列明细行。若该小计在
+        上一级勾稽中与兄弟小计相加正好等于上级合计（如 负债合计 = 流动负债 +
+        非流动负债），说明这张表自身自洽，缺口更可能来自恒等式未覆盖的明细行
+        （如租赁负债、应付债券），而不是某个已列数字算错——此时应弃权。
+        """
+        for (parent_label,), child_labels in PARENT_IDENTITIES.get(table, ()):
+            if total_label not in child_labels:
+                continue
+            parent = index.get((table, parent_label), {}).get(period)
+            children = [index.get((table, label), {}).get(period) for label in child_labels]
+            if parent is None or any(child is None for child in children):
+                continue
+            acc = IV(0)
+            for child in children:
+                acc = acc + child.interval()
+            if acc.intersects(parent.interval()):
+                return (f'{parent_label} = ' + ' + '.join(child_labels)
+                        + f'（{parent.num_text} = ' + ' + '.join(child.num_text for child in children) + '）')
+        return ''
+
     def _identity_checks(self, results: list[Result]):
         by_cid = {r.cid: r for r in results}
         claims = [c for c in self.model.claims if c.kind == 'table']
@@ -1336,9 +1396,22 @@ class Verifier:
                                 r.notes.append('券商模板聚合/残差项无法定同名科目，按“小计=明细之和”在表内勾稽一致')
                                 assume(r, 'identity', '券商模板聚合/残差项没有法定同名科目，按“小计=明细之和”在表内勾稽')
                             elif member.metric in ('RESIDUAL',):
-                                r.status, r.basis, r.error_type = 'violated', 'identity', 'E5'
-                                r.reason = f'表内勾稽不平：{total_label} ≠ ' + ' + '.join(parts)
-                                r.diagnosis = {'type': 'E5', 'detail': r.reason}
+                                corroboration = self._parent_identity(table, total_label, period, index)
+                                if not corroboration:
+                                    r.status, r.basis, r.error_type = 'violated', 'identity', 'E5'
+                                    r.reason = f'表内勾稽不平：{total_label} ≠ ' + ' + '.join(parts)
+                                    r.diagnosis = {'type': 'E5', 'detail': r.reason}
+                                else:
+                                    # 小计与已列明细不符，但小计本身在上一级勾稽中自洽：
+                                    # 缺口来自恒等式未覆盖的明细行（如租赁负债），不判错。
+                                    r.status, r.basis, r.error_type = 'unverifiable', 'identity', ''
+                                    r.abstain_code = 'X3'
+                                    r.diagnosis = {'type': 'X3', 'detail': corroboration}
+                                    r.reason = (f'表内小计与已列明细不符：{total_label} ≠ ' + ' + '.join(parts)
+                                                + f'；同期间{corroboration}，缺口疑为恒等式未覆盖的明细行，不判定')
+                                    r.notes.append(f'残差项按“小计=明细之和”反推得 {r.expected_display or r.expected}，'
+                                                   f'与表内 {member.num_text} 不符，但{corroboration}')
+                                    assume(r, 'identity', '小计在上一级勾稽中自洽，缺口来自未纳入恒等式的明细行')
 
     # —— 文本佐证：在已入库材料原文里找“同一数值 + 语境关键词” ——
     def _text_evidence(self, claim: Claim, result: Result, reason: str) -> Result:

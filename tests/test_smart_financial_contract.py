@@ -1,6 +1,7 @@
 """Financial counterexamples from the delivery audit, using in-memory inputs."""
 import hashlib
 import unittest
+from dataclasses import replace
 from decimal import Decimal, localcontext
 
 from mingjing.models import Fact
@@ -10,7 +11,7 @@ from mingjing.smart.common import IV, quantum
 from mingjing.smart.detect import DocMeta
 from mingjing.smart.docio import Document, Page, rows_from_layout_text
 from mingjing.smart.tables import extract_filing_facts
-from mingjing.smart.verify import Verifier, registered_definitions, summarize, verify_model
+from mingjing.smart.verify import Verifier, figure_tick_run, registered_definitions, summarize, verify_model
 
 
 def fact(value, account='REVENUE', period='2023Y', **overrides):
@@ -284,6 +285,35 @@ class ProvenanceAndInternalTests(unittest.TestCase):
                  {**shared, 'text': '2023年合并报表营业收入为2.00亿元。'}]
         self.assertEqual(verify_model([], m, texts=texts)[0].status, 'verified')
 
+    def test_single_quarter_header_binds_quarter_not_year(self):
+        """季报“本报告期（2026年7-9月）｜上年同期（2025年7-9月）”必须绑成单季。
+
+        版面把表头拆成“本报告期 上年同期 / 项目 / (2026年7-9月) (2025年7-9月)”三行，
+        月份区间若退化成年度，单季利润表数据就会被当成全年值，进而在增长率勾稽里
+        顶掉年报的真实全年基期（真实案例：2026 三季报 p3，营收 276,360,399.94 是
+        2025 年 7-9 月，不是 2025 年全年）。
+        """
+        text = ('第二节  公司基本情况\n'
+                '一、  主要财务数据\n'
+                '单位：元\n'
+                '本报告期  上年同期  本报告期比上年\n'
+                '项目\n'
+                '(2026年7-9月)  (2025年7-9月)  同期增减比例%\n'
+                '营业收入  600691926.83  276360399.94  117.36%\n'
+                '归属于上市公司股东的净利润  36879290.17  3329384.38  1007.69%\n')
+        doc = Document('/virtual/quarterly.txt', 'quarterly.txt', 'd' * 64, 'text', 'text',
+                       [Page(1, rows_from_layout_text(1, text), text)])
+        facts, _ = extract_filing_facts(doc, DocMeta(company='测试公司', doc_type='quarterly_report',
+                                                     period='20269M', report_date='2026-11-01'))
+        revenue = {f.period: f.value for f in facts if f.account == 'REVENUE' and f.source_relation == 'value'}
+        self.assertEqual(revenue, {'2026Q3': Decimal('600691926.83'), '2025Q3': Decimal('276360399.94')})
+        self.assertEqual({f.period: f.value for f in facts if f.account == 'NP_PARENT' and f.source_relation == 'value'},
+                         {'2026Q3': Decimal('36879290.17'), '2025Q3': Decimal('3329384.38')})
+        # 单季表不得再产出年度事实，否则会盖掉年报的全年值
+        self.assertFalse([f for f in facts if f.account in ('REVENUE', 'NP_PARENT') and f.period.endswith('Y')])
+        self.assertEqual([(f.period, f.value) for f in facts if f.account == 'REVENUE' and f.source_relation == 'yoy'],
+                         [('2026Q3', Decimal('1.1736'))])
+
     def test_split_month_header_preserves_intervening_annual_columns(self):
         text = ('合并利润表\n'
                 '                  2023年1月\n'
@@ -343,6 +373,67 @@ class ProvenanceAndInternalTests(unittest.TestCase):
         self.assertEqual(results[0].abstain_code, 'X1')
         self.assertEqual(results[0].internal_check, '表内小计与明细一致')
         self.assertEqual(results[4].status, 'verified')
+
+    @staticmethod
+    def bs_claims(total_liabilities: int, period: str = '2025Y'):
+        """最小的资产负债表：流动/非流动负债小计、非流动负债的两条登记明细与负债合计。
+
+        非流动负债 550 = 长期借款 421 + 租赁负债 58（未登记 metric，进不了恒等式）
+        + 其他非流动负债 72，差 1 为四舍五入，即表本身是平的。
+        """
+        rows = [('流动负债', 'CURRENT_LIABILITIES', 1212, 'core'),
+                ('非流动负债', 'NONCURRENT_LIABILITIES', 550, 'core'),
+                ('长期借款', 'LONG_TERM_BORROWING', 421, 'core'),
+                ('其他非流动负债', 'RESIDUAL', 72, 'template'),
+                ('负债合计', 'LIABILITIES', total_liabilities, 'core')]
+        return [Claim(cid=f'c{index}', kind='table', metric=metric, period=period, table='BS', row_label=label,
+                      value=str(value * 1000000), num_text=str(value), unit='百万元', decimals=0, category=category)
+                for index, (label, metric, value, category) in enumerate(rows)]
+
+    def test_missing_detail_line_with_consistent_parent_total_abstains(self):
+        # 小计与已列明细不符，但 负债合计 = 流动负债 + 非流动负债 自洽：
+        # 缺口来自恒等式未覆盖的明细行（租赁负债），属口径缺口，不得判为计算错误。
+        results = verify_model([], ReportModel(DocMeta(company='测试公司'), self.bs_claims(1762), [], {}, {}))
+        residual = results[3]
+        self.assertEqual((residual.status, residual.abstain_code), ('unverifiable', 'X3'))
+        self.assertEqual(residual.error_type, '')
+        self.assertEqual(residual.internal_check, '表内小计与明细不一致')
+        self.assertIn('负债合计 = 流动负债 + 非流动负债', residual.reason)
+        self.assertIn('不判定', residual.reason)
+        self.assertTrue(any(item['code'] == 'identity' for item in residual.assumptions))
+        self.assertEqual(residual.expected, '129000000')
+
+    def test_missing_detail_line_with_inconsistent_parent_total_is_still_violated(self):
+        # 合计 1,900 ≠ 1,212 + 550：缺口既解释不成漏列明细行，也落在残差项上，
+        # 仍按表内计算不平判错——修复弃权后不能把所有勾稽都放过。
+        results = verify_model([], ReportModel(DocMeta(company='测试公司'), self.bs_claims(1900), [], {}, {}))
+        residual = results[3]
+        self.assertEqual((residual.status, residual.error_type), ('violated', 'E5'))
+        self.assertEqual(residual.abstain_code, '')
+        self.assertEqual(residual.reason, '表内勾稽不平：非流动负债 ≠ 长期借款 + 其他非流动负债')
+
+    def test_figure_tick_run_is_abstained_instead_of_flagged(self):
+        """图轴刻度混进正文行时，紧邻刻度的数值归属无从确定：弃权，而不是判错。
+
+        真实案例：研报首页把 5pt 的图轴刻度与 10.6pt 的正文按纵向重叠聚成同一版面
+        行，“同比 -48% 2025/11/3 2026/3/3 2026/7/1”里的 -48% 是图内标注，却被当成
+        归母净利润的同比，与同句披露的 1,007.69% 冲突而误判 E5。
+        """
+        contaminated = ('2026Q3 公司实  -34% -41%现营收6.01 亿元,同比增长117.36%；'
+                        '归母净利润3,687.93 万元,同比  -48% 2025/11/3  2026/3/3  2026/7/1  2026/10/29增长1,007.69%')
+        claim = Claim(cid='c1', kind='prose', page=1, text=contaminated, num_text='-48%', value='-0.48',
+                      unit='%', decimals=2, metric='NP_PARENT', metric_text='归母净利润', relation='yoy',
+                      period='2026Q3', category='core')
+        result = verify_model([], ReportModel(DocMeta(company='测试公司'), [claim], [], {}, {}))[0]
+        self.assertEqual((result.status, result.abstain_code, result.error_type), ('unverifiable', 'X6', ''))
+        self.assertIn('图表刻度', result.reason)
+        self.assertIn('2025/11/3', result.reason)
+        # 同一行里不挨着刻度的数值照常核验：不能因为一行有刻度就把整行放过
+        self.assertEqual(figure_tick_run(replace(claim, cid='c2', num_text='6.01', relation='value')), '')
+        # 正文里被引用的单个日期不是刻度，不触发弃权
+        self.assertEqual(figure_tick_run(replace(claim, text='归母净利润同比下降48%，公司于2026/3/3披露业绩快报。')), '')
+        # 表格单元格（非正文行）不走这条判定
+        self.assertEqual(figure_tick_run(replace(claim, kind='table')), '')
 
     def test_analysis_uses_same_company_and_conflict_admission(self):
         result = analyze([fact(100000000), fact(90000000), fact(150000000, company='其他公司')], '测试公司')
