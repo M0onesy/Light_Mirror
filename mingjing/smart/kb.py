@@ -212,6 +212,18 @@ class KnowledgeBase:
                 self._save(index)
                 self.session['dedupe_hits'] += 1
                 self._journal('dedupe_hit', digest, name=name, origin=origin)
+                if not record.get('report_date') and not record.get('user_meta', {}).get('report_date'):
+                    # 首次入库时识别不出的日期（例如年报的汉字数字签署日）在识别规则变得可见后
+                    # 不会自动出现；重复上传同一文件时补一次识别，把缺口填上，用户不必手动改。
+                    try:
+                        meta = detect(self.document(digest), hints=record.get('user_meta') or {})
+                        if meta.report_date:
+                            record['report_date'] = meta.report_date
+                            record['signals'] = meta.signals
+                            self._save(index)
+                            self._journal('meta_refreshed', digest, report_date=meta.report_date)
+                    except Exception:            # 补齐失败不影响这次上传本身
+                        pass
                 return {**record, 'duplicate': True}
             target = self.blob_path(digest, ext)
             if not stored and not target.is_file():

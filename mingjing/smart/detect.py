@@ -57,6 +57,35 @@ def _dates(text: str) -> list[str]:
     return [value for value in found if value]
 
 
+_CN_DIGIT = {'〇': 0, '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9}
+_CN_RUN = r'[〇零一二三四五六七八九十]'
+
+
+def _cn_number(text: str) -> int:
+    """把 四/十二/三十一 这类汉字计数转成整数；无法确定时返回 0，不做猜测。"""
+    if not text:
+        return 0
+    if '十' not in text:
+        return _CN_DIGIT.get(text, 0) if len(text) == 1 else 0
+    head, _, tail = text.partition('十')
+    tens = 1 if not head else _CN_DIGIT.get(head, 0)
+    return tens * 10 + (0 if not tail else _CN_DIGIT.get(tail, 0))
+
+
+def _cn_dates(text: str) -> list[str]:
+    """识别汉字数字书写的日期（审计报告签署日惯例写作「二〇二六年四月二日」）。
+
+    年份逐位书写，月/日按中文计数；越界值由 _iso 直接丢弃，不做补猜。
+    """
+    found = []
+    for match in re.finditer(r'([〇零一二三四五六七八九]{4})\s*年\s*(' + _CN_RUN + r'{1,3})\s*月\s*(' + _CN_RUN + r'{1,3})\s*日', text):
+        year = ''.join(str(_CN_DIGIT[ch]) for ch in match.group(1))
+        value = _iso(year, _cn_number(match.group(2)), _cn_number(match.group(3)))
+        if value:
+            found.append(value)
+    return found
+
+
 def _pdf_date(doc: Document, period: str) -> str:
     """Read a plausible PDF creation date for diagnostics, never disclosure proof."""
     if doc.kind != 'pdf':
@@ -236,6 +265,16 @@ def detect(doc: Document, *, hints: dict | None = None) -> DocMeta:
                     later = [d for d in later if d[:4] == str(int(meta.period[:4]) + 1)]
                 if later:
                     meta.report_date = max(later)
+                else:
+                    # 年报的审计报告签署日惯例写作汉字数字（如「二〇二六年四月二日」），
+                    # 且位于文档中部而不在首页/尾页，上面的阿拉伯数字检索必然落空。
+                    # 该日期即董事会批准报出日，作为披露日取最大值（越晚越保守）。
+                    signed = _cn_dates('\n'.join(page.flow for page in doc.pages))
+                    if meta.period.endswith('Y'):
+                        signed = [d for d in signed if d[:4] == str(int(meta.period[:4]) + 1)]
+                    if signed:
+                        meta.report_date = max(signed)
+                        meta.signals.append('年报签署日（董事会批准报出日）作为披露日：' + meta.report_date)
         if not meta.period and meta.doc_type != 'facts_json':
             title = _FILING_TITLE.search(compact(name))
             if title:
